@@ -1,0 +1,32 @@
+{
+    "name": "warlof/seat-teamspeak",
+    "description": "This plugin provide an extension to the standard SeAT character Job which handle automatic graduation for Teamspeak user",
+    "type": "seat-plugin",
+    "autoload":{
+        "psr-4":{
+            "Seat\\Warlof\\Teamspeak\\": "src/"
+        }
+    },
+    "require": {
+        "eveseat/services": "^1.0",
+        "eveseat/eveapi": "^1.0",
+        "eveseat/web": "^1.0",
+        "erusev/parsedown": "^1.6",
+        "planetteamspeak/ts3-php-framework": "^1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8",
+        "orchestra/testbench": "~3.0",
+        "codeclimate/php-test-reporter": "dev-master",
+        "satooshi/php-coveralls": "^1.0",
+        "codacy/coverage": "dev-master"
+    },
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Warlof Tutsimo",
+            "email": "loic.leuilliot@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
