@@ -10,7 +10,7 @@ return [
     'quick_create' => 'Quick create',
     'type' => 'Type',
     'username' => 'Username',
-    'channel' => 'Server Groups',
+    'group' => 'Server Groups',
     'add' => 'Add',
     'authorisations' => 'Authorisations',
     'user_filter' => 'User Filter',

@@ -67,7 +67,7 @@ class TeamspeakController extends Controller
     
     public function getLogs()
     {
-        $logs = TeamspeakLog::all();
+        $logs = TeamspeakLog::orderBy('created_at', 'desc')->take(30)->get();
 
         return view('teamspeak::logs', compact('logs'));
     }

@@ -32,7 +32,13 @@ class TeamspeakReceptionist extends AbstractTeamspeak
                 $userInfo = $this->getTeamspeak()->clientGetByUid($teamspeakUser->teamspeak_id, true);
 
                 $allowedGroups = $this->allowedGroups($teamspeakUser, true);
-                $memberOfGroups = $this->getTeamspeak()->clientGetServerGroupsByDbid($userInfo->client_database_id);
+                $teamspeakGroups = $this->getTeamspeak()->clientGetServerGroupsByDbid($userInfo->client_database_id);
+
+                $memberOfGroups = [];
+                foreach ($teamspeakGroups as $g) {
+                    $memberOfGroups[] = $g['sgid'];
+                }
+
                 $missingGroups = array_diff($allowedGroups, $memberOfGroups);
 
                 if (!empty($missingGroups)) {

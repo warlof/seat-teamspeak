@@ -62,8 +62,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="teamspeak-channel-id">{{ trans('teamspeak::seat.channel') }}</label>
-                        <select name="teamspeak-channel-id" id="teamspeak-channel-id" class="col-md-12">
+                        <label for="teamspeak-group-id">{{ trans('teamspeak::seat.group') }}</label>
+                        <select name="teamspeak-group-id" id="teamspeak-group-id" class="col-md-12">
                             @foreach($groups as $group)
                             <option value="{{ $group->id }}">{{ $group->name }}</option>
                             @endforeach
@@ -117,7 +117,7 @@
                         <thead>
                         <tr>
                             <th></th>
-                            <th>{{ trans('teamspeak::seat.channel') }}</th>
+                            <th>{{ trans('teamspeak::seat.group') }}</th>
                             <th>{{ trans('teamspeak::seat.created') }}</th>
                             <th>{{ trans('teamspeak::seat.updated') }}</th>
                             <th>{{ trans('teamspeak::seat.status') }}</th>
@@ -149,7 +149,7 @@
                         <thead>
                         <tr>
                             <th>{{ trans('teamspeak::seat.username') }}</th>
-                            <th>{{ trans('teamspeak::seat.channel') }}</th>
+                            <th>{{ trans('teamspeak::seat.group') }}</th>
                             <th>{{ trans('teamspeak::seat.created') }}</th>
                             <th>{{ trans('teamspeak::seat.updated') }}</th>
                             <th>{{ trans('teamspeak::seat.status') }}</th>
@@ -181,7 +181,7 @@
                         <thead>
                         <tr>
                             <th>{{ trans('teamspeak::seat.role') }}</th>
-                            <th>{{ trans('teamspeak::seat.channel') }}</th>
+                            <th>{{ trans('teamspeak::seat.group') }}</th>
                             <th>{{ trans('teamspeak::seat.created') }}</th>
                             <th>{{ trans('teamspeak::seat.updated') }}</th>
                             <th>{{ trans('teamspeak::seat.status') }}</th>
@@ -213,7 +213,7 @@
                         <thead>
                         <tr>
                             <th>{{ trans('teamspeak::seat.corporation') }}</th>
-                            <th>{{ trans('teamspeak::seat.channel') }}</th>
+                            <th>{{ trans('teamspeak::seat.group') }}</th>
                             <th>{{ trans('teamspeak::seat.created') }}</th>
                             <th>{{ trans('teamspeak::seat.updated') }}</th>
                             <th>{{ trans('teamspeak::seat.status') }}</th>
@@ -245,7 +245,7 @@
                         <thead>
                         <tr>
                             <th>{{ trans('teamspeak::seat.alliance') }}</th>
-                            <th>{{ trans('teamspeak::seat.channel') }}</th>
+                            <th>{{ trans('teamspeak::seat.group') }}</th>
                             <th>{{ trans('teamspeak::seat.created') }}</th>
                             <th>{{ trans('teamspeak::seat.updated') }}</th>
                             <th>{{ trans('teamspeak::seat.status') }}</th>
@@ -289,7 +289,7 @@
             });
         }).select2();
 
-        $('#teamspeak-user-id, #teamspeak-role-id, #teamspeak-corporation-id, #teamspeak-alliance-id, #teamspeak-channel-id').select2();
+        $('#teamspeak-user-id, #teamspeak-role-id, #teamspeak-corporation-id, #teamspeak-alliance-id, #teamspeak-group-id').select2();
 
         $('#teamspeak-tabs a').click(function(e){
             e.preventDefault();

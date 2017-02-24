@@ -41,7 +41,8 @@ class TeamspeakGroupsUpdate extends Command
 
         $tsServer = TeamspeakHelper::connect($tsUsername, $tsPassword, $tsHostname, $tsServerQuery, $tsServerPort);
 
-        $groups = $tsServer->serverGroupList();
+        // type : {0 = template, 1 = normal, 2 = query}
+        $groups = $tsServer->serverGroupList(['type' => 1]);
 
         foreach ($groups as $group) {
             $teamspeakGroup = TeamspeakGroup::find($group->sgid);

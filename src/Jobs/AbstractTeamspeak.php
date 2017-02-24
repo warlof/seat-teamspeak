@@ -157,7 +157,7 @@ abstract class AbstractTeamspeak
                         'character_character_sheets.characterID')
                     ->join('eve_api_keys', 'eve_api_keys.key_id', '=', 'account_api_key_info_characters.keyID')
                     ->where('eve_api_keys.user_id', $teamspeakUser->user_id)
-                    ->where('teamspeak_groups.is_group', (int) $private)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
                     ->select('group_id')
             )->union(
                 TeamspeakGroupPublic::join('teamspeak_groups', 'teamspeak_group_public.group_id', '=', 'teamspeak_groups.id')

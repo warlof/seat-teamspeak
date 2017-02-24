@@ -19,7 +19,7 @@ class AddRelation extends Request
             'teamspeak-role-id' => 'string',
             'teamspeak-corporation-id' => 'string',
             'teamspeak-alliance-id' => 'string',
-            'teamspeak-channel-id' => 'required|string',
+            'teamspeak-group-id' => 'required|string',
             'teamspeak-enabled' => 'boolean'
         ];
     }
