@@ -10,7 +10,6 @@
         </div>
         <div class="panel-body">
             <form role="form" action="{{ route('teamspeak.configuration.post') }}" method="post" class="form-horizontal">
-                {{ csrf_field() }}
 
                 <div class="box-body">
 
@@ -25,6 +24,7 @@
                                 @else
                                 <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" value="{{ $tsHostname }}" />
                                 @endif
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="hostname-eraser">
                                         <i class="fa fa-eraser"></i>

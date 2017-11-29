@@ -5,6 +5,7 @@ namespace Seat\Warlof\Teamspeak;
 use Illuminate\Support\ServiceProvider;
 use Seat\Warlof\Teamspeak\Commands\TeamspeakLogsClear;
 use Seat\Warlof\Teamspeak\Commands\TeamspeakUpdate;
+use Seat\Warlof\Teamspeak\Commands\TeamspeakCheck;
 use Seat\Warlof\Teamspeak\Commands\TeamspeakGroupsUpdate;
 
 class TeamSpeakServiceProvider extends ServiceProvider
@@ -44,6 +45,7 @@ class TeamSpeakServiceProvider extends ServiceProvider
     {
         $this->commands([
             TeamspeakUpdate::class,
+            TeamspeakCheck::class,
             TeamspeakGroupsUpdate::class,
             TeamspeakLogsClear::class
         ]);

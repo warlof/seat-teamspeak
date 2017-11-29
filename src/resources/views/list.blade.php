@@ -10,7 +10,8 @@
         </div>
         <div class="panel-body">
             <form role="form" action="{{ route('teamspeak.add') }}" method="post">
-                {{ csrf_field() }}
+            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+
 
                 <div class="box-body">
 
@@ -21,6 +22,7 @@
                             <option value="role">{{ trans('teamspeak::seat.role_filter') }}</option>
                             <option value="corporation">{{ trans('teamspeak::seat.corporation_filter') }}</option>
                             <option value="alliance">{{ trans('teamspeak::seat.alliance_filter') }}</option>
+                            <option value="title">{{ trans('teamspeak::seat.title_filter') }}</option>
                             <option value="public">{{ trans('teamspeak::seat.public_filter') }}</option>
                         </select>
                     </div>
@@ -59,6 +61,11 @@
                             <option value="{{ $alliance->allianceID }}">{{ $alliance->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="teamspeak-title-id">{{ trans('teamspeak::seat.title') }}</label>
+                        <select name="teamspeak-title-id" id="teamspeak-title-id" class="col-md-12" disabled="disabled"></select>
                     </div>
 
                     <div class="form-group">
@@ -102,6 +109,9 @@
                 </li>
                 <li role="presentation">
                     <a href="#teamspeak-role">{{ trans('teamspeak::seat.role_filter') }}</a>
+                </li>
+                <li role="presentation">
+                    <a href="#teamspeak-title">{{ trans('teamspeak::seat.title_filter') }}</a>
                 </li>
                 <li role="presentation">
                     <a href="#teamspeak-corporation">{{ trans('teamspeak::seat.corporation_filter') }}</a>
@@ -208,7 +218,41 @@
                         </tbody>
                     </table>
                 </div>
-                <div role="tabpanel" class="tab-pane" id="teamspeak-corporation">
+                <div role="tabpanel" class="tab-pane" id="teamspeak-title">
+                    <table class="table table-condensed table-hover table-responsive">
+                        <thead>
+                        <tr>
+                            <th>{{ trans('teamspeak::seat.corporation') }}</th>
+                            <th>{{ trans('teamspeak::seat.title') }}</th>
+                            <th>{{ trans('teamspeak::seat.group') }}</th>
+                            <th>{{ trans('teamspeak::seat.created') }}</th>
+                            <th>{{ trans('teamspeak::seat.updated') }}</th>
+                            <th>{{ trans('teamspeak::seat.status') }}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($groupTitles as $group)
+                            <tr>
+                                <td>{{ $group->corporation->corporationName }}</td>
+                                <td>{{ strip_tags($group->title->titleName) }}</td>
+                                <td>{{ $group->group->name }}</td>
+                                <td>{{ $group->created_at }}</td>
+                                <td>{{ $group->updated_at }}</td>
+                                <td>{{ $group->enable }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ route('teamspeak.title.remove', ['corporation_id' => $group->corporation_id, 'title_id' => $group->title_id, 'group_id' => $group->group_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                            {{ trans('web::seat.remove') }}
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+               <div role="tabpanel" class="tab-pane" id="teamspeak-corporation">
                     <table class="table table-condensed table-hover table-responsive">
                         <thead>
                         <tr>
@@ -277,23 +321,53 @@
     </div>
 @stop
 
-@section('javascript')
+@push('javascript')
     <script type="application/javascript">
+        function getCorporationTitle() {
+            console.debug('in');
+            $('#teamspeak-title-id').empty();
+
+            $.ajax('{{ route('teamspeak.json.titles') }}', {
+                data: {
+                    corporation_id: $('#teamspeak-corporation-id').val()
+                },
+                dataType: 'json',
+                method: 'GET',
+                success: function(data){
+                    for (var i = 0; i < data.length; i++) {
+                        $('#teamspeak-title-id').append($('<option></option>').attr('value', data[i].titleID).text(data[i].titleName));
+                    }
+                }
+            });
+        }
+
         $('#teamspeak-type').change(function(){
-            $.each(['teamspeak-user-id', 'teamspeak-role-id', 'teamspeak-corporation-id', 'teamspeak-alliance-id'], function(key, value){
+            $.each(['teamspeak-user-id', 'teamspeak-role-id', 'teamspeak-corporation-id', 'teamspeak-title-id', 'teamspeak-alliance-id'], function(key, value){
                 if (value == ('teamspeak-' + $('#teamspeak-type').val() + '-id')) {
                     $(('#' + value)).prop('disabled', false);
                 } else {
                     $(('#' + value)).prop('disabled', true);
                 }
             });
+
+            if ($('#teamspeak-type').val() == 'title') {
+                $('#teamspeak-corporation-id, #teamspeak-title-id').prop('disabled', false);
+            }
         }).select2();
 
-        $('#teamspeak-user-id, #teamspeak-role-id, #teamspeak-corporation-id, #teamspeak-alliance-id, #teamspeak-group-id').select2();
+        $('#teamspeak-corporation-id').change(function(){
+            getCorporationTitle();
+        });
 
-        $('#teamspeak-tabs a').click(function(e){
+        $('#teamspeak-user-id, #teamspeak-role-id, #teamspeak-corporation-id, #teamspeak-title-id, #teamspeak-alliance-id, #teamspeak-channel-id').select2();
+
+        $('#teamspeak-tabs').find('a').click(function(e){
             e.preventDefault();
             $(this).tab('show');
         });
+
+        $(document).ready(function(){
+            getCorporationTitle();
+        });
     </script>
-@stop
+@endpush

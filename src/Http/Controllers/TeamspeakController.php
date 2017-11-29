@@ -7,22 +7,28 @@
 
 namespace Seat\Warlof\Teamspeak\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Seat\Eveapi\Models\Corporation\CorporationSheet;
+use Seat\Eveapi\Models\Corporation\Title;
 use Seat\Eveapi\Models\Eve\AllianceList;
 use Seat\Services\Settings\Seat;
+use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupRole;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupCorporation;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupAlliance;
+use Seat\Warlof\Teamspeak\Models\TeamspeakGroupTitle;
 use Seat\Warlof\Teamspeak\Models\TeamspeakLog;
 use Seat\Warlof\Teamspeak\Validation\AddRelation;
 use Seat\Warlof\Teamspeak\Validation\ValidateConfiguration;
 use Seat\Web\Models\Acl\Role;
 use Seat\Web\Models\User;
+use Illuminate\Http\Request;
+
+use TeamSpeak3;
 
 class TeamspeakController extends Controller
 {
@@ -33,6 +39,7 @@ class TeamspeakController extends Controller
         $groupRoles = TeamspeakGroupRole::all();
         $groupCorporations = TeamspeakGroupCorporation::all();
         $groupAlliances = TeamspeakGroupAlliance::all();
+        $groupTitles = TeamspeakGroupTitle::all();
         
         $users = User::all();
         $roles = Role::all();
@@ -41,17 +48,17 @@ class TeamspeakController extends Controller
         $groups = TeamspeakGroup::all();
 
         return view('teamspeak::list',
-            compact('groupPublic', 'groupUsers', 'groupRoles', 'groupCorporations', 'groupAlliances',
+            compact('groupPublic', 'groupUsers', 'groupRoles', 'groupCorporations', 'groupAlliances', 'groupTitles',
                 'users', 'roles', 'corporations', 'alliances', 'groups'));
     }
 
     public function getConfiguration()
     {
-        $tsUsername = Seat::get('teamspeak_username');
-        $tsPassword = Seat::get('teamspeak_password');
-        $tsHostname = Seat::get('teamspeak_hostname');
-        $tsServerQuery = Seat::get('teamspeak_server_query');
-        $tsServerPort = Seat::get('teamspeak_server_port');
+        $tsUsername = setting('teamspeak_username', true);
+        $tsPassword = setting('teamspeak_password', true);
+        $tsHostname = setting('teamspeak_hostname', true);
+        $tsServerQuery = setting('teamspeak_server_query', true);
+        $tsServerPort = setting('teamspeak_server_port', true);
         $greenSettings = false;
 
         if ($tsUsername != "" && $tsPassword != "" && $tsHostname != "" && $tsServerQuery != "" && $tsServerPort != "") {
@@ -78,6 +85,7 @@ class TeamspeakController extends Controller
         $roleId = $request->input('teamspeak-role-id');
         $corporationId = $request->input('teamspeak-corporation-id');
         $allianceId = $request->input('teamspeak-alliance-id');
+        $titleId = $request->input('teamspeak-title-id');
         $groupId = $request->input('teamspeak-group-id');
 
         // use a single post route in order to create any kind of relation
@@ -93,6 +101,8 @@ class TeamspeakController extends Controller
                 return $this->postCorporationRelation($groupId, $corporationId);
             case 'alliance':
                 return $this->postAllianceRelation($groupId, $allianceId);
+            case 'title':
+                return $this->postTitleRelation($groupId, $corporationId,  $titleId);
             default:
                 return redirect()->back()
                     ->with('error', 'Unknown relation type');
@@ -101,11 +111,11 @@ class TeamspeakController extends Controller
 
     public function postConfiguration(ValidateConfiguration $request)
     {
-        Seat::set('teamspeak_username', $request->input('teamspeak-configuration-username'));
-        Seat::set('teamspeak_password', $request->input('teamspeak-configuration-password'));
-        Seat::set('teamspeak_hostname', $request->input('teamspeak-configuration-hostname'));
-        Seat::set('teamspeak_server_query', $request->input('teamspeak-configuration-query'));
-        Seat::set('teamspeak_server_port', $request->input('teamspeak-configuration-port'));
+        setting(['teamspeak_username', $request->input('teamspeak-configuration-username')], true);
+        setting(['teamspeak_password', $request->input('teamspeak-configuration-password')], true);
+        setting(['teamspeak_hostname', $request->input('teamspeak-configuration-hostname')], true);
+        setting(['teamspeak_server_query', $request->input('teamspeak-configuration-query')], true);
+        setting(['teamspeak_server_port', $request->input('teamspeak-configuration-port')], true);
         return redirect()->back()
             ->with('success', 'The Teamspeak settings has been updated');
     }
@@ -182,6 +192,23 @@ class TeamspeakController extends Controller
 
         return redirect()->back()
             ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the alliance.');
+    }
+
+
+    public function getRemoveTitle($corporationId, $titleId, $groupId)
+    {
+        $groupTitle = TeamspeakGroupTitle::where('corporation_id', $corporationId)
+            ->where('title_id', $titleId)
+            ->where('group_id', $groupId);
+
+        if ($groupTitle != null) {
+            $groupTitle->delete();
+            return redirect()->back()
+                ->with('success', 'The teamspeak relation for the title has been removed');
+        }
+
+        return redirect()->back()
+            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the title.');
     }
 
     public function getSubmitJob($commandName)
@@ -265,6 +292,28 @@ class TeamspeakController extends Controller
             ->with('error', 'This relation already exists');
     }
 
+    private function postTitleRelation($groupId, $corporationId, $titleId)
+    {
+        $relation = TeamspeakGroupTitle::where('corporation_id', '=', $corporationId)
+            ->where('title_id', '=', $titleId)
+            ->where('group_id', '=', $groupId)
+            ->get();
+
+        if ($relation->count() == 0) {
+            TeamspeakGroupTitle::create([
+                'corporation_id' => $corporationId,
+                'title_id' => $titleId,
+                'group_id' => $groupId
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'New teamspeak title relation has been created');
+        }
+
+        return redirect()->back()
+            ->with('error', 'This relation already exists');
+    }
+
     private function postCorporationRelation($groupId, $corporationId)
     {
         $relation = TeamspeakGroupCorporation::where('corporation_id', '=', $corporationId)
@@ -305,4 +354,49 @@ class TeamspeakController extends Controller
             ->with('error', 'This relation already exists');
     }
 
+    public function getUserID() {
+        $serverQuery = "serverquery://".setting('teamspeak_username',true).":"
+            .setting('teamspeak_password',true)."@"
+            .setting('teamspeak_hostname',true).":"
+            .setting('teamspeak_server_query',true)."/?server_port="
+            .setting('teamspeak_server_port',true)."&blocking=0";
+
+        $ts3Server = TeamSpeak3::factory($serverQuery);
+        
+        $userList = $ts3Server->clientList();
+        foreach ($userList as $user) {
+            $nickname = preg_replace('/’/', '\'', $user->client_nickname->toString());
+            if ($nickname == setting('main_character_name')) {
+                    $uid = $user->client_unique_identifier->toString();
+                    $founduser = [];
+                    $founduser['id'] = $uid;
+                    $founduser['nick'] = $nickname;
+                    $this->postRegisterUser($uid);
+			return json_encode($founduser);
+            }
+        }
+        return json_encode([]);
+    }
+
+    public function getRegisterUser() {
+        return view('teamspeak::register');
+    }
+
+    private function postRegisterUser($uid)
+    {
+        $userId = auth()->user()->id;
+        
+        $tsUser = TeamspeakUser::find($userId); 
+        if ($tsUser == null) {
+            TeamspeakUser::create([
+                'user_id' => $userId,
+                'teamspeak_id' => $uid
+            ]);
+        }
+        else {
+            $tsUser->teamspeak_id = $uid;
+            $tsUser->save();
+        }
+        return;
+    }
 }

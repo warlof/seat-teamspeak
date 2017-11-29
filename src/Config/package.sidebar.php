@@ -6,6 +6,13 @@
  */
 
 return [
+    'ts3register' => [
+        'name'          => 'Teamspeak Register',
+        'icon'          => 'fa-microphone',
+        'route_segment' => 'teamspeak',
+        'route'         => 'ts3.register',
+        'permission'    => 'teamspeak.view'
+    ],
     'teamspeak' => [
         'name'          => 'Teamspeak',
         'icon'          => 'fa-microphone',
@@ -28,6 +35,6 @@ return [
                 'route' => 'teamspeak.logs'
             ]
         ],
-        'permission' => 'teamspeak:view'
+        'permission' => 'teamspeak.setup'
     ]
 ];

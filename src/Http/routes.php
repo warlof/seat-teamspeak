@@ -9,9 +9,32 @@ Route::group([
     'namespace' => 'Seat\Warlof\Teamspeak\Http\Controllers',
     'prefix' => 'teamspeak'
 ], function(){
+
+    Route::group([
+        'middleware' => 'web'
+    ], function () {
+
     Route::get('/', [
         'as' => 'teamspeak.list',
         'uses' => 'TeamspeakController@getRelations',
+        'middleware' => 'bouncer:teamspeak.view'
+    ]);
+
+    Route::get('/getclients', [
+        'as' => 'teamspeak.getclients',
+        'uses' => 'TeamspeakController@getClientUserList',
+        'middleware' => 'bouncer:teamspeak.view'
+    ]);
+
+    Route::get('/getuserid', [
+        'as' => 'teamspeak.getclients',
+        'uses' => 'TeamspeakController@getUserID',
+        'middleware' => 'bouncer:teamspeak.view'
+    ]);
+
+    Route::get('/ts3register', [
+        'as' => 'ts3.register',
+        'uses' => 'TeamspeakController@getRegisterUser',
         'middleware' => 'bouncer:teamspeak.view'
     ]);
 
@@ -45,6 +68,12 @@ Route::group([
         'middleware' => 'bouncer:teamspeak.create'
     ]);
 
+    Route::get('/titles/{corporation_id}/{title_id}/{group_id}/remove', [
+        'as' => 'teamspeak.title.remove',
+        'uses' => 'TeamspeakController@getRemoveTitle',
+        'middleware' => 'bouncer:teamspeak.create'
+    ]);
+
     Route::post('/', [
         'as' => 'teamspeak.add',
         'uses' => 'TeamspeakController@postRelation',
@@ -74,4 +103,17 @@ Route::group([
         'uses' => 'TeamspeakController@postConfiguration',
         'middleware' => 'bouncer:teamspeak.setup'
     ]);
+
+    Route::group([
+         'prefix' => 'json'
+    ], function(){
+
+        Route::get('/titles', [
+            'as' => 'teamspeak.json.titles',
+            'uses' => 'TeamspeakJsonController@getJsonTitle',
+            'middleware' => 'bouncer:teamspeak.create'
+        ]);
+    });
+
+});
 });
