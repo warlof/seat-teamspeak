@@ -24,7 +24,7 @@
                                 @else
                                 <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" value="{{ $tsHostname }}" />
                                 @endif
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                                {{ csrf_field() }}
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="hostname-eraser">
                                         <i class="fa fa-eraser"></i>

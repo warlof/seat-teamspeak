@@ -84,9 +84,6 @@ class TeamspeakUpdater implements ShouldQueue
 
             } catch (Exception $e) {
                 $this->reportJobError($e);
-
-                sleep(1);
-
                 return;
             }
 

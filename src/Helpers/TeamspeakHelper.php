@@ -7,6 +7,7 @@
 
 namespace Seat\Warlof\Teamspeak\Helpers;
 
+use TeamSpeak3;
 
 class TeamspeakHelper
 {
@@ -20,8 +21,10 @@ class TeamspeakHelper
      */
     public static function connect($tsUsername, $tsPassword, $tsHostname, $tsServerQuery, $tsServerPort)
     {
-        return \TeamSpeak3::factory("serverquery://" . $tsUsername . ':' . $tsPassword . '@' . $tsHostname .
-            ':' . $tsServerQuery . "/?server_port=" . $tsServerPort . "&blocking=0");
+        $serverQuery = sprintf("serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0", $tsUsername, $tsPassword, 
+            $tsHostname, $tsServerQuery, $tsServerPort);
+
+        return \TeamSpeak3::factory($serverQuery);
     }
 
     /**

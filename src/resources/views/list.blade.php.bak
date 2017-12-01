@@ -10,7 +10,9 @@
         </div>
         <div class="panel-body">
             <form role="form" action="{{ route('teamspeak.add') }}" method="post">
-            {{ csrf_field() }}
+            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+
+
                 <div class="box-body">
 
                     <div class="form-group">
@@ -20,7 +22,6 @@
                             <option value="role">{{ trans('teamspeak::seat.role_filter') }}</option>
                             <option value="corporation">{{ trans('teamspeak::seat.corporation_filter') }}</option>
                             <option value="alliance">{{ trans('teamspeak::seat.alliance_filter') }}</option>
-                            <option value="title">{{ trans('teamspeak::seat.title_filter') }}</option>
                             <option value="public">{{ trans('teamspeak::seat.public_filter') }}</option>
                         </select>
                     </div>
@@ -63,7 +64,7 @@
 
                     <div class="form-group">
                         <label for="teamspeak-title-id">{{ trans('teamspeak::seat.title') }}</label>
-                        <select name="teamspeak-title-id" id="teamspeak-title-id" class="col-md-12" disabled="disabled"></select>
+                        <select name="teamspeak-title-id" id="teamspeak-title-id" class="col-md-12"></select>
                     </div>
 
                     <div class="form-group">
@@ -216,41 +217,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div role="tabpanel" class="tab-pane" id="teamspeak-title">
-                    <table class="table table-condensed table-hover table-responsive">
-                        <thead>
-                        <tr>
-                            <th>{{ trans('teamspeak::seat.corporation') }}</th>
-                            <th>{{ trans('teamspeak::seat.title') }}</th>
-                            <th>{{ trans('teamspeak::seat.group') }}</th>
-                            <th>{{ trans('teamspeak::seat.created') }}</th>
-                            <th>{{ trans('teamspeak::seat.updated') }}</th>
-                            <th>{{ trans('teamspeak::seat.status') }}</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($groupTitles as $group)
-                            <tr>
-                                <td>{{ $group->corporation->corporationName }}</td>
-                                <td>{{ strip_tags($group->title->titleName) }}</td>
-                                <td>{{ $group->group->name }}</td>
-                                <td>{{ $group->created_at }}</td>
-                                <td>{{ $group->updated_at }}</td>
-                                <td>{{ $group->enable }}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('teamspeak.title.remove', ['corporation_id' => $group->corporation_id, 'title_id' => $group->title_id, 'group_id' => $group->group_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
-                                            {{ trans('web::seat.remove') }}
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
-               <div role="tabpanel" class="tab-pane" id="teamspeak-corporation">
+                <div role="tabpanel" class="tab-pane" id="teamspeak-corporation">
                     <table class="table table-condensed table-hover table-responsive">
                         <thead>
                         <tr>
@@ -322,6 +289,7 @@
 @push('javascript')
     <script type="application/javascript">
         function getCorporationTitle() {
+            console.debug('in');
             $('#teamspeak-title-id').empty();
 
             $.ajax('{{ route('teamspeak.json.titles') }}', {
@@ -367,4 +335,3 @@
             getCorporationTitle();
         });
     </script>
-@endpush
