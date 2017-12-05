@@ -33,10 +33,10 @@
     $('.loading').css('background-image', 'none');
 
     $('#ts3register').on('click', function () {
-      $('.loading').css('background-image', 'url("http://loadinggif.com/images/image-selection/3.gif")');
+      $('.loading').css('background-image', 'url("{{ asset('web/img/spinner.gif') }}")');
       $.ajax({
         headers: function() {},
-        url: 'https://devcc.cripplecreekcorp.com/teamspeak/getuserid',
+        url: "{{ route('teamspeak.getclients') }}",
         dataType: 'json',
         jsonp: false,
         contentType: "application/json",

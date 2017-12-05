@@ -69,6 +69,7 @@ class TeamSpeakServiceProvider extends ServiceProvider
     public function addPublications()
     {
         $this->publishes([
+            __DIR__ . '/resources/assets'     => public_path('web'),
             __DIR__ . '/database/migrations/' => database_path('migrations')
         ]);
     }

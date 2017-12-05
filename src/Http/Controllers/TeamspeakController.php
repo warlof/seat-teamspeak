@@ -356,7 +356,14 @@ class TeamspeakController extends Controller
 
     public function getUserID() {
 
-        $serverQuery = sprintf("serverquery://%s:%s@%s:%s/?serverport=%s&blocking=0", $tsUsername, $tsPassword, $tsHostname, $tsServerQuery, $tsServerPort);
+        $tsUsername = setting('teamspeak_username', true);
+        $tsPassword = setting('teamspeak_password', true);
+        $tsHostname = setting('teamspeak_hostname', true);
+        $tsServerQuery = setting('teamspeak_server_query', true);
+        $tsServerPort = setting('teamspeak_server_port', true);
+
+        $serverQuery = sprintf("serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0", $tsUsername, $tsPassword,
+            $tsHostname, $tsServerQuery, $tsServerPort);
         $ts3Server = TeamSpeak3::factory($serverQuery);
         
         $userList = $ts3Server->clientList();

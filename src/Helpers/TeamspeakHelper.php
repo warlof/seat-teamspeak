@@ -5,7 +5,7 @@
  * Time: 15:59
  */
 
-namespace Seat\Warlof\Teamspeak\Helpers;
+namespace Warlof\Seat\Teamspeak\Helpers;
 
 use TeamSpeak3;
 
