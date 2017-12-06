@@ -9,7 +9,6 @@ namespace Seat\Warlof\Teamspeak\Commands;
 
 
 use Illuminate\Console\Command;
-use Seat\Services\Settings\Seat;
 use Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
@@ -25,13 +24,17 @@ class TeamspeakGroupsUpdate extends Command
         parent::__construct();
     }
 
+	/**
+	 * @throws TeamspeakSettingException
+	 * @throws \Seat\Services\Exceptions\SettingException
+	 */
     public function handle()
     {
-        $tsUsername = Seat::get('teamspeak_username');
-        $tsPassword = Seat::get('teamspeak_password');
-        $tsHostname = Seat::get('teamspeak_hostname');
-        $tsServerQuery = Seat::get('teamspeak_server_query');
-        $tsServerPort = Seat::get('teamspeak_server_port');
+        $tsUsername = setting('teamspeak_username', true);
+        $tsPassword = setting('teamspeak_password', true);
+        $tsHostname = setting('teamspeak_hostname', true);
+        $tsServerQuery = setting('teamspeak_server_query', true);
+        $tsServerPort = setting('teamspeak_server_port', true);
 
         if ($tsUsername == null || $tsPassword == null || $tsHostname == null || $tsServerQuery == null ||
             $tsServerPort == null) {

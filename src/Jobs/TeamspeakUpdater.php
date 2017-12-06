@@ -48,11 +48,11 @@ class TeamspeakUpdater implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param JobPayloadContainer $jobPayload
+     * @param JobPayloadContainer $job_payload
      */
-    public function __construct(JobPayloadContainer $jobPayload)
+    public function __construct(JobPayloadContainer $job_payload)
     {
-        $this->jobPayload = $jobPayload;
+        $this->jobPayload = $job_payload;
 
         // Setup workers
         $this->workers = [
@@ -108,7 +108,7 @@ class TeamspeakUpdater implements ShouldQueue
     public function failed(Exception $exception)
     {
         logger()->error(
-            'A worker error occured. The exception thrown was ' .
+            'A worker error occurred. The exception thrown was ' .
             $exception->getMessage() . ' in file ' . $exception->getFile() .
             ' on line ' . $exception->getLine()
         );

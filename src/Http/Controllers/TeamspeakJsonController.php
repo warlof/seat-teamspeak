@@ -9,13 +9,8 @@
 namespace Seat\Warlof\Teamspeak\Http\Controllers;
 
 
-use Illuminate\Support\Facades\Redis;
-use Seat\Eveapi\Models\Corporation\CorporationSheet;
 use Seat\Eveapi\Models\Corporation\Title;
-use Seat\Eveapi\Models\Eve\AllianceList;
 use Seat\Web\Http\Controllers\Controller;
-use Seat\Web\Models\Acl\Role;
-use Seat\Web\Models\User;
 
 class TeamspeakJsonController extends Controller
 {
