@@ -22,11 +22,10 @@
 
 @push('javascript')
 <style>
-.loading {    
-    background-color: #ffffff;
+.loading {
     background-size: 20px 20px;
-    background-position:right center;
-    background-repeat: no-repeat;
+    background: #ffffff no-repeat right center;
+}
 </style>
 
 <script type="application/javascript">
@@ -39,7 +38,7 @@
         url: "{{ route('teamspeak.getclients') }}",
         dataType: 'json',
         jsonp: false,
-        contentType: "application/json",
+        contentType: "application/json"
       }).done(function (data) {
         $('.loading').css('background-image', 'none');
         if (data.id) {

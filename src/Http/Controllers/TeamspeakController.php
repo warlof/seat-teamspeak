@@ -10,9 +10,7 @@ namespace Seat\Warlof\Teamspeak\Http\Controllers;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Seat\Eveapi\Models\Corporation\CorporationSheet;
-use Seat\Eveapi\Models\Corporation\Title;
 use Seat\Eveapi\Models\Eve\AllianceList;
-use Seat\Services\Settings\Seat;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
@@ -26,7 +24,6 @@ use Seat\Warlof\Teamspeak\Validation\AddRelation;
 use Seat\Warlof\Teamspeak\Validation\ValidateConfiguration;
 use Seat\Web\Models\Acl\Role;
 use Seat\Web\Models\User;
-use Illuminate\Http\Request;
 
 use TeamSpeak3;
 
@@ -52,6 +49,10 @@ class TeamspeakController extends Controller
                 'users', 'roles', 'corporations', 'alliances', 'groups'));
     }
 
+	/**
+	 * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+	 * @throws \Seat\Services\Exceptions\SettingException
+	 */
     public function getConfiguration()
     {
         $tsUsername = setting('teamspeak_username', true);
@@ -109,6 +110,12 @@ class TeamspeakController extends Controller
         }
     }
 
+	/**
+	 * @param ValidateConfiguration $request
+	 *
+	 * @return \Illuminate\Http\RedirectResponse
+	 * @throws \Seat\Services\Exceptions\SettingException
+	 */
     public function postConfiguration(ValidateConfiguration $request)
     {
         setting(['teamspeak_username', $request->input('teamspeak-configuration-username')], true);
@@ -354,6 +361,10 @@ class TeamspeakController extends Controller
             ->with('error', 'This relation already exists');
     }
 
+	/**
+	 * @return string
+	 * @throws \Seat\Services\Exceptions\SettingException
+	 */
     public function getUserID() {
 
         $tsUsername = setting('teamspeak_username', true);

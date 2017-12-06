@@ -7,14 +7,16 @@
 
 namespace Seat\Warlof\Teamspeak\Jobs\Workers;
 
-use Illuminate\Support\Facades\Log;
 use Seat\Eveapi\Models\Eve\ApiKey;
-use Seat\Warlof\Teamspeak\Exceptions\TeamspeakServerGroupException;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 
 class TeamspeakReceptionist extends AbstractTeamspeak
 {
 
+	/**
+	 * @throws \Seat\Services\Exceptions\SettingException
+	 * @throws \Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException
+	 */
     public function call()
     {
 
@@ -58,15 +60,14 @@ class TeamspeakReceptionist extends AbstractTeamspeak
     /**
      * Invite an user to each group
      * 
-     * @param \TeamSpeak3_Node_Client $teamspeakClientNode
+     * @param \TeamSpeak3_Node_Client $teamspeak_client_node
      * @param array $groups
-     * @throws TeamspeakServerGroupException
      */
-    private function processGroupsInvitation($teamspeakClientNode, $groups)
+    private function processGroupsInvitation($teamspeak_client_node, $groups)
     {
         // iterate over each group ID and add the user
         foreach ($groups as $groupId) {
-            $this->getTeamspeak()->serverGroupClientAdd($groupId, $teamspeakClientNode['client_database_id']);
+            $this->getTeamspeak()->serverGroupClientAdd($groupId, $teamspeak_client_node['client_database_id']);
         }
     }
 }

@@ -7,12 +7,16 @@
 
 namespace Seat\Warlof\Teamspeak\Jobs\Workers;
 
-use Illuminate\Support\Facades\Log;
 use Seat\Eveapi\Models\Eve\ApiKey;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 
 class TeamspeakAssKicker extends AbstractTeamspeak
 {
+
+	/**
+	 * @throws \Seat\Services\Exceptions\SettingException
+	 * @throws \Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException
+	 */
     public function call()
     {
         // call the parent call method in order to load the Teamspeak Server object
@@ -67,14 +71,13 @@ class TeamspeakAssKicker extends AbstractTeamspeak
     /**
      * Kick an user from each group
      *
-     * @param \TeamSpeak3_Node_Client $teamspeakClientNode
+     * @param \TeamSpeak3_Node_Client $teamspeak_client_node
      * @param $groups
-     * @throws \Seat\Warlof\Teamspeak\Exceptions\TeamspeakServerGroupException
      */
-    private function processGroupsKick($teamspeakClientNode, $groups)
+    private function processGroupsKick($teamspeak_client_node, $groups)
     {
         foreach ($groups as $groupId) {
-            $this->getTeamspeak()->serverGroupClientDel($groupId, $teamspeakClientNode['client_database_id']);
+            $this->getTeamspeak()->serverGroupClientDel($groupId, $teamspeak_client_node['client_database_id']);
         }
     }
 
