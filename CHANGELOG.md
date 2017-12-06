@@ -1,3 +1,2 @@
-# Version 0.1.0
-
-Forked from Slackbot, this package is handling Teamspeak graduation based on the same mechanism.
+# 2.0.0-RC1
+Release candidate is available. Thanks to [@denngarr](https://github.com/dysath)
