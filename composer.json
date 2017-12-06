@@ -26,6 +26,10 @@
         {
             "name": "Warlof Tutsimo",
             "email": "loic.leuilliot@gmail.com"
+        },
+        {
+            "name": "Denngarr B'tarn",
+            "email": "ed.stafford@gmail.com"
         }
     ],
     "minimum-stability": "dev"

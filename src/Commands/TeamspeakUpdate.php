@@ -9,15 +9,17 @@ namespace Seat\Warlof\Teamspeak\Commands;
 
 
 use Illuminate\Console\Command;
-use Seat\Eveapi\Helpers\JobContainer;
+use Seat\Eveapi\Helpers\JobPayloadContainer;
 use Seat\Eveapi\Traits\JobManager;
+use Seat\Services\Helpers\AnalyticsContainer;
+use Seat\Services\Jobs\Analytics;
 use Seat\Warlof\Teamspeak\Jobs\TeamspeakUpdater;
 use Seat\Web\Models\User;
 
 class TeamspeakUpdate extends Command
 {
     use JobManager;
-    
+
     protected $signature = 'teamspeak:update';
 
     protected $description = 'Auto invite and kick member based on white list/teamspeak relation';
@@ -27,9 +29,12 @@ class TeamspeakUpdate extends Command
         parent::__construct();
     }
 
-    public function handle(JobContainer $job)
+    public function handle(JobPayloadContainer $job)
     {
-        User::where('active', true)->chunk(10, function($users) use ($job) {
+        // Counter for the number of keys queued
+        $queuedKeys = 0;
+
+        User::chunk(10, function($users) use ($job, &$queuedKeys) {
 
             foreach ($users as $user) {
                 $job->api = 'Teamspeak';
@@ -42,7 +47,21 @@ class TeamspeakUpdate extends Command
                 );
 
                 $this->info('Job ' . $jobId . ' dispatched');
+
+                $queuedKeys++;
             }
         });
+
+        // Analytics
+        dispatch(
+            (new Analytics(
+                (new AnalyticsContainer())->set('type', 'event')
+                ->set('ec', 'queues')
+                ->set('ea', 'teamspeak_update')
+                ->set('el', 'console')
+                ->set('ev', $queuedKeys)
+            ))->onQueue('medium')
+        );
     }
 }
+

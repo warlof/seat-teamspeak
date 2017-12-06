@@ -7,12 +7,12 @@
 
 return [
     'management' => 'Teamspeak Access Management',
-    'quick_create' => 'Quick create',
+    'quick_create' => 'Quick Create',
     'type' => 'Type',
     'username' => 'Username',
     'group' => 'Server Groups',
     'add' => 'Add',
-    'authorisations' => 'Authorisations',
+    'authorisations' => 'Authorizations',
     'user_filter' => 'User Filter',
     'role_filter' => 'Role Filter',
     'corporation_filter' => 'Corporation Filter',
@@ -26,5 +26,7 @@ return [
     'alliance' => 'Alliance',
     'remove' => 'Remove',
     'enabled' => 'Enabled',
-    'settings' => 'Teamspeak Settings'
+    'settings' => 'Teamspeak Settings',
+    'title' => 'Title',
+    'title_filter' => 'Title Filter'
 ];
