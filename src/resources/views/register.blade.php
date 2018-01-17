@@ -4,15 +4,26 @@
 @section('page_header', trans('teamspeak::register'))
 
 @section('left')
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Register my Teamspeak User</h3>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Register my Teamspeak User</h3>
         </div>
-        <div class="panel-body">
+        <div class="box-body">
             <p>Log into the Teamspeak server with your nickname set to the EXACT SAME as your Main character's name.</p>
-            <p>TS Name should be: <b>{{ setting('main_character_name') }}</b><p>
-            <input type="text" id="ts3id" name="ts3id" value="" maxlength="29" size="29" disabled="true" class="loading">
-            <input type="button" id="ts3register" name="ts3register" value="Click to find your name and register">
+            <p>TS Name should be: <b>
+            @if ($tags != '')
+              [{{ $ticker }}] 
+            @endif 
+            {{ setting('main_character_name') }}</b><p>
+            <p>@if ($tags != '')
+            * Note: There is a space between the corp tag and your username.
+            @endif</p> 
+            <div class="input-group input-group-sm">
+              <input type="text" class="form-control" id="ts3id" name="ts3id" value="" maxlength="29" size="29" disabled="true" class="loading">
+              <span class="input-group-btn">
+                   <button type="button" id="ts3register" name="ts3register" class="btn btn-info btn-flat">Click to find your name and register</button>
+              </span>
+            </div>
         </div>
     </div>
 @stop
@@ -22,9 +33,11 @@
 
 @push('javascript')
 <style>
-.loading {
+.loading {    
+    background-color: #ffffff;
     background-size: 20px 20px;
-    background: #ffffff no-repeat right center;
+    background-position:right center;
+    background-repeat: no-repeat;
 }
 </style>
 
@@ -38,7 +51,7 @@
         url: "{{ route('teamspeak.getclients') }}",
         dataType: 'json',
         jsonp: false,
-        contentType: "application/json"
+        contentType: "application/json",
       }).done(function (data) {
         $('.loading').css('background-image', 'none');
         if (data.id) {
