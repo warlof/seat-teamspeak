@@ -7,14 +7,11 @@
 
 namespace Seat\Warlof\Teamspeak\Http\Controllers;
 
-use Illuminate\Support\Facades\Log;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Seat\Eveapi\Models\Corporation\CorporationSheet;
 use Seat\Eveapi\Models\Corporation\Title;
 use Seat\Eveapi\Models\Eve\AllianceList;
-use Seat\Eveapi\Models\Character\CharacterSheet;
-use Seat\Services\Settings\Seat;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
@@ -28,7 +25,6 @@ use Seat\Warlof\Teamspeak\Validation\AddRelation;
 use Seat\Warlof\Teamspeak\Validation\ValidateConfiguration;
 use Seat\Web\Models\Acl\Role;
 use Seat\Web\Models\User;
-use Illuminate\Http\Request;
 
 use TeamSpeak3;
 
@@ -415,7 +411,13 @@ class TeamspeakController extends Controller
 
     public function getRegisterUser() {
         $character = CharacterSheet::find(setting('main_character_id'));
+        if (!$character) {
+            redirect()->back()->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
+        }
         $corp = CorporationSheet::find($character->corporationID);
+        if (!$corp) {
+            redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
+        }
         $ticker = $corp->ticker;
         $tags = setting('teamspeak_tags', true);
 

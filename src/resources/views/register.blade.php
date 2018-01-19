@@ -15,9 +15,9 @@
               [{{ $ticker }}] 
             @endif 
             {{ setting('main_character_name') }}</b><p>
-            <p>@if ($tags != '')
-            * Note: There is a space between the corp tag and your username.
-            @endif</p> 
+            @if ($tags != '')
+            <p class="help-block">* Note: There is a space between the corp tag and your username.</p>
+            @endif
             <div class="input-group input-group-sm">
               <input type="text" class="form-control" id="ts3id" name="ts3id" value="" maxlength="29" size="29" disabled="true" class="loading">
               <span class="input-group-btn">

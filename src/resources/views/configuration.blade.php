@@ -19,7 +19,7 @@
                         <label for="teamspeak-configuration-token" class="col-md-4">Server Hostname</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if ($tsHostname == null)
+                                @if ( $tsHostname == null )
                                 <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" />
                                 @else
                                 <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" value="{{ $tsHostname }}" />
