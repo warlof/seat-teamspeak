@@ -19,7 +19,7 @@
                         <label for="teamspeak-configuration-token" class="col-md-4">Server Hostname</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if ($tsHostname == null)
+                                @if ( $tsHostname == null )
                                 <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" />
                                 @else
                                 <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" value="{{ $tsHostname }}" />
@@ -102,6 +102,19 @@
                                         <i class="fa fa-eraser"></i>
                                     </button>
                                 </span>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <div class="form-group">
+                        <label for="teamspeak-configuration-tags" class="col-md-4">Use Corp Tags?</label>
+                        <div class="col-md-7">
+                            <div class="form-check">
+                                @if ($tsTags == null)
+                                    <input type="checkbox" class="form-check-input" id="teamspeak-configuration-tags" name="teamspeak-configuration-tags" />
+                                @else
+                                    <input type="checkbox" class="form-check-input" id="teamspeak-configuration-tags" name="teamspeak-configuration-tags" checked />
+                                @endif
                             </div>
                         </div>
                     </div>

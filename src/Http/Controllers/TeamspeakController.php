@@ -10,6 +10,7 @@ namespace Seat\Warlof\Teamspeak\Http\Controllers;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Seat\Eveapi\Models\Corporation\CorporationSheet;
+use Seat\Eveapi\Models\Corporation\Title;
 use Seat\Eveapi\Models\Eve\AllianceList;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
@@ -49,10 +50,10 @@ class TeamspeakController extends Controller
                 'users', 'roles', 'corporations', 'alliances', 'groups'));
     }
 
-	/**
-	 * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-	 * @throws \Seat\Services\Exceptions\SettingException
-	 */
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Seat\Services\Exceptions\SettingException
+    **/
     public function getConfiguration()
     {
         $tsUsername = setting('teamspeak_username', true);
@@ -60,6 +61,7 @@ class TeamspeakController extends Controller
         $tsHostname = setting('teamspeak_hostname', true);
         $tsServerQuery = setting('teamspeak_server_query', true);
         $tsServerPort = setting('teamspeak_server_port', true);
+        $tsTags = setting('teamspeak_tags', true);
         $greenSettings = false;
 
         if ($tsUsername != "" && $tsPassword != "" && $tsHostname != "" && $tsServerQuery != "" && $tsServerPort != "") {
@@ -70,7 +72,7 @@ class TeamspeakController extends Controller
         $changelog = $parser->parse($this->getChangelog());
         
         return view('teamspeak::configuration', compact('tsUsername', 'tsPassword', 'tsHostname', 'tsServerQuery',
-            'tsServerPort', 'changelog', 'greenSettings'));
+            'tsServerPort', 'tsTags', 'changelog', 'greenSettings'));
     }
     
     public function getLogs()
@@ -110,12 +112,12 @@ class TeamspeakController extends Controller
         }
     }
 
-	/**
-	 * @param ValidateConfiguration $request
-	 *
-	 * @return \Illuminate\Http\RedirectResponse
-	 * @throws \Seat\Services\Exceptions\SettingException
-	 */
+    /**
+     * @param ValidateConfiguration $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Seat\Services\Exceptions\SettingException
+    */
     public function postConfiguration(ValidateConfiguration $request)
     {
         setting(['teamspeak_username', $request->input('teamspeak-configuration-username')], true);
@@ -123,6 +125,12 @@ class TeamspeakController extends Controller
         setting(['teamspeak_hostname', $request->input('teamspeak-configuration-hostname')], true);
         setting(['teamspeak_server_query', $request->input('teamspeak-configuration-query')], true);
         setting(['teamspeak_server_port', $request->input('teamspeak-configuration-port')], true);
+
+        if ($request->input('teamspeak-configuration-tags') === null) {
+            setting(['teamspeak_tags', ''], true);
+        } else {
+            setting(['teamspeak_tags', $request->input('teamspeak-configuration-tags')], true);
+        }
         return redirect()->back()
             ->with('success', 'The Teamspeak settings has been updated');
     }
@@ -361,10 +369,10 @@ class TeamspeakController extends Controller
             ->with('error', 'This relation already exists');
     }
 
-	/**
-	 * @return string
-	 * @throws \Seat\Services\Exceptions\SettingException
-	 */
+    /**
+     * @return string
+     * @throws \Seat\Services\Exceptions\SettingException
+    */
     public function getUserID() {
 
         $tsUsername = setting('teamspeak_username', true);
@@ -372,6 +380,15 @@ class TeamspeakController extends Controller
         $tsHostname = setting('teamspeak_hostname', true);
         $tsServerQuery = setting('teamspeak_server_query', true);
         $tsServerPort = setting('teamspeak_server_port', true);
+        $tsTags = setting('teamspeak_tags', true);
+
+        if ($tsTags != '') {
+            $character = CharacterSheet::find(setting('main_character_id'));
+            $corp = CorporationSheet::find($character->corporationID);
+            $main_character = "[" . $corp->ticker . "] ".setting('main_character_name');
+        } else {
+            $main_character = setting('main_character_name');
+        }
 
         $serverQuery = sprintf("serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0", $tsUsername, $tsPassword,
             $tsHostname, $tsServerQuery, $tsServerPort);
@@ -380,7 +397,7 @@ class TeamspeakController extends Controller
         $userList = $ts3Server->clientList();
         foreach ($userList as $user) {
             $nickname = preg_replace('/’/', '\'', $user->client_nickname->toString());
-            if ($nickname == setting('main_character_name')) {
+            if ($nickname === $main_character) {
                     $uid = $user->client_unique_identifier->toString();
                     $founduser = [];
                     $founduser['id'] = $uid;
@@ -393,7 +410,18 @@ class TeamspeakController extends Controller
     }
 
     public function getRegisterUser() {
-        return view('teamspeak::register');
+        $character = CharacterSheet::find(setting('main_character_id'));
+        if (!$character) {
+            redirect()->back()->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
+        }
+        $corp = CorporationSheet::find($character->corporationID);
+        if (!$corp) {
+            redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
+        }
+        $ticker = $corp->ticker;
+        $tags = setting('teamspeak_tags', true);
+
+        return view('teamspeak::register', compact('ticker', 'tags'));
     }
 
     private function postRegisterUser($uid)
