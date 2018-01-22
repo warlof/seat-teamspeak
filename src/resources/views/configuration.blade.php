@@ -19,10 +19,10 @@
                         <label for="teamspeak-configuration-token" class="col-md-4">Server Hostname</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if ( $tsHostname == null )
+                                @if (is_null(setting('teamspeak_hostname', true)))
                                 <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" />
                                 @else
-                                <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" value="{{ $tsHostname }}" />
+                                <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" value="{{ setting('teamspeak_hostname', true) }}" />
                                 @endif
                                 {{ csrf_field() }}
                                 <span class="input-group-btn">
@@ -38,10 +38,10 @@
                         <label for="teamspeak-configuration-port" class="col-md-4">Server Port</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if ($tsServerPort == null)
+                                @if (is_null(setting('teamspeak_server_port', true)))
                                     <input type="text" class="form-control" id="teamspeak-configuration-port" name="teamspeak-configuration-port" />
                                 @else
-                                    <input type="text" class="form-control" id="teamspeak-configuration-port" name="teamspeak-configuration-port" value="{{ $tsServerPort }}" />
+                                    <input type="text" class="form-control" id="teamspeak-configuration-port" name="teamspeak-configuration-port" value="{{ setting('teamspeak_server_port', true) }}" />
                                 @endif
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="port-eraser">
@@ -56,10 +56,10 @@
                         <label for="teamspeak-configuration-query" class="col-md-4">Server Query Port</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if ($tsServerQuery == null)
+                                @if (is_null(setting('teamspeak_server_query', true)))
                                     <input type="text" class="form-control" id="teamspeak-configuration-query" name="teamspeak-configuration-query" />
                                 @else
-                                    <input type="text" class="form-control" id="teamspeak-configuration-query" name="teamspeak-configuration-query" value="{{ $tsServerQuery }}" />
+                                    <input type="text" class="form-control" id="teamspeak-configuration-query" name="teamspeak-configuration-query" value="{{ setting('teamspeak_server_query', true) }}" />
                                 @endif
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="query-eraser">
@@ -74,10 +74,10 @@
                         <label for="teamspeak-configuration-username" class="col-md-4">Server Query Username</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if ($tsUsername == null)
+                                @if (is_null(setting('teamspeak_username', true)))
                                     <input type="text" class="form-control" id="teamspeak-configuration-username" name="teamspeak-configuration-username" />
                                 @else
-                                    <input type="text" class="form-control" id="teamspeak-configuration-username" name="teamspeak-configuration-username" value="{{ $tsUsername }}" />
+                                    <input type="text" class="form-control" id="teamspeak-configuration-username" name="teamspeak-configuration-username" value="{{ setting('teamspeak_username', true) }}" />
                                 @endif
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="username-eraser">
@@ -92,10 +92,10 @@
                         <label for="teamspeak-configuration-password" class="col-md-4">Server Query Password</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if ($tsPassword == null)
+                                @if (is_null(setting('teamspeak_password', true)))
                                     <input type="text" class="form-control" id="teamspeak-configuration-password" name="teamspeak-configuration-password" />
                                 @else
-                                    <input type="text" class="form-control" id="teamspeak-configuration-password" name="teamspeak-configuration-password" value="{{ $tsPassword }}" />
+                                    <input type="text" class="form-control" id="teamspeak-configuration-password" name="teamspeak-configuration-password" value="{{ setting('teamspeak_password', true) }}" />
                                 @endif
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="password-eraser">
@@ -110,7 +110,7 @@
                         <label for="teamspeak-configuration-tags" class="col-md-4">Use Corp Tags?</label>
                         <div class="col-md-7">
                             <div class="form-check">
-                                @if ($tsTags == null)
+                                @if (setting('teamspeak_tags', true) == '')
                                     <input type="checkbox" class="form-check-input" id="teamspeak-configuration-tags" name="teamspeak-configuration-tags" />
                                 @else
                                     <input type="checkbox" class="form-check-input" id="teamspeak-configuration-tags" name="teamspeak-configuration-tags" checked />

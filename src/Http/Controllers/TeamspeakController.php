@@ -11,6 +11,7 @@ use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Seat\Eveapi\Models\Corporation\CorporationSheet;
 use Seat\Eveapi\Models\Corporation\Title;
+use Seat\Eveapi\Models\Character\CharacterSheet;
 use Seat\Eveapi\Models\Eve\AllianceList;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
@@ -71,8 +72,7 @@ class TeamspeakController extends Controller
         $parser = new \Parsedown();
         $changelog = $parser->parse($this->getChangelog());
         
-        return view('teamspeak::configuration', compact('tsUsername', 'tsPassword', 'tsHostname', 'tsServerQuery',
-            'tsServerPort', 'tsTags', 'changelog', 'greenSettings'));
+        return view('teamspeak::configuration', compact('changelog', 'greenSettings'));
     }
     
     public function getLogs()
