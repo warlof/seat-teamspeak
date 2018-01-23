@@ -34,6 +34,7 @@ and save the file.  Now you're ready to tell SeAT how to use the plugin:
 ```
 php artisan vendor:publish --force
 php artisan migrate
+php artisan up
 ```
 
 And now, when you log into 'Seat', you should see a 'Teamspeak' link on the left.  
