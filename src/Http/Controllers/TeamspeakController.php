@@ -257,7 +257,8 @@ class TeamspeakController extends Controller
     {
         if (TeamspeakGroupPublic::find($groupId) == null) {
             TeamspeakGroupPublic::create([
-                'group_id' => $groupId
+                'group_id' => $groupId,
+                'enable'   => true,
             ]);
 
             return redirect()->back()
@@ -276,8 +277,10 @@ class TeamspeakController extends Controller
 
         if ($relation->count() == 0) {
             TeamspeakGroupUser::create([
-                'user_id' => $userId,
-                'group_id' => $groupId]);
+                'user_id'  => $userId,
+                'group_id' => $groupId,
+                'enable'   => true,
+            ]);
 
             return redirect()->back()
                 ->with('success', 'New teamspeak user relation has been created');
@@ -295,8 +298,9 @@ class TeamspeakController extends Controller
 
         if ($relation->count() == 0) {
             TeamspeakGroupRole::create([
-                'role_id' => $roleId,
-                'group_id' => $groupId
+                'role_id'  => $roleId,
+                'group_id' => $groupId,
+                'enabled'  => true,
             ]);
 
             return redirect()->back()
@@ -318,7 +322,8 @@ class TeamspeakController extends Controller
             TeamspeakGroupTitle::create([
                 'corporation_id' => $corporationId,
                 'title_id' => $titleId,
-                'group_id' => $groupId
+                'group_id' => $groupId,
+                'enable'     => true,
             ]);
 
             return redirect()->back()
@@ -338,7 +343,8 @@ class TeamspeakController extends Controller
         if ($relation->count() == 0) {
             TeamspeakGroupCorporation::create([
                 'corporation_id' => $corporationId,
-                'group_id' => $groupId
+                'group_id' => $groupId,
+                'enable'   => true,
             ]);
 
             return redirect()->back()
@@ -358,7 +364,8 @@ class TeamspeakController extends Controller
         if ($relation->count() == 0) {
             TeamspeakGroupAlliance::create([
                 'alliance_id' => $allianceId,
-                'group_id' => $groupId
+                'group_id'    => $groupId,
+                'enabled'     => true,
             ]);
 
             return redirect()->back()
