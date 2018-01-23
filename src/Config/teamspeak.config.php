@@ -6,5 +6,5 @@
  */
 
 return [
-    'version'   => '2.0.0-RC2'
+    'version'   => '2.0.1'
 ];
