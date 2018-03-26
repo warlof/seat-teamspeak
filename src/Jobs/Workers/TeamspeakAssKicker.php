@@ -64,7 +64,7 @@ class TeamspeakAssKicker extends AbstractTeamspeak
                 $this->logEvent('kick', $extraGroups);
             }
         }
-
+        sleep(5);
         return;
     }
 

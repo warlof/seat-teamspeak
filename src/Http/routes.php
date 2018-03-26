@@ -20,12 +20,12 @@ Route::group([
             'middleware' => 'bouncer:teamspeak.view'
         ]);
 
-        Route::get('/getclients', [
+/*        Route::get('/getclients', [
             'as' => 'teamspeak.getclients',
             'uses' => 'TeamspeakController@getClientUserList',
             'middleware' => 'bouncer:teamspeak.view'
         ]);
-
+*/
         Route::get('/getuserid', [
             'as' => 'teamspeak.getclients',
             'uses' => 'TeamspeakController@getUserID',

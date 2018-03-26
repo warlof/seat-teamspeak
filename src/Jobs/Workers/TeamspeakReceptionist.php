@@ -53,7 +53,7 @@ class TeamspeakReceptionist extends AbstractTeamspeak
                 }
             }
         }
-
+        sleep(5);
         return;
     }
 

@@ -14,15 +14,17 @@
             @if ($tags != '')
               [{{ $ticker }}] 
             @endif 
-            {{ setting('main_character_name') }}</b><p>
+            {{ setting('main_character_name') }}</b><span id="verify" class="fa"></span>
             @if ($tags != '')
             <p class="help-block">* Note: There is a space between the corp tag and your username.</p>
             @endif
-            <div class="input-group input-group-sm">
-              <input type="text" class="form-control" id="ts3id" name="ts3id" value="" maxlength="29" size="29" disabled="true" class="loading">
-              <span class="input-group-btn">
-                   <button type="button" id="ts3register" name="ts3register" class="btn btn-info btn-flat">Click to find your name and register</button>
-              </span>
+            <div class="form-group has-feedback" id="forms">
+              <div class="input-group input-group-sm">
+                  <input type="text" class="form-control loading" id="ts3id" name="ts3id" value="" />
+                  <span class="input-group-btn">
+                      <button type="button" id="ts3register" name="ts3register" class="btn btn-info btn-flat">Click to find your name and register</button>
+                  </span>
+              </div>
             </div>
         </div>
     </div>
@@ -39,6 +41,7 @@
     background-position:right center;
     background-repeat: no-repeat;
 }
+
 </style>
 
 <script type="application/javascript">
@@ -55,9 +58,17 @@
       }).done(function (data) {
         $('.loading').css('background-image', 'none');
         if (data.id) {
+          $('#forms').removeClass('has-error');
+          $('#forms').addClass('has-success');
+          $('#verify').removeClass('fa-times text-red');
+          $('#verify').addClass('fa-check text-green');
           $('#ts3id').val(data.id);
         }
         else {
+          $('#forms').removeClass('has-success');
+          $('#forms').addClass('has-error');
+          $('#verify').removeClass('fa-check text-green');
+          $('#verify').addClass('fa-times text-red');
           $('#ts3id').val("Username not Found on TS");
         }
       });
