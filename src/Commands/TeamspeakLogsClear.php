@@ -15,7 +15,7 @@ class TeamspeakLogsClear extends Command
 {
     protected $signature = 'teamspeak:logs:clear';
 
-    protected $description = 'Clearing Teamspeak logs';
+    protected $description = 'Clearing slack logs';
 
     public function __construct()
     {

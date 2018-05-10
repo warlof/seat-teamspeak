@@ -14,7 +14,6 @@
             @if ($tags != '')
               [{{ $ticker }}] 
             @endif 
-<<<<<<< HEAD
             {{ auth()->user()->group->main_character->name }}</b><span id="verify" class="fa"></span>
             @if ($tags != '')
             <p class="help-block">* Note: There is a space between the corp tag and your username.</p>
@@ -26,17 +25,6 @@
                       <button type="button" id="ts3register" name="ts3register" class="btn btn-info btn-flat">Click to find your name and register</button>
                   </span>
               </div>
-=======
-            {{ setting('main_character_name') }}</b><p>
-            @if ($tags != '')
-            <p class="help-block">* Note: There is a space between the corp tag and your username.</p>
-            @endif
-            <div class="input-group input-group-sm">
-              <input type="text" class="form-control" id="ts3id" name="ts3id" value="" maxlength="29" size="29" disabled="true" class="loading">
-              <span class="input-group-btn">
-                   <button type="button" id="ts3register" name="ts3register" class="btn btn-info btn-flat">Click to find your name and register</button>
-              </span>
->>>>>>> upstream/master
             </div>
         </div>
     </div>
