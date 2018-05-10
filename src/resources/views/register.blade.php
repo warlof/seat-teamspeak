@@ -14,7 +14,7 @@
             @if ($tags != '')
               [{{ $ticker }}] 
             @endif 
-            {{ setting('main_character_name') }}</b><span id="verify" class="fa"></span>
+            {{ auth()->user()->group->main_character->name }}</b><span id="verify" class="fa"></span>
             @if ($tags != '')
             <p class="help-block">* Note: There is a space between the corp tag and your username.</p>
             @endif

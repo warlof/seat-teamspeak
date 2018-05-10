@@ -3,7 +3,7 @@
 namespace Seat\Warlof\Teamspeak\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Seat\Eveapi\Models\Corporation\CorporationSheet;
+use Seat\Eveapi\Models\Corporation\CorporationInfo;
 
 class TeamspeakGroupCorporation extends Model
 {
@@ -16,6 +16,6 @@ class TeamspeakGroupCorporation extends Model
 
     public function corporation()
     {
-        return $this->belongsTo(CorporationSheet::class, 'corporation_id', 'corporationID');
+        return $this->belongsTo(CorporationInfo::class, 'corporation_id', 'corporation_id');
     }
 }

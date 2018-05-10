@@ -23,12 +23,14 @@ class CreateTeamspeakTables extends Migration
         });
 
         Schema::create('teamspeak_users', function (Blueprint $table) {
-            $table->unsignedInteger('user_id');
+            $table->bigInteger('user_id');
             $table->string('teamspeak_id');
             $table->timestamps();
 
             $table->primary('user_id');
+        });
 
+        Schema::table('teamspeak_users', function (Blueprint $table) {
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
@@ -48,10 +50,6 @@ class CreateTeamspeakTables extends Migration
                 ->on('teamspeak_groups')
                 ->onDelete('cascade');
 
-            $table->foreign('alliance_id')
-                ->references('allianceID')
-                ->on('eve_alliance_lists')
-                ->onDelete('cascade');
         });
 
         Schema::create('teamspeak_group_corporations', function (Blueprint $table) {
@@ -88,7 +86,7 @@ class CreateTeamspeakTables extends Migration
         });
 
         Schema::create('teamspeak_group_users', function (Blueprint $table) {
-            $table->unsignedInteger('user_id');
+            $table->bigInteger('user_id');
             $table->string('group_id');
             $table->boolean('enable');
             $table->timestamps();

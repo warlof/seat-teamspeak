@@ -3,7 +3,7 @@
 namespace Seat\Warlof\Teamspeak\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Seat\Eveapi\Models\Eve\AllianceList;
+use Seat\Eveapi\Models\Alliances\Alliance;
 
 class TeamspeakGroupAlliance extends Model
 {
@@ -16,6 +16,6 @@ class TeamspeakGroupAlliance extends Model
 
     public function alliance()
     {
-        return $this->belongsTo(AllianceList::class, 'alliance_id', 'allianceID');
+        return $this->belongsTo(Alliance::class, 'alliance_id', 'alliance_id');
     }
 }

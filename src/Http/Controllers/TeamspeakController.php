@@ -8,12 +8,13 @@
 namespace Seat\Warlof\Teamspeak\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
-use Seat\Eveapi\Models\Corporation\CorporationSheet;
+use Seat\Eveapi\Models\Corporation\CorporationInfo;
 use Seat\Eveapi\Models\Corporation\Title;
-use Seat\Eveapi\Models\Character\CharacterSheet;
-use Seat\Eveapi\Models\Eve\AllianceList;
+use Seat\Eveapi\Models\Character\CharacterInfo;
+use Seat\Eveapi\Models\Alliances\Alliance;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
@@ -28,7 +29,7 @@ use Seat\Warlof\Teamspeak\Validation\ValidateConfiguration;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 use Seat\Web\Models\Acl\Role;
 use Seat\Web\Models\User;
-use Seat\Eveapi\Models\Eve\ApiKey;
+// use Seat\Eveapi\Models\Eve\ApiKey;
 
 use TeamSpeak3;
 
@@ -48,8 +49,8 @@ class TeamspeakController extends Controller
         
         $users = User::all();
         $roles = Role::all();
-        $corporations = CorporationSheet::all();
-        $alliances = AllianceList::all();
+        $corporations = CorporationInfo::all();
+        $alliances = Alliance::all();
         $groups = TeamspeakGroup::all();
 
         return view('teamspeak::list',
@@ -386,11 +387,11 @@ class TeamspeakController extends Controller
         $tsTags = setting('teamspeak_tags', true);
 
         if ($tsTags != '') {
-            $character = CharacterSheet::find(setting('main_character_id'));
-            $corp = CorporationSheet::find($character->corporationID);
-            $main_character = "[" . $corp->ticker . "] ".setting('main_character_name');
+            $character = CharacterInfo::find(auth()->user()->group->main_character->id);
+            $corp = CorporationInfo::find($character->corporation_id);
+            $main_character = "[" . $corp->ticker . "] ".auth()->user()->group->main_character->name;
         } else {
-            $main_character = setting('main_character_name');
+            $main_character = auth()->user()->group->main_character->name;
         }
 
         $userList = $this->teamspeak->clientList();
@@ -426,55 +427,50 @@ class TeamspeakController extends Controller
         return json_encode([]);
     }
 
-    protected function allowedGroups(TeamspeakUser $teamspeak_user, $private)
+    protected function allowedGroups($teamspeak_user, $private)
     {
         $groups = [];
 
-        $rows = User::join('teamspeak_group_users', 'teamspeak_group_users.user_id', '=', 'users.id')
-            ->join('teamspeak_groups', 'teamspeak_group_users.group_id', '=', 'teamspeak_groups.id')
-            ->select('group_id')
-            ->where('users.id', $teamspeak_user->user_id)
+        $user = User::where('id', $teamspeak_user->user_id)->first();
+        $group_id = $user->group_id;
+
+        $characters = $user->associatedCharacterIds();
+
+        $rows = TeamspeakGroupUser::join('users', 'teamspeak_group_users.user_id', '=', 'users.id')
+            ->join('teamspeak_groups', 'teamspeak_group_users.group_id' , '=', 'teamspeak_groups.id')
+            ->whereIn('users.id', $characters)
             ->where('teamspeak_groups.is_server_group', (int) $private)
+            ->select('teamspeak_group_users.group_id')
             ->union(
                 // fix model declaration calling the table directly
-                DB::table('role_user')->join('teamspeak_group_roles', 'teamspeak_group_roles.role_id', '=',
-                    'role_user.role_id')
-                    ->join('teamspeak_groups', 'teamspeak_group_roles.group_id', '=', 'teamspeak_groups.id')
-                    ->where('role_user.user_id', $teamspeak_user->user_id)
+                TeamspeakGroupRole::join('group_role', 'teamspeak_group_roles.role_id', '=', 'group_role.role_id')
+            ->join('teamspeak_groups', 'teamspeak_group_roles.group_id' , '=', 'teamspeak_groups.id')
+                    ->where('group_role.group_id', $group_id)
                     ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('group_id')
+                    ->select('teamspeak_group_roles.group_id')
             )->union(
-                ApiKey::join('account_api_key_info_characters', 'account_api_key_info_characters.keyID', '=',
-                    'eve_api_keys.key_id')
-                    ->join('teamspeak_group_corporations', 'teamspeak_group_corporations.corporation_id', '=',
-                        'account_api_key_info_characters.corporationID')
-                    ->join('teamspeak_groups', 'teamspeak_group_corporations.group_id', '=', 'teamspeak_groups.id')
-                    ->where('eve_api_keys.user_id', $teamspeak_user->user_id)
+                TeamspeakGroupCorporation::join('character_infos', 'teamspeak_group_corporations.corporation_id', '=', 'character_infos.corporation_id')
+            ->join('teamspeak_groups', 'teamspeak_group_corporations.group_id' , '=', 'teamspeak_groups.id')
+                    ->whereIn('character_infos.character_id', $characters)
                     ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('group_id')
+                    ->select('teamspeak_group_corporations.group_id')
             )->union(
-                CharacterSheet::join('teamspeak_group_alliances', 'teamspeak_group_alliances.alliance_id', '=',
-                    'character_character_sheets.allianceID')
-                    ->join('teamspeak_groups', 'teamspeak_group_alliances.group_id', '=', 'teamspeak_groups.id')
-                    ->join('account_api_key_info_characters', 'account_api_key_info_characters.characterID', '=',
-                        'character_character_sheets.characterID')
-                    ->join('eve_api_keys', 'eve_api_keys.key_id', '=', 'account_api_key_info_characters.keyID')
-                    ->where('eve_api_keys.user_id', $teamspeak_user->user_id)
+                TeamspeakGroupAlliance::join('character_infos', 'teamspeak_group_alliances.alliance_id', '=', 'character_infos.alliance_id')
+            ->join('teamspeak_groups', 'teamspeak_group_alliances.group_id' , '=', 'teamspeak_groups.id')
+                    ->whereIn('character_infos.character_id', $characters)
                     ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('group_id')
+                    ->select('teamspeak_group_alliances.group_id')
             )->union(
                 TeamspeakGroupPublic::join('teamspeak_groups', 'teamspeak_group_public.group_id', '=', 'teamspeak_groups.id')
                     ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('group_id')
+                    ->select('teamspeak_group_public.group_id')
             )->get();
 
         foreach ($rows as $row) {
             $groups[] = $row->group_id;
         }
-
         return $groups;
     }
-
 
     /**
      * Invite an user to each group
@@ -492,14 +488,17 @@ class TeamspeakController extends Controller
 
 
     public function getRegisterUser() {
-        $character = CharacterSheet::find(setting('main_character_id'));
+        $character = CharacterInfo::find(auth()->user()->group->main_character->id)->first();
+
         if (!$character) {
             redirect()->back()->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
         }
-        $corp = CorporationSheet::find($character->corporationID);
+        $corp = CorporationInfo::find($character->corporation_id);
+
         if (!$corp) {
             redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
         }
+
         $ticker = $corp->ticker;
         $tags = setting('teamspeak_tags', true);
 
@@ -546,6 +545,28 @@ class TeamspeakController extends Controller
         }
 
         $this->teamspeak = TeamspeakHelper::connect($tsUsername, $tsPassword, $tsHostname, $tsServerQuery, $tsServerPort);
+    }
+
+    protected function logEvent($event_type, $groups)
+    {
+        $message = '';
+
+        switch ($event_type)
+        {
+            case 'invite':
+                $message = 'The user ' . $this->user->name . ' has been invited to following groups : ' .
+                    implode(',', $groups);
+                break;
+            case 'kick':
+                $message = 'The user ' . $this->user->name . ' has been kicked from following groups : ' .
+                    implode(',', $groups);
+                break;
+        }
+
+        TeamspeakLog::create([
+            'event' => $event_type,
+            'message' => $message
+        ]);
     }
 }
 
