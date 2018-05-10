@@ -9,13 +9,14 @@ namespace Seat\Warlof\Teamspeak\Commands;
 
 
 use Illuminate\Console\Command;
-use Seat\Warlof\Teamspeak\Models\TeamspeakLog;
+use Seat\Warlof\Teamspeak\Jobs\TeamspeakInviter;
+use Seat\Web\Models\User;
 
-class TeamspeakLogsClear extends Command
+class TeamspeakInvite extends Command
 {
-    protected $signature = 'teamspeak:logs:clear';
+    protected $signature = 'teamspeak:users:invite';
 
-    protected $description = 'Clearing Teamspeak logs';
+    protected $description = 'Auto invite based on white list/teamspeak relation';
 
     public function __construct()
     {
@@ -24,6 +25,7 @@ class TeamspeakLogsClear extends Command
 
     public function handle()
     {
-        TeamspeakLog::truncate();
+        TeamspeakInviter::dispatch();
     }
 }
+
