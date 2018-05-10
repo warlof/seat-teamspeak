@@ -6,5 +6,9 @@
  */
 
 return [
+<<<<<<< HEAD
     'version'   => '3.0.0-alpha1'
+=======
+    'version'   => '2.0.3'
+>>>>>>> upstream/master
 ];

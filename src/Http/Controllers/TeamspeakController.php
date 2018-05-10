@@ -11,10 +11,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
+<<<<<<< HEAD
 use Seat\Eveapi\Models\Corporation\CorporationInfo;
 use Seat\Eveapi\Models\Corporation\Title;
 use Seat\Eveapi\Models\Character\CharacterInfo;
 use Seat\Eveapi\Models\Alliances\Alliance;
+=======
+use Seat\Eveapi\Models\Corporation\CorporationSheet;
+use Seat\Eveapi\Models\Corporation\Title;
+use Seat\Eveapi\Models\Character\CharacterSheet;
+use Seat\Eveapi\Models\Eve\AllianceList;
+>>>>>>> upstream/master
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
@@ -264,7 +271,8 @@ class TeamspeakController extends Controller
     {
         if (TeamspeakGroupPublic::find($groupId) == null) {
             TeamspeakGroupPublic::create([
-                'group_id' => $groupId
+                'group_id' => $groupId,
+                'enable'   => true,
             ]);
 
             return redirect()->back()
@@ -283,8 +291,10 @@ class TeamspeakController extends Controller
 
         if ($relation->count() == 0) {
             TeamspeakGroupUser::create([
-                'user_id' => $userId,
-                'group_id' => $groupId]);
+                'user_id'  => $userId,
+                'group_id' => $groupId,
+                'enable'   => true,
+            ]);
 
             return redirect()->back()
                 ->with('success', 'New teamspeak user relation has been created');
@@ -302,8 +312,9 @@ class TeamspeakController extends Controller
 
         if ($relation->count() == 0) {
             TeamspeakGroupRole::create([
-                'role_id' => $roleId,
-                'group_id' => $groupId
+                'role_id'  => $roleId,
+                'group_id' => $groupId,
+                'enabled'  => true,
             ]);
 
             return redirect()->back()
@@ -325,7 +336,8 @@ class TeamspeakController extends Controller
             TeamspeakGroupTitle::create([
                 'corporation_id' => $corporationId,
                 'title_id' => $titleId,
-                'group_id' => $groupId
+                'group_id' => $groupId,
+                'enable'     => true,
             ]);
 
             return redirect()->back()
@@ -345,7 +357,8 @@ class TeamspeakController extends Controller
         if ($relation->count() == 0) {
             TeamspeakGroupCorporation::create([
                 'corporation_id' => $corporationId,
-                'group_id' => $groupId
+                'group_id' => $groupId,
+                'enable'   => true,
             ]);
 
             return redirect()->back()
@@ -365,7 +378,8 @@ class TeamspeakController extends Controller
         if ($relation->count() == 0) {
             TeamspeakGroupAlliance::create([
                 'alliance_id' => $allianceId,
-                'group_id' => $groupId
+                'group_id'    => $groupId,
+                'enabled'     => true,
             ]);
 
             return redirect()->back()
@@ -382,7 +396,24 @@ class TeamspeakController extends Controller
     */
     public function getUserID() {
 
+<<<<<<< HEAD
         $this->getTeamspeak();
+=======
+        $tsUsername = setting('teamspeak_username', true);
+        $tsPassword = setting('teamspeak_password', true);
+        $tsHostname = setting('teamspeak_hostname', true);
+        $tsServerQuery = setting('teamspeak_server_query', true);
+        $tsServerPort = setting('teamspeak_server_port', true);
+        $tsTags = setting('teamspeak_tags', true);
+
+        if ($tsTags != '') {
+            $character = CharacterSheet::find(setting('main_character_id'));
+            $corp = CorporationSheet::find($character->corporationID);
+            $main_character = "[" . $corp->ticker . "] ".setting('main_character_name');
+        } else {
+            $main_character = setting('main_character_name');
+        }
+>>>>>>> upstream/master
 
         $tsTags = setting('teamspeak_tags', true);
 
@@ -398,6 +429,7 @@ class TeamspeakController extends Controller
         foreach ($userList as $user) {
             $nickname = preg_replace('/’/', '\'', $user->client_nickname->toString());
             if ($nickname === $main_character) {
+<<<<<<< HEAD
                 $uid = $user->client_unique_identifier->toString();
                 $founduser = [];
                 $founduser['id'] = $uid;
@@ -422,6 +454,14 @@ class TeamspeakController extends Controller
                     $this->logEvent('invite', $missingGroups);
                 }
 			    return json_encode($founduser);
+=======
+                    $uid = $user->client_unique_identifier->toString();
+                    $founduser = [];
+                    $founduser['id'] = $uid;
+                    $founduser['nick'] = $nickname;
+                    $this->postRegisterUser($uid);
+			return json_encode($founduser);
+>>>>>>> upstream/master
             }
         }
         return json_encode([]);
@@ -488,6 +528,7 @@ class TeamspeakController extends Controller
 
 
     public function getRegisterUser() {
+<<<<<<< HEAD
         $character = CharacterInfo::find(auth()->user()->group->main_character->id)->first();
 
         if (!$character) {
@@ -499,6 +540,16 @@ class TeamspeakController extends Controller
             redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
         }
 
+=======
+        $character = CharacterSheet::find(setting('main_character_id'));
+        if (!$character) {
+            redirect()->back()->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
+        }
+        $corp = CorporationSheet::find($character->corporationID);
+        if (!$corp) {
+            redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
+        }
+>>>>>>> upstream/master
         $ticker = $corp->ticker;
         $tags = setting('teamspeak_tags', true);
 
