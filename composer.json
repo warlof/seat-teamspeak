@@ -8,8 +8,8 @@
         }
     },
     "require": {
-        "eveseat/eveapi": "^2.0",
-        "eveseat/web": "^2.0",
+        "eveseat/eveapi": "^3.0",
+        "eveseat/web": "^3.0",
         "erusev/parsedown": "^1.6",
         "planetteamspeak/ts3-php-framework": "^1.1"
     },
@@ -31,5 +31,5 @@
             "email": "ed.stafford@gmail.com"
         }
     ],
-    "minimum-stability": "stable"
+    "minimum-stability": "alpha"
 }

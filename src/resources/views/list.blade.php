@@ -47,7 +47,7 @@
                         <label for="teamspeak-corporation-id">{{ trans('teamspeak::seat.corporation') }}</label>
                         <select name="teamspeak-corporation-id" id="teamspeak-corporation-id" class="col-md-12" disabled="disabled">
                             @foreach($corporations as $corporation)
-                            <option value="{{ $corporation->corporationID }}">{{ $corporation->corporationName }}</option>
+                            <option value="{{ $corporation->corporation_id }}">{{ $corporation->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -56,7 +56,7 @@
                         <label for="teamspeak-alliance-id">{{ trans('teamspeak::seat.alliance') }}</label>
                         <select name="teamspeak-alliance-id" id="teamspeak-alliance-id" class="col-md-12" disabled="disabled">
                             @foreach($alliances as $alliance)
-                            <option value="{{ $alliance->allianceID }}">{{ $alliance->name }}</option>
+                            <option value="{{ $alliance->alliance_id }}">{{ $alliance->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -265,7 +265,7 @@
                         <tbody>
                         @foreach($groupCorporations as $group)
                             <tr>
-                                <td>{{ $group->corporation->corporationName }}</td>
+                                <td>{{ $group->corporation->name }}</td>
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>

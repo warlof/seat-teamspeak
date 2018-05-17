@@ -7,12 +7,14 @@
 
 namespace Seat\Warlof\Teamspeak\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
-use Seat\Eveapi\Models\Corporation\CorporationSheet;
+use Seat\Eveapi\Models\Corporation\CorporationInfo;
 use Seat\Eveapi\Models\Corporation\Title;
-use Seat\Eveapi\Models\Character\CharacterSheet;
-use Seat\Eveapi\Models\Eve\AllianceList;
+use Seat\Eveapi\Models\Character\CharacterInfo;
+use Seat\Eveapi\Models\Alliances\Alliance;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
@@ -24,13 +26,18 @@ use Seat\Warlof\Teamspeak\Models\TeamspeakGroupTitle;
 use Seat\Warlof\Teamspeak\Models\TeamspeakLog;
 use Seat\Warlof\Teamspeak\Validation\AddRelation;
 use Seat\Warlof\Teamspeak\Validation\ValidateConfiguration;
+use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 use Seat\Web\Models\Acl\Role;
 use Seat\Web\Models\User;
+// use Seat\Eveapi\Models\Eve\ApiKey;
 
 use TeamSpeak3;
 
 class TeamspeakController extends Controller
 {
+
+    private $teamspeak;
+
     public function getRelations()
     {
         $groupPublic = TeamspeakGroupPublic::all();
@@ -42,8 +49,8 @@ class TeamspeakController extends Controller
         
         $users = User::all();
         $roles = Role::all();
-        $corporations = CorporationSheet::all();
-        $alliances = AllianceList::all();
+        $corporations = CorporationInfo::all();
+        $alliances = Alliance::all();
         $groups = TeamspeakGroup::all();
 
         return view('teamspeak::list',
@@ -257,8 +264,7 @@ class TeamspeakController extends Controller
     {
         if (TeamspeakGroupPublic::find($groupId) == null) {
             TeamspeakGroupPublic::create([
-                'group_id' => $groupId,
-                'enable'   => true,
+                'group_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -277,10 +283,8 @@ class TeamspeakController extends Controller
 
         if ($relation->count() == 0) {
             TeamspeakGroupUser::create([
-                'user_id'  => $userId,
-                'group_id' => $groupId,
-                'enable'   => true,
-            ]);
+                'user_id' => $userId,
+                'group_id' => $groupId]);
 
             return redirect()->back()
                 ->with('success', 'New teamspeak user relation has been created');
@@ -298,9 +302,8 @@ class TeamspeakController extends Controller
 
         if ($relation->count() == 0) {
             TeamspeakGroupRole::create([
-                'role_id'  => $roleId,
-                'group_id' => $groupId,
-                'enabled'  => true,
+                'role_id' => $roleId,
+                'group_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -322,8 +325,7 @@ class TeamspeakController extends Controller
             TeamspeakGroupTitle::create([
                 'corporation_id' => $corporationId,
                 'title_id' => $titleId,
-                'group_id' => $groupId,
-                'enable'     => true,
+                'group_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -343,8 +345,7 @@ class TeamspeakController extends Controller
         if ($relation->count() == 0) {
             TeamspeakGroupCorporation::create([
                 'corporation_id' => $corporationId,
-                'group_id' => $groupId,
-                'enable'   => true,
+                'group_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -364,8 +365,7 @@ class TeamspeakController extends Controller
         if ($relation->count() == 0) {
             TeamspeakGroupAlliance::create([
                 'alliance_id' => $allianceId,
-                'group_id'    => $groupId,
-                'enabled'     => true,
+                'group_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -382,49 +382,123 @@ class TeamspeakController extends Controller
     */
     public function getUserID() {
 
-        $tsUsername = setting('teamspeak_username', true);
-        $tsPassword = setting('teamspeak_password', true);
-        $tsHostname = setting('teamspeak_hostname', true);
-        $tsServerQuery = setting('teamspeak_server_query', true);
-        $tsServerPort = setting('teamspeak_server_port', true);
+        $this->getTeamspeak();
+
         $tsTags = setting('teamspeak_tags', true);
 
         if ($tsTags != '') {
-            $character = CharacterSheet::find(setting('main_character_id'));
-            $corp = CorporationSheet::find($character->corporationID);
-            $main_character = "[" . $corp->ticker . "] ".setting('main_character_name');
+            $character = CharacterInfo::find(auth()->user()->group->main_character->id);
+            $corp = CorporationInfo::find($character->corporation_id);
+            $main_character = "[" . $corp->ticker . "] ".auth()->user()->group->main_character->name;
         } else {
-            $main_character = setting('main_character_name');
+            $main_character = auth()->user()->group->main_character->name;
         }
 
-        $serverQuery = sprintf("serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0", $tsUsername, $tsPassword,
-            $tsHostname, $tsServerQuery, $tsServerPort);
-        $ts3Server = TeamSpeak3::factory($serverQuery);
-        
-        $userList = $ts3Server->clientList();
+        $userList = $this->teamspeak->clientList();
         foreach ($userList as $user) {
             $nickname = preg_replace('/’/', '\'', $user->client_nickname->toString());
             if ($nickname === $main_character) {
-                    $uid = $user->client_unique_identifier->toString();
-                    $founduser = [];
-                    $founduser['id'] = $uid;
-                    $founduser['nick'] = $nickname;
-                    $this->postRegisterUser($uid);
-			return json_encode($founduser);
+                $uid = $user->client_unique_identifier->toString();
+                $founduser = [];
+                $founduser['id'] = $uid;
+                $founduser['nick'] = $nickname;
+                $this->postRegisterUser($uid);
+
+                $teamspeakUser = TeamspeakUser::where('user_id', auth()->user()->id)->first();
+                // search client information using client unique ID
+                // $userInfo = $this->getTeamspeak()->clientGetByUid($teamspeakUser->teamspeak_id, true);
+
+                $allowedGroups = $this->allowedGroups($teamspeakUser, true);
+                $teamspeakGroups = $this->teamspeak->clientGetServerGroupsByDbid($user->client_database_id);
+
+                $memberOfGroups = [];
+                foreach ($teamspeakGroups as $g) {
+                    $memberOfGroups[] = $g['sgid'];
+                }
+
+                $missingGroups = array_diff($allowedGroups, $memberOfGroups);
+                if (!empty($missingGroups)) {
+                    $this->processGroupsInvitation($user, $missingGroups);
+                    $this->logEvent('invite', $missingGroups);
+                }
+			    return json_encode($founduser);
             }
         }
         return json_encode([]);
     }
 
+    protected function allowedGroups($teamspeak_user, $private)
+    {
+        $groups = [];
+
+        $user = User::where('id', $teamspeak_user->user_id)->first();
+        $group_id = $user->group_id;
+
+        $characters = $user->associatedCharacterIds();
+
+        $rows = TeamspeakGroupUser::join('users', 'teamspeak_group_users.user_id', '=', 'users.id')
+            ->join('teamspeak_groups', 'teamspeak_group_users.group_id' , '=', 'teamspeak_groups.id')
+            ->whereIn('users.id', $characters)
+            ->where('teamspeak_groups.is_server_group', (int) $private)
+            ->select('teamspeak_group_users.group_id')
+            ->union(
+                // fix model declaration calling the table directly
+                TeamspeakGroupRole::join('group_role', 'teamspeak_group_roles.role_id', '=', 'group_role.role_id')
+            ->join('teamspeak_groups', 'teamspeak_group_roles.group_id' , '=', 'teamspeak_groups.id')
+                    ->where('group_role.group_id', $group_id)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('teamspeak_group_roles.group_id')
+            )->union(
+                TeamspeakGroupCorporation::join('character_infos', 'teamspeak_group_corporations.corporation_id', '=', 'character_infos.corporation_id')
+            ->join('teamspeak_groups', 'teamspeak_group_corporations.group_id' , '=', 'teamspeak_groups.id')
+                    ->whereIn('character_infos.character_id', $characters)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('teamspeak_group_corporations.group_id')
+            )->union(
+                TeamspeakGroupAlliance::join('character_infos', 'teamspeak_group_alliances.alliance_id', '=', 'character_infos.alliance_id')
+            ->join('teamspeak_groups', 'teamspeak_group_alliances.group_id' , '=', 'teamspeak_groups.id')
+                    ->whereIn('character_infos.character_id', $characters)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('teamspeak_group_alliances.group_id')
+            )->union(
+                TeamspeakGroupPublic::join('teamspeak_groups', 'teamspeak_group_public.group_id', '=', 'teamspeak_groups.id')
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('teamspeak_group_public.group_id')
+            )->get();
+
+        foreach ($rows as $row) {
+            $groups[] = $row->group_id;
+        }
+        return $groups;
+    }
+
+    /**
+     * Invite an user to each group
+     *
+     * @param \TeamSpeak3_Node_Client $teamspeak_client_node
+     * @param array $groups
+     */
+    private function processGroupsInvitation(\TeamSpeak3_Node_Client $teamspeak_client_node, $groups)
+    {
+        // iterate over each group ID and add the user
+        foreach ($groups as $groupId) {
+            $this->teamspeak->serverGroupClientAdd($groupId, $teamspeak_client_node->client_database_id);
+        }
+    }
+
+
     public function getRegisterUser() {
-        $character = CharacterSheet::find(setting('main_character_id'));
+        $character = CharacterInfo::find(auth()->user()->group->main_character->id)->first();
+
         if (!$character) {
             redirect()->back()->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
         }
-        $corp = CorporationSheet::find($character->corporationID);
+        $corp = CorporationInfo::find($character->corporation_id);
+
         if (!$corp) {
             redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
         }
+
         $ticker = $corp->ticker;
         $tags = setting('teamspeak_tags', true);
 
@@ -448,4 +522,52 @@ class TeamspeakController extends Controller
         }
         return;
     }
+
+    /**
+     * Set the Teamspeak Server object
+     *
+     * @throws \Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException
+     * @throws \Seat\Services\Exceptions\SettingException
+     */
+    public function getTeamspeak()
+    {
+        // load token and team uri from settings
+        $tsUsername = setting('teamspeak_username', true);
+        $tsPassword = setting('teamspeak_password', true);
+        $tsHostname = setting('teamspeak_hostname', true);
+        $tsServerQuery = setting('teamspeak_server_query', true);
+        $tsServerPort = setting('teamspeak_server_port', true);
+
+        if ($tsUsername == null || $tsPassword == null || $tsHostname == null || $tsServerQuery == null ||
+            $tsServerPort == null) {
+            throw new TeamspeakSettingException("missing teamspeak_username, teamspeak_password, teamspeak_hostname, ".
+                "teamspeak_server_query or teamspeak_server_port in settings");
+        }
+
+        $this->teamspeak = TeamspeakHelper::connect($tsUsername, $tsPassword, $tsHostname, $tsServerQuery, $tsServerPort);
+    }
+
+    protected function logEvent($event_type, $groups)
+    {
+        $message = '';
+
+        switch ($event_type)
+        {
+            case 'invite':
+                $message = 'The user ' . $this->user->name . ' has been invited to following groups : ' .
+                    implode(',', $groups);
+                break;
+            case 'kick':
+                $message = 'The user ' . $this->user->name . ' has been kicked from following groups : ' .
+                    implode(',', $groups);
+                break;
+        }
+
+        TeamspeakLog::create([
+            'event' => $event_type,
+            'message' => $message
+        ]);
+    }
 }
+
+

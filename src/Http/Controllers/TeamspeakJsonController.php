@@ -18,8 +18,8 @@ class TeamspeakJsonController extends Controller
     {
         $corporationId = request()->input('corporation_id');
 
-        if (!empty($corporationId)) {
-            $titles = Title::where('corporationID', $corporationId)->select('titleID', 'titleName')
+        if (!empty($corporation_id)) {
+            $titles = Title::where('corporation_id', $corporationId)->select('titleID', 'titleName')
                 ->get();
 
             return response()->json($titles->map(
