@@ -40,7 +40,7 @@ class CreateTeamspeakTables extends Migration
         Schema::create('teamspeak_group_alliances', function (Blueprint $table) {
             $table->integer('alliance_id');
             $table->string('group_id');
-            $table->boolean('enable');
+            $table->boolean('enable')->default(true);;
             $table->timestamps();
 
             $table->primary(['alliance_id', 'group_id']);
@@ -55,7 +55,7 @@ class CreateTeamspeakTables extends Migration
         Schema::create('teamspeak_group_corporations', function (Blueprint $table) {
             $table->integer('corporation_id');
             $table->string('group_id');
-            $table->boolean('enable');
+            $table->boolean('enable')->default(true);;
             $table->timestamps();
 
             $table->primary(['corporation_id', 'group_id']);
@@ -69,7 +69,7 @@ class CreateTeamspeakTables extends Migration
         Schema::create('teamspeak_group_roles', function (Blueprint $table) {
             $table->unsignedInteger('role_id');
             $table->string('group_id');
-            $table->boolean('enable');
+            $table->boolean('enable')->default(true);;
             $table->timestamps();
 
             $table->primary(['role_id', 'group_id']);
@@ -88,7 +88,7 @@ class CreateTeamspeakTables extends Migration
         Schema::create('teamspeak_group_users', function (Blueprint $table) {
             $table->bigInteger('user_id');
             $table->string('group_id');
-            $table->boolean('enable');
+            $table->boolean('enable')->default(true);
             $table->timestamps();
 
             $table->primary(['user_id', 'group_id']);
@@ -106,7 +106,7 @@ class CreateTeamspeakTables extends Migration
 
         Schema::create('teamspeak_group_public', function (Blueprint $table) {
             $table->string('group_id');
-            $table->boolean('enable');
+            $table->boolean('enable')->default(true);;
             $table->timestamps();
 
             $table->primary('group_id');
