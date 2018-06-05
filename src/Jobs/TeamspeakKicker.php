@@ -13,7 +13,7 @@ use Seat\Eseye\Exceptions\EsiScopeAccessDeniedException;
 use Seat\Eseye\Exceptions\RequestFailedException;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 
-class TeamspeakKicker extends EsiBase
+class TeamspeakKicker extends TeamspeakJobBase
 {
 
     protected $tags = ['teamspeak', 'kick'];

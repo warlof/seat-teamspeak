@@ -13,7 +13,7 @@ use Seat\Eseye\Exceptions\EsiScopeAccessDeniedException;
 use Seat\Eseye\Exceptions\RequestFailedException;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 
-class TeamspeakInviter extends EsiBase
+class TeamspeakInviter extends TeamspeakJobBase
 {
 
     protected $tags = ['teamspeak', 'invite'];
