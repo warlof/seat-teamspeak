@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * User: Warlof Tutsimo <loic.leuilliot@gmail.com>
  * Date: 15/06/2016
@@ -387,9 +387,9 @@ class TeamspeakController extends Controller
         $tsTags = setting('teamspeak_tags', true);
 
         if ($tsTags != '') {
-            $character = CharacterInfo::find(auth()->user()->group->main_character->id);
+            $character = auth()->user()->group->main_character;
             $corp = CorporationInfo::find($character->corporation_id);
-            $main_character = "[" . $corp->ticker . "] ".auth()->user()->group->main_character->name;
+            $main_character = $corp->ticker . " | ".auth()->user()->group->main_character->name;
         } else {
             $main_character = auth()->user()->group->main_character->name;
         }
@@ -406,7 +406,7 @@ class TeamspeakController extends Controller
 
                 $teamspeakUser = TeamspeakUser::where('user_id', auth()->user()->id)->first();
                 // search client information using client unique ID
-                // $userInfo = $this->getTeamspeak()->clientGetByUid($teamspeakUser->teamspeak_id, true);
+                $userInfo = $this->teamspeak->clientGetByUid($teamspeakUser->teamspeak_id, true);
 
                 $allowedGroups = $this->allowedGroups($teamspeakUser, true);
                 $teamspeakGroups = $this->teamspeak->clientGetServerGroupsByDbid($user->client_database_id);
@@ -418,8 +418,8 @@ class TeamspeakController extends Controller
 
                 $missingGroups = array_diff($allowedGroups, $memberOfGroups);
                 if (!empty($missingGroups)) {
-                    $this->processGroupsInvitation($user, $missingGroups);
-                    $this->logEvent('invite', $missingGroups);
+                    $this->processGroupsInvitation($userInfo, $missingGroups);
+                    $this->logEvent($nickname, 'invite', $missingGroups);
                 }
 			    return json_encode($founduser);
             }
@@ -488,7 +488,7 @@ class TeamspeakController extends Controller
 
 
     public function getRegisterUser() {
-        $character = CharacterInfo::find(auth()->user()->group->main_character->id)->first();
+        $character = auth()->user()->group->main_character;
 
         if (!$character) {
             redirect()->back()->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
@@ -547,18 +547,18 @@ class TeamspeakController extends Controller
         $this->teamspeak = TeamspeakHelper::connect($tsUsername, $tsPassword, $tsHostname, $tsServerQuery, $tsServerPort);
     }
 
-    protected function logEvent($event_type, $groups)
+    protected function logEvent($user, $event_type, $groups)
     {
         $message = '';
 
         switch ($event_type)
         {
             case 'invite':
-                $message = 'The user ' . $this->user->name . ' has been invited to following groups : ' .
+                $message = 'The user ' . $user . ' has been invited to following groups : ' .
                     implode(',', $groups);
                 break;
             case 'kick':
-                $message = 'The user ' . $this->user->name . ' has been kicked from following groups : ' .
+                $message = 'The user ' . $user . ' has been kicked from following groups : ' .
                     implode(',', $groups);
                 break;
         }
