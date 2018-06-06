@@ -431,7 +431,7 @@ class TeamspeakController extends Controller
     {
         $groups = [];
 
-        $user = User::where('id', $teamspeak_user->user_id)->first();
+        $user = Group::where('id', $teamspeak_user->user_id)->first();
         $group_id = $user->group_id;
 
         $characters = $user->associatedCharacterIds();
