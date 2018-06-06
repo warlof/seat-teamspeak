@@ -22,15 +22,12 @@ class CreateTeamspeakTables extends Migration
             $table->primary('id');
         });
 
-        Schema::create('teamspeak_users', function (Blueprint $table) {
-            $table->integer('group_id');
+        		
+		Schema::create('teamspeak_users', function (Blueprint $table) {
+            $table->unsignedInteger('group_id');
             $table->string('teamspeak_id');
             $table->timestamps();
-
             $table->primary('group_id');
-        });
-
-        Schema::table('teamspeak_users', function (Blueprint $table) {
             $table->foreign('group_id')
                 ->references('id')
                 ->on('groups')
