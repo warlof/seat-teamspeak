@@ -28,7 +28,7 @@ use Seat\Warlof\Teamspeak\Validation\AddRelation;
 use Seat\Warlof\Teamspeak\Validation\ValidateConfiguration;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 use Seat\Web\Models\Acl\Role;
-use Seat\Web\Models\User;
+use Seat\Web\Models\Group;
 // use Seat\Eveapi\Models\Eve\ApiKey;
 
 use TeamSpeak3;
@@ -47,7 +47,7 @@ class TeamspeakController extends Controller
         $groupAlliances = TeamspeakGroupAlliance::all();
         $groupTitles = TeamspeakGroupTitle::all();
         
-        $users = User::all();
+        $users = Group::all();
         $roles = Role::all();
         $corporations = CorporationInfo::all();
         $alliances = Alliance::all();

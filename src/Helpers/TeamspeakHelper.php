@@ -87,9 +87,9 @@ class TeamspeakHelper
 
         $characters = $user->associatedCharacterIds();
 
-        $rows = TeamspeakGroupUser::join('users', 'teamspeak_group_users.group_id', '=', 'users.id')
+        $rows = TeamspeakGroupUser::join('groups', 'teamspeak_group_users.group_id', '=', 'groups.id')
             ->join('teamspeak_groups', 'teamspeak_group_users.tsgrp_id' , '=', 'teamspeak_groups.id')
-            ->whereIn('users.id', $characters)
+            ->whereIn('groups.id', $characters)
             ->where('teamspeak_groups.is_server_group', (int) $private)
             ->select('teamspeak_group_users.tsgrp_id')
             ->union(
