@@ -7,11 +7,11 @@ use Seat\Web\Models\Acl\Role;
 
 class TeamspeakGroupRole extends Model
 {
-    protected $fillable = ['role_id', 'group_id', 'enable'];
+    protected $fillable = ['role_id', 'tsgrp_id', 'enable'];
 
     public function group()
     {
-        return $this->belongsTo(TeamspeakGroup::class, 'group_id', 'id');
+        return $this->belongsTo(TeamspeakGroup::class, 'tsgrp_id', 'id');
     }
 
     public function role()

@@ -29,6 +29,7 @@ use Seat\Warlof\Teamspeak\Validation\ValidateConfiguration;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 use Seat\Web\Models\Acl\Role;
 use Seat\Web\Models\Group;
+use Seat\Web\Models\User;
 // use Seat\Eveapi\Models\Eve\ApiKey;
 
 use TeamSpeak3;
