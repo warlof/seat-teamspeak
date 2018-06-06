@@ -36,13 +36,13 @@ class CreateTeamspeakTables extends Migration
 
         Schema::create('teamspeak_group_alliances', function (Blueprint $table) {
             $table->integer('alliance_id');
-            $table->string('tsgroup_id');
+            $table->string('tsgrp_id');
             $table->boolean('enable')->default(true);;
             $table->timestamps();
 
-            $table->primary(['alliance_id', 'tsgroup_id']);
+            $table->primary(['alliance_id', 'tsgrp_id']);
 
-            $table->foreign('tsgroup_id')
+            $table->foreign('tsgrp_id')
                 ->references('id')
                 ->on('teamspeak_groups')
                 ->onDelete('cascade');
@@ -51,13 +51,13 @@ class CreateTeamspeakTables extends Migration
 
         Schema::create('teamspeak_group_corporations', function (Blueprint $table) {
             $table->integer('corporation_id');
-            $table->string('tsgroup_id');
+            $table->string('tsgrp_id');
             $table->boolean('enable')->default(true);;
             $table->timestamps();
 
-            $table->primary(['corporation_id', 'tsgroup_id']);
+            $table->primary(['corporation_id', 'tsgrp_id']);
 
-            $table->foreign('tsgroup_id')
+            $table->foreign('tsgrp_id')
                 ->references('id')
                 ->on('teamspeak_groups')
                 ->onDelete('cascade');
@@ -65,50 +65,50 @@ class CreateTeamspeakTables extends Migration
 
         Schema::create('teamspeak_group_roles', function (Blueprint $table) {
             $table->unsignedInteger('role_id');
-            $table->string('tsgroup_id');
+            $table->string('tsgrp_id');
             $table->boolean('enable')->default(true);;
             $table->timestamps();
 
-            $table->primary(['role_id', 'tsgroup_id']);
+            $table->primary(['role_id', 'tsgrp_id']);
 
             $table->foreign('role_id')
                 ->references('id')
                 ->on('roles')
                 ->onDelete('cascade');
 
-            $table->foreign('tsgroup_id')
+            $table->foreign('tsgrp_id')
                 ->references('id')
                 ->on('teamspeak_groups')
                 ->onDelete('cascade');
         });
 
         Schema::create('teamspeak_group_users', function (Blueprint $table) {
-            $table->integer('group_id');
-            $table->string('tsgroup_id');
+            $table->unsignedInteger('group_id');
+            $table->string('tsgrp_id');
             $table->boolean('enable')->default(true);
             $table->timestamps();
 
-            $table->primary(['group_id', 'tsgroup_id']);
+            $table->primary(['group_id', 'tsgrp_id']);
 
             $table->foreign('group_id')
                 ->references('id')
                 ->on('groups')
                 ->onDelete('cascade');
 
-            $table->foreign('tsgroup_id')
+            $table->foreign('tsgrp_id')
                 ->references('id')
                 ->on('teamspeak_groups')
                 ->onDelete('cascade');
         });
 
         Schema::create('teamspeak_group_public', function (Blueprint $table) {
-            $table->string('tsgroup_id');
+            $table->string('tsgrp_id');
             $table->boolean('enable')->default(true);;
             $table->timestamps();
 
-            $table->primary('tsgroup_id');
+            $table->primary('tsgrp_id');
 
-            $table->foreign('tsgroup_id')
+            $table->foreign('tsgrp_id')
                 ->references('id')
                 ->on('teamspeak_groups')
                 ->onDelete('cascade');
