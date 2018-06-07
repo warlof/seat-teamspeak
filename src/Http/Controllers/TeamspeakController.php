@@ -48,7 +48,7 @@ class TeamspeakController extends Controller
         $groupAlliances = TeamspeakGroupAlliance::all();
         $groupTitles = TeamspeakGroupTitle::all();
         
-        $users = Group::all();
+        $users = User::all();
         $roles = Role::all();
         $corporations = CorporationInfo::all();
         $alliances = Alliance::all();
@@ -145,7 +145,7 @@ class TeamspeakController extends Controller
 
     public function getRemovePublic($groupId)
     {
-        $groupPublic = TeamspeakGroupPublic::where('group_id', $groupId);
+        $groupPublic = TeamspeakGroupPublic::where('tsgrp_id', $groupId);
 
         if ($groupPublic != null) {
             $groupPublic->delete();
@@ -159,8 +159,8 @@ class TeamspeakController extends Controller
 
     public function getRemoveUser($userId, $groupId)
     {
-        $groupUser = TeamspeakGroupUser::where('user_id', $userId)
-            ->where('group_id', $groupId);
+        $groupUser = TeamspeakGroupUser::where('group_id', $userId)
+            ->where('tsgrp_id', $groupId);
 
         if ($groupUser != null) {
             $groupUser->delete();
@@ -175,7 +175,7 @@ class TeamspeakController extends Controller
     public function getRemoveRole($roleId, $groupId)
     {
         $groupRole = TeamspeakGroupRole::where('role_id', $roleId)
-            ->where('group_id', $groupId);
+            ->where('tsgrp_id', $groupId);
 
         if ($groupRole != null) {
             $groupRole->delete();
@@ -190,7 +190,7 @@ class TeamspeakController extends Controller
     public function getRemoveCorporation($corporationId, $groupId)
     {
         $groupCorporation = TeamspeakGroupCorporation::where('corporation_id', $corporationId)
-            ->where('group_id', $groupId);
+            ->where('tsgrp_id', $groupId);
 
         if ($groupCorporation != null) {
             $groupCorporation->delete();
@@ -205,7 +205,7 @@ class TeamspeakController extends Controller
     public function getRemoveAlliance($allianceId, $groupId)
     {
         $groupAlliance = TeamspeakGroupAlliance::where('alliance_id', $allianceId)
-            ->where('group_id', $groupId);
+            ->where('tsgrp_id', $groupId);
 
         if ($groupAlliance != null) {
             $groupAlliance->delete();
@@ -222,7 +222,7 @@ class TeamspeakController extends Controller
     {
         $groupTitle = TeamspeakGroupTitle::where('corporation_id', $corporationId)
             ->where('title_id', $titleId)
-            ->where('group_id', $groupId);
+            ->where('tsgrp_id', $groupId);
 
         if ($groupTitle != null) {
             $groupTitle->delete();
@@ -265,7 +265,7 @@ class TeamspeakController extends Controller
     {
         if (TeamspeakGroupPublic::find($groupId) == null) {
             TeamspeakGroupPublic::create([
-                'group_id' => $groupId
+                'tsgrp_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -278,14 +278,14 @@ class TeamspeakController extends Controller
 
     private function postUserRelation($groupId, $userId)
     {
-        $relation = TeamspeakGroupUser::where('group_id', '=', $groupId)
-            ->where('user_id', '=', $userId)
+        $relation = TeamspeakGroupUser::where('tsgrp_id', '=', $groupId)
+            ->where('group_id', '=', $userId)
             ->get();
 
         if ($relation->count() == 0) {
             TeamspeakGroupUser::create([
-                'user_id' => $userId,
-                'group_id' => $groupId]);
+                'group_id' => $userId,
+                'tsgrp_id' => $groupId]);
 
             return redirect()->back()
                 ->with('success', 'New teamspeak user relation has been created');
@@ -298,13 +298,13 @@ class TeamspeakController extends Controller
     private function postRoleRelation($groupId, $roleId)
     {
         $relation = TeamspeakGroupRole::where('role_id', '=', $roleId)
-            ->where('group_id', '=', $groupId)
+            ->where('tsgrp_id', '=', $groupId)
             ->get();
 
         if ($relation->count() == 0) {
             TeamspeakGroupRole::create([
                 'role_id' => $roleId,
-                'group_id' => $groupId
+                'tsgrp_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -319,14 +319,14 @@ class TeamspeakController extends Controller
     {
         $relation = TeamspeakGroupTitle::where('corporation_id', '=', $corporationId)
             ->where('title_id', '=', $titleId)
-            ->where('group_id', '=', $groupId)
+            ->where('tsgrp_id', '=', $groupId)
             ->get();
 
         if ($relation->count() == 0) {
             TeamspeakGroupTitle::create([
                 'corporation_id' => $corporationId,
                 'title_id' => $titleId,
-                'group_id' => $groupId
+                'tsgrp_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -340,13 +340,13 @@ class TeamspeakController extends Controller
     private function postCorporationRelation($groupId, $corporationId)
     {
         $relation = TeamspeakGroupCorporation::where('corporation_id', '=', $corporationId)
-            ->where('group_id', '=', $groupId)
+            ->where('tsgrp_id', '=', $groupId)
             ->get();
 
         if ($relation->count() == 0) {
             TeamspeakGroupCorporation::create([
                 'corporation_id' => $corporationId,
-                'group_id' => $groupId
+                'tsgrp_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -360,13 +360,13 @@ class TeamspeakController extends Controller
     private function postAllianceRelation($groupId, $allianceId)
     {
         $relation = TeamspeakGroupAlliance::where('alliance_id', '=', $allianceId)
-            ->where('group_id', '=', $groupId)
+            ->where('tsgrp_id', '=', $groupId)
             ->get();
 
         if ($relation->count() == 0) {
             TeamspeakGroupAlliance::create([
                 'alliance_id' => $allianceId,
-                'group_id' => $groupId
+                'tsgrp_id' => $groupId
             ]);
 
             return redirect()->back()
@@ -513,7 +513,7 @@ class TeamspeakController extends Controller
         $tsUser = TeamspeakUser::find($userId); 
         if ($tsUser == null) {
             TeamspeakUser::create([
-                'user_id' => $userId,
+                'group_id' => $userId,
                 'teamspeak_id' => $uid
             ]);
         }
