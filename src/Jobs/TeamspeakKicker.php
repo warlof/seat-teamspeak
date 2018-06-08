@@ -32,7 +32,7 @@ class TeamspeakKicker extends TeamspeakJobBase
 
             $group_id = $user->group_id;
 
-            $teamspeakUser = TeamspeakUser::where('user_id', $user->id)->first();
+            $teamspeakUser = TeamspeakUser::where('group_id', $group_id)->first();
 
 Log::info("Teamspeak User: " . $teamspeakUser . " And User ID " . $user->id);
 Log::info("Teamspeak Handler: " . $thelper->getTeamspeak());
@@ -54,7 +54,7 @@ Log::info("Teamspeak Handler: " . $thelper->getTeamspeak());
 
                 if (!empty($missingGroups)) {
                    $thelper->processGroupsKick($userInfo, $missingGroups);
-                   $thelper->logEvent('kick', $missingGroups);
+                   $thelper->logEvent($userInfo, 'kick', $missingGroups);
                 }
             }
         }

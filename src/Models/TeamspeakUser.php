@@ -13,7 +13,7 @@ class TeamspeakUser extends Model
 
     protected $primaryKey = 'group_id';
     
-    public function user()
+    public function group()
     {
         return $this->belongsTo(Group::class, 'group_id', 'id');
     }

@@ -29,7 +29,9 @@
                         <label for="teamspeak-user-id">{{ trans('teamspeak::seat.username') }}</label>
                         <select name="teamspeak-user-id" id="teamspeak-user-id" class="col-md-12">
                             @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+								@if ($user->id != 1)
+                            <option value="{{ $user->group_id }}">{{ $user->name }}</option>
+								@endif
                             @endforeach
                         </select>
                     </div>
@@ -167,14 +169,14 @@
                         <tbody>
                        @foreach($groupUsers as $group)
                             <tr>
-                                <td>{{ $group->user->name }}</td>
+                                <td>{{ $group->user->main_character->name }}</td>
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.user.remove', ['user_id' => $group->user_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.user.remove', ['user_id' => $group->group_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>

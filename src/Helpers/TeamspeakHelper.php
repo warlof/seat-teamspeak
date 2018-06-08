@@ -24,6 +24,7 @@ use Seat\Warlof\Teamspeak\Models\TeamspeakGroupTitle;
 use Seat\Warlof\Teamspeak\Models\TeamspeakLog;
 use Seat\Web\Models\Acl\Role;
 use Seat\Web\Models\Group;
+use Seat\Web\Models\User;
 
 class TeamspeakHelper
 {
@@ -78,50 +79,7 @@ class TeamspeakHelper
         return $this->teamspeak;
     }
 
-    public function allowedGroups($teamspeak_user, $private)
-    {
-        $groups = [];
-
-        $user = Group::where('id', $teamspeak_user->group_id)->first();
-        $tsgrp_id = $user->tsgrp_id;
-
-        $characters = $user->associatedCharacterIds();
-
-        $rows = TeamspeakGroupUser::join('groups', 'teamspeak_group_users.group_id', '=', 'groups.id')
-            ->join('teamspeak_groups', 'teamspeak_group_users.tsgrp_id' , '=', 'teamspeak_groups.id')
-            ->whereIn('groups.id', $characters)
-            ->where('teamspeak_groups.is_server_group', (int) $private)
-            ->select('teamspeak_group_users.tsgrp_id')
-            ->union(
-                // fix model declaration calling the table directly
-                TeamspeakGroupRole::join('group_role', 'teamspeak_group_roles.role_id', '=', 'group_role.role_id')
-            ->join('teamspeak_groups', 'teamspeak_group_roles.tsgrp_id' , '=', 'teamspeak_groups.id')
-                    ->where('group_role.tsgrp_id', $tsgrp_id)
-                    ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('teamspeak_group_roles.tsgrp_id')
-            )->union(
-                TeamspeakGroupCorporation::join('character_infos', 'teamspeak_group_corporations.corporation_id', '=', 'character_infos.corporation_id')
-            ->join('teamspeak_groups', 'teamspeak_group_corporations.tsgrp_id' , '=', 'teamspeak_groups.id')
-                    ->whereIn('character_infos.character_id', $characters)
-                    ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('teamspeak_group_corporations.tsgrp_id')
-            )->union(
-                TeamspeakGroupAlliance::join('character_infos', 'teamspeak_group_alliances.alliance_id', '=', 'character_infos.alliance_id')
-            ->join('teamspeak_groups', 'teamspeak_group_alliances.tsgrp_id' , '=', 'teamspeak_groups.id')
-                    ->whereIn('character_infos.character_id', $characters)
-                    ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('teamspeak_group_alliances.tsgrp_id')
-            )->union(
-                TeamspeakGroupPublic::join('teamspeak_groups', 'teamspeak_group_public.tsgrp_id', '=', 'teamspeak_groups.id')
-                    ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('teamspeak_group_public.tsgrp_id')
-            )->get();
-
-        foreach ($rows as $row) {
-            $groups[] = $row->tsgrp_id;
-        }
-        return $groups;
-    }
+    
 
     /**
      * Invite an user to each group
@@ -150,18 +108,18 @@ class TeamspeakHelper
         }
     }
 
-    public function logEvent($event_type, $groups)
+    public function logEvent($user, $event_type, $groups)
     {
         $message = '';
 
         switch ($event_type)
         {
             case 'invite':
-                $message = 'The user ' . ' has been invited to following groups : ' .
+                $message = 'The user ' . $user . ' has been invited to following groups : ' .
                     implode(',', $groups);
                 break;
             case 'kick':
-                $message = 'The user ' . ' has been kicked from following groups : ' .
+                $message = 'The user ' . $user . ' has been kicked from following groups : ' .
                     implode(',', $groups);
                 break;
         }
@@ -171,6 +129,56 @@ class TeamspeakHelper
             'message' => $message
         ]);
     }
+	
 
+public function allowedGroups($teamspeak_user, $private)
+    {
+        $groups = [];
+		
+		Log::info('Starting process with teamspeak user: '.$teamspeak_user);
+
+        $user = User::where('group_id', $teamspeak_user->group_id)->first();
+		
+		Log::info('Getting Group ID for Allow: '.$user);
+		
+        $group_id = $teamspeak_user->group_id;
+		
+		Log::info('Launching Allow with ID: '.$group_id);
+
+        $rows = TeamspeakGroupUser::join('groups', 'teamspeak_group_users.group_id', '=', 'groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_users.tsgrp_id' , '=', 'teamspeak_groups.id')
+            ->where('groups.id', $group_id)
+            ->where('teamspeak_groups.is_server_group', (int) $private)
+            ->select('tsgrp_id')
+            ->union(
+                // fix model declaration calling the table directly
+                TeamspeakGroupRole::join('group_role', 'teamspeak_group_roles.role_id', '=', 'group_role.role_id')
+            ->join('teamspeak_groups', 'teamspeak_group_roles.tsgrp_id' , '=', 'teamspeak_groups.id')
+                    ->where('group_role.group_id', $group_id)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('tsgrp_id')
+            )->union(
+                TeamspeakGroupCorporation::join('character_infos', 'teamspeak_group_corporations.corporation_id', '=', 'character_infos.corporation_id')
+            ->join('teamspeak_groups', 'teamspeak_group_corporations.tsgrp_id' , '=', 'teamspeak_groups.id')
+                    ->where('character_infos.character_id', $user->id)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('tsgrp_id')
+            )->union(
+                TeamspeakGroupAlliance::join('character_infos', 'teamspeak_group_alliances.alliance_id', '=', 'character_infos.alliance_id')
+            ->join('teamspeak_groups', 'teamspeak_group_alliances.tsgrp_id' , '=', 'teamspeak_groups.id')
+                    ->where('character_infos.character_id', $user->id)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('tsgrp_id')
+            )->union(
+                TeamspeakGroupPublic::join('teamspeak_groups', 'teamspeak_group_public.tsgrp_id', '=', 'teamspeak_groups.id')
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('tsgrp_id')
+            )->get();
+
+        
+		$groups = $rows->unique('tsgrp_id')->pluck('tsgrp_id')->toArray();
+		
+        return $groups;
+    }
 
 }
