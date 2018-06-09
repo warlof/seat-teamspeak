@@ -7,8 +7,9 @@
 
 namespace Seat\Warlof\Teamspeak\Exceptions;
 
+use Exception;
 
-class TeamspeakSettingException extends \Exception
+class TeamspeakSettingException extends Exception
 {
 
 }

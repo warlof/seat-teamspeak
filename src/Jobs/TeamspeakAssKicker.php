@@ -13,7 +13,7 @@ use Seat\Eseye\Exceptions\EsiScopeAccessDeniedException;
 use Seat\Eseye\Exceptions\RequestFailedException;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 
-class TeamspeakKicker extends TeamspeakJobBase
+class TeamspeakAssKicker extends TeamspeakBase
 {
 
     protected $tags = ['teamspeak', 'kick'];
@@ -32,26 +32,26 @@ class TeamspeakKicker extends TeamspeakJobBase
 
             $group_id = $user->group_id;
 
-            $teamspeakUser = TeamspeakUser::where('group_id', $group_id)->first();
+            $teamspeak_user = TeamspeakUser::where('group_id', $group_id)->first();
 
 			// control that we already know it's Teamspeak ID
-            if ($teamspeakUser != null) {
+            if ($teamspeak_user != null) {
                 // search client information using client unique ID
-                $userInfo = $thelper->getTeamspeak()->clientGetByUid($teamspeakUser->teamspeak_id, true);
+                $user_info = $thelper->getTeamspeak()->clientGetByUid($teamspeak_user->teamspeak_id, true);
 
-                $allowedGroups = $thelper->allowedGroups($teamspeakUser, true);
-                $teamspeakGroups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($userInfo->client_database_id);
+                $allowed_groups = $thelper->allowedGroups($teamspeak_user, true);
+                $teamspeak_groups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($user_info->client_database_id);
 
-                $memberOfGroups = [];
-                foreach ($teamspeakGroups as $g) {
-                   $memberOfGroups[] = $g['sgid'];
+                $member_of_groups = [];
+                foreach ($teamspeak_groups as $g) {
+                   $member_of_groups[] = $g['sgid'];
                 }
 
-                $missingGroups = array_diff($memberOfGroups, $allowedGroups);
+                $missing_groups = array_diff($member_of_groups, $allowed_groups);
 
-                if (!empty($missingGroups)) {
-                   $thelper->processGroupsKick($userInfo, $missingGroups);
-                   $thelper->logEvent($userInfo, 'kick', $missingGroups);
+                if (!empty($missing_groups)) {
+                   $thelper->processGroupsKick($user_info, $missing_groups);
+                   $thelper->logEvent($user_info, 'kick', $missing_groups);
                 }
             }
         }

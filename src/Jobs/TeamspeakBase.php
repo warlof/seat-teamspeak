@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
  * Class TeamspeakJobBase
  * @package Seat\Warlof\Teamspeak\Jobs
  */
-abstract class TeamspeakJobBase implements ShouldQueue
+abstract class TeamspeakBase implements ShouldQueue
 {
 
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
