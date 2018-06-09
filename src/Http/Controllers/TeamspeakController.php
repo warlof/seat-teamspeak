@@ -4,7 +4,7 @@
 * Date: 15/06/2016
 * Time: 18:58
 */
- 
+
 namespace Seat\Warlof\Teamspeak\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
