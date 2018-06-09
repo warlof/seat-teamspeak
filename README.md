@@ -37,7 +37,10 @@ php artisan migrate
 php artisan up
 ```
 
-And now, when you log into 'Seat', you should see a 'Teamspeak' link on the left.  
+And now, when you log into 'Seat', you should see a 'Teamspeak' link on the left.
+
+Access your Teamspeak server and find the query_ip_whitelist.txt file. Add the IP address of your Seat install server to the list to avoid ServerQuery flood bans when running jobs.
+Don't forget to add an empty line at the end of the query_ip_whitelist.txt.
 
 Click on 'Teamspeak' and then click on 'Settings'.
 
@@ -46,5 +49,9 @@ Change the Configuration to meet your Teamspeak server's settings.  The Query po
 Click 'Update', then click 'Update Teamspeak server groups' to load in all of your currently defined groups.
 
 Access is granted through the 'Access Management' section.
+
+
+Click on 'Settings' and then click on 'Schedule'. 
+Add 'teamspeak:users:invite' and 'teamspeak:users:kick' (recommended 5 minutes).
 
 Good luck, and Happy Hunting!!  o7

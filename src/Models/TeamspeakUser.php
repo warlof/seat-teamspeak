@@ -3,18 +3,18 @@
 namespace Seat\Warlof\Teamspeak\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Seat\Web\Models\User;
+use Seat\Web\Models\Group;
 
 class TeamspeakUser extends Model
 {
     protected $fillable = [
-        'user_id', 'teamspeak_id'
+        'group_id', 'teamspeak_id'
     ];
 
-    protected $primaryKey = 'user_id';
+    protected $primaryKey = 'group_id';
     
-    public function user()
+    public function group()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(Group::class, 'group_id', 'id');
     }
 }

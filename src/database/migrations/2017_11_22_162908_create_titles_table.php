@@ -17,11 +17,11 @@ class CreateTitlesTable extends Migration
             $table->integer('corporation_id');
             $table->integer('title_id');
             $table->integer('title_surrogate_key');
-            $table->string('group_id');
-            $table->boolean('enable')->default(false);
+            $table->string('tsgrp_id');
+            $table->boolean('enable')->default(true);
             $table->timestamps();
 
-            $table->primary(['corporation_id', 'title_id', 'group_id']);
+            $table->primary(['corporation_id', 'title_id', 'tsgrp_id']);
         });
     }
 

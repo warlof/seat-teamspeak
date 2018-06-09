@@ -29,7 +29,9 @@
                         <label for="teamspeak-user-id">{{ trans('teamspeak::seat.username') }}</label>
                         <select name="teamspeak-user-id" id="teamspeak-user-id" class="col-md-12">
                             @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+								@if ($user->id != 1)
+                            <option value="{{ $user->group_id }}">{{ $user->name }}</option>
+								@endif
                             @endforeach
                         </select>
                     </div>
@@ -142,7 +144,7 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.public.remove', ['group_id' => $group->group_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.public.remove', ['group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
@@ -165,22 +167,22 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($groupUsers as $group)
+                       @foreach($groupUsers as $group)
                             <tr>
-                                <td>{{ $group->user->name }}</td>
+                                <td>{{ $group->user->main_character->name }}</td>
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.user.remove', ['user_id' => $group->user_id, 'group_id' => $group->group_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.user.remove', ['user_id' => $group->group_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+@endforeach
                         </tbody>
                     </table>
                 </div>
@@ -197,7 +199,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($groupRoles as $group)
+                       @foreach($groupRoles as $group)
                             <tr>
                                 <td>{{ $group->role->title }}</td>
                                 <td>{{ $group->group->name }}</td>
@@ -206,13 +208,13 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.role.remove', ['role_id' => $group->role_id, 'group_id' => $group->group_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.role.remove', ['role_id' => $group->role_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+@endforeach
                         </tbody>
                     </table>
                 </div>
@@ -230,7 +232,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($groupTitles as $group)
+                       @foreach($groupTitles as $group)
                             <tr>
                                 <td>{{ $group->corporation->corporationName }}</td>
                                 <td>{{ strip_tags($group->title->titleName) }}</td>
@@ -240,13 +242,13 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.title.remove', ['corporation_id' => $group->corporation_id, 'title_id' => $group->title_id, 'group_id' => $group->group_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.title.remove', ['corporation_id' => $group->corporation_id, 'title_id' => $group->title_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+@endforeach
                         </tbody>
                     </table>
                 </div>
@@ -272,13 +274,13 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.corporation.remove', ['corporation_id' => $group->corporation_id, 'group_id' => $group->group_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.corporation.remove', ['corporation_id' => $group->corporation_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+@endforeach
                         </tbody>
                     </table>
                 </div>
@@ -304,13 +306,13 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.alliance.remove', ['alliance_id' => $group->alliance_id, 'group_id' => $group->group_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.alliance.remove', ['alliance_id' => $group->alliance_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+@endforeach
                         </tbody>
                     </table>
                 </div>

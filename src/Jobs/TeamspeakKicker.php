@@ -13,7 +13,7 @@ use Seat\Eseye\Exceptions\EsiScopeAccessDeniedException;
 use Seat\Eseye\Exceptions\RequestFailedException;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 
-class TeamspeakKicker extends EsiBase
+class TeamspeakKicker extends TeamspeakJobBase
 {
 
     protected $tags = ['teamspeak', 'kick'];
@@ -32,12 +32,9 @@ class TeamspeakKicker extends EsiBase
 
             $group_id = $user->group_id;
 
-            $teamspeakUser = TeamspeakUser::where('user_id', $user->id)->first();
+            $teamspeakUser = TeamspeakUser::where('group_id', $group_id)->first();
 
-Log::info("Teamspeak User: " . $teamspeakUser . " And User ID " . $user->id);
-Log::info("Teamspeak Handler: " . $thelper->getTeamspeak());
-
-            // control that we already know it's Teamspeak ID
+			// control that we already know it's Teamspeak ID
             if ($teamspeakUser != null) {
                 // search client information using client unique ID
                 $userInfo = $thelper->getTeamspeak()->clientGetByUid($teamspeakUser->teamspeak_id, true);
@@ -54,7 +51,7 @@ Log::info("Teamspeak Handler: " . $thelper->getTeamspeak());
 
                 if (!empty($missingGroups)) {
                    $thelper->processGroupsKick($userInfo, $missingGroups);
-                   $thelper->logEvent('kick', $missingGroups);
+                   $thelper->logEvent($userInfo, 'kick', $missingGroups);
                 }
             }
         }

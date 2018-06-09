@@ -8,7 +8,7 @@ use Seat\Eveapi\Models\Corporation\Title;
 
 class TeamspeakGroupTitle extends Model
 {
-    protected $fillable = ['title_id', 'group_id', 'title_surrogate_key', 'corporation_id', 'enable'];
+    protected $fillable = ['title_id', 'tsgrp_id', 'title_surrogate_key', 'corporation_id', 'enable'];
 
     public static function create(array $attributes = [])
     {
@@ -24,7 +24,7 @@ class TeamspeakGroupTitle extends Model
 
     public function group()
     {
-        return $this->belongsTo(TeamspeakGroup::class, 'group_id', 'id');
+        return $this->belongsTo(TeamspeakGroup::class, 'tsgrp_id', 'id');
     }
 
     public function corporation()

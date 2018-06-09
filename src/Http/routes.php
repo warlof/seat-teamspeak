@@ -16,8 +16,7 @@ Route::group([
 
         Route::get('/', [
             'as' => 'teamspeak.list',
-            'uses' => 'TeamspeakController@getRelations',
-            'middleware' => 'bouncer:teamspeak.view'
+            'uses' => 'TeamspeakController@getRelations'
         ]);
 
 /*        Route::get('/getclients', [
@@ -28,14 +27,12 @@ Route::group([
 */
         Route::get('/getuserid', [
             'as' => 'teamspeak.getclients',
-            'uses' => 'TeamspeakController@getUserID',
-            'middleware' => 'bouncer:teamspeak.view'
+            'uses' => 'TeamspeakController@getUserID'
         ]);
 
         Route::get('/ts3register', [
             'as' => 'ts3.register',
-            'uses' => 'TeamspeakController@getRegisterUser',
-            'middleware' => 'bouncer:teamspeak.view'
+            'uses' => 'TeamspeakController@getRegisterUser'
         ]);
 
         Route::get('/public/{group_id}/remove', [

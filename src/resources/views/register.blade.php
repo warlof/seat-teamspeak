@@ -10,13 +10,14 @@
         </div>
         <div class="box-body">
             <p>Log into the Teamspeak server with your nickname set to the EXACT SAME as your Main character's name.</p>
+	    
             <p>TS Name should be: <b>
             @if ($tags != '')
-              [{{ $ticker }}] 
+              {{ $ticker }} | 
             @endif 
             {{ auth()->user()->group->main_character->name }}</b><span id="verify" class="fa"></span>
             @if ($tags != '')
-            <p class="help-block">* Note: There is a space between the corp tag and your username.</p>
+            <p class="help-block">* Note: There is a space either side of the pipe between your ticker and username.</p>
             @endif
             <div class="form-group has-feedback" id="forms">
               <div class="input-group input-group-sm">
