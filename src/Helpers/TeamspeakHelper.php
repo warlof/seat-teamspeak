@@ -135,17 +135,11 @@ public function allowedGroups($teamspeak_user, $private)
     {
         $groups = [];
 		
-		Log::info('Starting process with teamspeak user: '.$teamspeak_user);
-
-        $user = User::where('group_id', $teamspeak_user->group_id)->first();
+		$user = User::where('group_id', $teamspeak_user->group_id)->first();
 		
-		Log::info('Getting Group ID for Allow: '.$user);
+		$group_id = $teamspeak_user->group_id;
 		
-        $group_id = $teamspeak_user->group_id;
-		
-		Log::info('Launching Allow with ID: '.$group_id);
-
-        $rows = TeamspeakGroupUser::join('groups', 'teamspeak_group_users.group_id', '=', 'groups.id')
+		$rows = TeamspeakGroupUser::join('groups', 'teamspeak_group_users.group_id', '=', 'groups.id')
             ->join('teamspeak_groups', 'teamspeak_group_users.tsgrp_id' , '=', 'teamspeak_groups.id')
             ->where('groups.id', $group_id)
             ->where('teamspeak_groups.is_server_group', (int) $private)

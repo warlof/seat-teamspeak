@@ -24,48 +24,33 @@ class TeamspeakInviter extends TeamspeakJobBase
 	 */
     public function handle()
     {
-		Log::info('Running Inviter.');
-		
-        $users = User::all();
+		$users = User::all();
         $thelper = new TeamspeakHelper;
         $thelper->joinTeamspeak();
 
         foreach ($users as $user) {
 			
-			Log::info('User: '.$user->id);
-
-            $group_id = $user->group_id;
-			Log::info('Group: '.$group_id);
-
+			$group_id = $user->group_id;
+			
             $teamspeakUser = TeamspeakUser::where('group_id', $group_id)->first();
 			
-			Log::info('TS User: '.$teamspeakUser);
-
-            // control that we already know it's Teamspeak ID
+			// control that we already know it's Teamspeak ID
             if ($teamspeakUser != null) {
                 // search client information using client unique ID
                 $userInfo = $thelper->getTeamspeak()->clientGetByUid($teamspeakUser->teamspeak_id, true);
 				
-				Log::info('TS User Info: '.$userInfo);
-
-                $allowedGroups = $thelper->allowedGroups($teamspeakUser, true);
+				$allowedGroups = $thelper->allowedGroups($teamspeakUser, true);
 				
-				Log::info('TS Allowed Groups: '.implode(" ",$allowedGroups));
+				$teamspeakGroups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($userInfo->client_database_id);
 				
-                $teamspeakGroups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($userInfo->client_database_id);
-				
-				Log::info('Teamspeak Groups: '.var_dump(" ",$teamspeakGroups));
-
-                $memberOfGroups = [];
+				$memberOfGroups = [];
                 foreach ($teamspeakGroups as $g) {
                    $memberOfGroups[] = $g['sgid'];
                 }
 
                 $missingGroups = array_diff($allowedGroups, $memberOfGroups);
 				
-				Log::info('Missing Groups: '.implode(" ",$missingGroups));
-				
-                if (!empty($missingGroups)) {
+				if (!empty($missingGroups)) {
                    $thelper->processGroupsInvitation($userInfo, $missingGroups);
                    $thelper->logEvent($userInfo, 'invite', $missingGroups);
                 }

@@ -34,10 +34,7 @@ class TeamspeakKicker extends TeamspeakJobBase
 
             $teamspeakUser = TeamspeakUser::where('group_id', $group_id)->first();
 
-Log::info("Teamspeak User: " . $teamspeakUser . " And User ID " . $user->id);
-Log::info("Teamspeak Handler: " . $thelper->getTeamspeak());
-
-            // control that we already know it's Teamspeak ID
+			// control that we already know it's Teamspeak ID
             if ($teamspeakUser != null) {
                 // search client information using client unique ID
                 $userInfo = $thelper->getTeamspeak()->clientGetByUid($teamspeakUser->teamspeak_id, true);
