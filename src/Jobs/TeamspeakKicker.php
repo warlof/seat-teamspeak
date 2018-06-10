@@ -37,10 +37,10 @@ class TeamspeakKicker extends TeamspeakJobBase
 			// control that we already know it's Teamspeak ID
             if ($teamspeakUser != null) {
                 // search client information using client unique ID
-                $userInfo = $thelper->getTeamspeak()->clientGetByUid($teamspeakUser->teamspeak_id, true);
+                $userInfo = $thelper->getTeamspeak()->clientGetNameByUid($teamspeakUser->teamspeak_id, true);
 
                 $allowedGroups = $thelper->allowedGroups($teamspeakUser, true);
-                $teamspeakGroups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($userInfo->client_database_id);
+                $teamspeakGroups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($userInfo['cldbid']);
 
                 $memberOfGroups = [];
                 foreach ($teamspeakGroups as $g) {
@@ -50,8 +50,8 @@ class TeamspeakKicker extends TeamspeakJobBase
                 $missingGroups = array_diff($memberOfGroups, $allowedGroups);
 
                 if (!empty($missingGroups)) {
-                   $thelper->processGroupsKick($userInfo, $missingGroups);
-                   $thelper->logEvent($userInfo, 'kick', $missingGroups);
+                   $thelper->processGroupsKick($userInfo['cldbid'], $missingGroups);
+                   $thelper->logEvent($userInfo['name'], 'kick', $missingGroups);
                 }
             }
         }
