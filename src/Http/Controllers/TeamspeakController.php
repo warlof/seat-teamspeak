@@ -394,6 +394,9 @@ class TeamspeakController extends Controller
         } else {
             $main_character = auth()->user()->group->main_character->name;
         }
+		
+		// Teamspeak has a 30 char limit on names. Trim it.
+		$main_character = substr($main_character, 0, 30);
 
         $userList = $this->teamspeak->clientList();
         foreach ($userList as $user) {
@@ -486,21 +489,32 @@ class TeamspeakController extends Controller
 
 
     public function getRegisterUser() {
-        $character = auth()->user()->group->main_character;
+		
+		$main_character = auth()->user()->group->main_character;
 
-        if (!$character) {
+        if (!$main_character) {
             redirect()->back()->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
         }
-        $corp = CorporationInfo::find($character->corporation_id);
+        $corp = CorporationInfo::find($main_character->corporation_id);
 
         if (!$corp) {
             redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
         }
+		
+		$tsTags = setting('teamspeak_tags', true);
 
-        $ticker = $corp->ticker;
-        $tags = setting('teamspeak_tags', true);
-
-        return view('teamspeak::register', compact('ticker', 'tags'));
+        if ($tsTags != '') {
+            $main_character = $corp->ticker . " | ".auth()->user()->group->main_character->name;
+        } else {
+            $main_character = auth()->user()->group->main_character->name;
+        }
+		
+		// Teamspeak has a 30 char limit on names. Trim it.
+		$main_character = substr($main_character, 0, 30);	
+			
+		define('main_character', $main_character);
+		
+        return view('teamspeak::register', compact('main_character'));
     }
 
     private function postRegisterUser($uid)

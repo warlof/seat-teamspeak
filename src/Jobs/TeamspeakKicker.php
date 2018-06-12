@@ -44,7 +44,11 @@ class TeamspeakKicker extends TeamspeakJobBase
 
                 $memberOfGroups = [];
                 foreach ($teamspeakGroups as $g) {
-                   $memberOfGroups[] = $g['sgid'];
+					
+					if ($g['sgid'] != 8) {
+                   		$memberOfGroups[] = $g['sgid'];
+					}
+				   
                 }
 
                 $missingGroups = array_diff($memberOfGroups, $allowedGroups);
