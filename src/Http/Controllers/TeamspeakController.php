@@ -144,6 +144,7 @@ class TeamspeakController extends Controller
 
     public function getRemovePublic($teamspeak_sgid)
     {
+
         $public_filter = TeamspeakGroupPublic::where('teamspeak_sgid', $teamspeak_sgid);
 
         if ($public_filter != null) {
@@ -158,6 +159,7 @@ class TeamspeakController extends Controller
 
     public function getRemoveUser($user_id, $teamspeak_sgid)
     {
+
         $user_filter = TeamspeakGroupUser::where('group_id', $user_id)
             ->where('teamspeak_sgid', $teamspeak_sgid);
 
@@ -173,6 +175,7 @@ class TeamspeakController extends Controller
 
     public function getRemoveRole($role_id, $teamspeak_sgid)
     {
+
         $role_filter = TeamspeakGroupRole::where('role_id', $role_id)
             ->where('teamspeak_sgid', $teamspeak_sgid);
 
@@ -188,7 +191,8 @@ class TeamspeakController extends Controller
 
     public function getRemoveCorporation($corporation_id, $teamspeak_sgid)
     {
-        $corporation_filter = TeamspeakGroupCorporation::where('corporation_id', $corporation_id)
+        
+		$corporation_filter = TeamspeakGroupCorporation::where('corporation_id', $corporation_id)
             ->where('teamspeak_sgid', $teamspeak_sgid);
 
         if ($corporation_filter != null) {
@@ -203,6 +207,7 @@ class TeamspeakController extends Controller
 
     public function getRemoveAlliance($alliance_id, $teamspeak_sgid)
     {
+
         $alliance_filter = TeamspeakGroupAlliance::where('alliance_id', $alliance_id)
             ->where('teamspeak_sgid', $teamspeak_sgid);
 
@@ -219,6 +224,7 @@ class TeamspeakController extends Controller
 
     public function getRemoveTitle($corporation_id, $title_id, $teamspeak_sgid)
     {
+
         $title_filter = TeamspeakGroupTitle::where('corporation_id', $corporation_id)
             ->where('title_id', $title_id)
             ->where('teamspeak_sgid', $teamspeak_sgid);
@@ -264,7 +270,9 @@ class TeamspeakController extends Controller
     {
         if (TeamspeakGroupPublic::find($teamspeak_sgid) == null) {
             TeamspeakGroupPublic::create([
+			
                 'teamspeak_sgid' => $teamspeak_sgid
+
             ]);
 
             return redirect()->back()
@@ -277,6 +285,7 @@ class TeamspeakController extends Controller
 
     private function postUserRelation($teamspeak_sgid, $user_id)
     {
+
         $filter = TeamspeakGroupUser::where('teamspeak_sgid', '=', $teamspeak_sgid)
             ->where('group_id', '=', $user_id)
             ->get();
@@ -296,6 +305,7 @@ class TeamspeakController extends Controller
 
     private function postRoleRelation($teamspeak_sgid, $role_id)
     {
+
         $filter = TeamspeakGroupRole::where('role_id', '=', $role_id)
             ->where('teamspeak_sgid', '=', $teamspeak_sgid)
             ->get();
@@ -388,11 +398,16 @@ class TeamspeakController extends Controller
 
         $main_character = auth()->user()->group->main_character->name;
 
-        if ($ts_tags != '') {
+        if ($tsTags != '') {
             $character = auth()->user()->group->main_character;
             $corp = CorporationInfo::find($character->corporation_id);
             $main_character = sprintf('%s | %s', $corp->ticker, auth()->user()->group->main_character->name);
+        } else {
+            $main_character = auth()->user()->group->main_character->name;
         }
+		
+		// Teamspeak has a 30 char limit on names. Trim it.
+		$main_character = substr($main_character, 0, 30);
 
         $user_list = $this->teamspeak->clientList();
         foreach ($user_list as $user) {
@@ -404,11 +419,12 @@ class TeamspeakController extends Controller
                 $found_user['nick'] = $nickname;
                 $this->postRegisterUser($uid);
 
+
                 $teamspeak_user = TeamspeakUser::where('group_id', auth()->user()->group->id)->first();
                 // search client information using client unique ID
                 $user_info = $this->teamspeak->clientGetByUid($teamspeak_user->teamspeak_id, true);
 
-                $allowed_groups = TeamspeakHelper::allowedGroups($teamspeak_user, true);
+                $allowed_groups = $this->allowedGroups($teamspeak_user, true);
                 $teamspeak_groups = $this->teamspeak->clientGetServerGroupsByDbid($user->client_database_id);
                 $member_of_groups = [];
                 foreach ($teamspeak_groups as $g) {
@@ -424,6 +440,49 @@ class TeamspeakController extends Controller
             }
         }
         return json_encode([]);
+    }
+
+    protected function allowedGroups($teamspeak_user, $private)
+    {
+        $groups = [];
+
+        $user = Group::where('id', $teamspeak_user->group_id)->first();
+        $group_id = $user->id;
+
+        $rows = TeamspeakGroupUser::join('groups', 'teamspeak_group_users.group_id', '=', 'groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_users.tsgrp_id' , '=', 'teamspeak_groups.id')
+            ->where('groups.id', $group_id)
+            ->where('teamspeak_groups.is_server_group', (int) $private)
+            ->select('tsgrp_id')
+            ->union(
+                // fix model declaration calling the table directly
+                TeamspeakGroupRole::join('group_role', 'teamspeak_group_roles.role_id', '=', 'group_role.role_id')
+            ->join('teamspeak_groups', 'teamspeak_group_roles.tsgrp_id' , '=', 'teamspeak_groups.id')
+                    ->where('group_role.group_id', $group_id)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('tsgrp_id')
+            )->union(
+                TeamspeakGroupCorporation::join('character_infos', 'teamspeak_group_corporations.corporation_id', '=', 'character_infos.corporation_id')
+            ->join('teamspeak_groups', 'teamspeak_group_corporations.tsgrp_id' , '=', 'teamspeak_groups.id')
+                    ->where('character_infos.character_id', $group_id)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('tsgrp_id')
+            )->union(
+                TeamspeakGroupAlliance::join('character_infos', 'teamspeak_group_alliances.alliance_id', '=', 'character_infos.alliance_id')
+            ->join('teamspeak_groups', 'teamspeak_group_alliances.tsgrp_id' , '=', 'teamspeak_groups.id')
+                    ->where('character_infos.character_id', $group_id)
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('tsgrp_id')
+            )->union(
+                TeamspeakGroupPublic::join('teamspeak_groups', 'teamspeak_group_public.tsgrp_id', '=', 'teamspeak_groups.id')
+                    ->where('teamspeak_groups.is_server_group', (int) $private)
+                    ->select('tsgrp_id')
+            )->get();
+
+        
+		$groups = $rows->unique('tsgrp_id')->pluck('tsgrp_id')->toArray();
+		
+        return $groups;
     }
 
     /**
@@ -453,11 +512,21 @@ class TeamspeakController extends Controller
         if (! $corp) {
             redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
         }
+		
+		$tsTags = setting('teamspeak_tags', true);
 
-        $ticker = $corp->ticker;
-        $tags = setting('teamspeak_tags', true);
-
-        return view('teamspeak::register', compact('ticker', 'tags'));
+        if ($tsTags != '') {
+            $main_character = $corp->ticker . " | ".auth()->user()->group->main_character->name;
+        } else {
+            $main_character = auth()->user()->group->main_character->name;
+        }
+		
+		// Teamspeak has a 30 char limit on names. Trim it.
+		$main_character = substr($main_character, 0, 30);	
+			
+		define('main_character', $main_character);
+		
+        return view('teamspeak::register', compact('main_character'));
     }
 
     private function postRegisterUser($uid)

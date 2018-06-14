@@ -27,8 +27,8 @@ class CreateTeamspeakTables extends Migration
             $table->unsignedInteger('group_id');
             $table->string('teamspeak_id');
             $table->timestamps();
-
-            $table->primary('group_id');
+			
+			$table->primary('group_id');
 
             $table->foreign('group_id')
                 ->references('id')
@@ -38,8 +38,9 @@ class CreateTeamspeakTables extends Migration
 
         Schema::create('teamspeak_group_alliances', function (Blueprint $table) {
             $table->integer('alliance_id');
+
             $table->string('teamspeak_sgid');
-            $table->boolean('enable')->default(true);;
+            $table->boolean('enable')->default(true);
             $table->timestamps();
 
             $table->primary(['alliance_id', 'teamspeak_sgid']);
@@ -53,8 +54,9 @@ class CreateTeamspeakTables extends Migration
 
         Schema::create('teamspeak_group_corporations', function (Blueprint $table) {
             $table->integer('corporation_id');
+
             $table->string('teamspeak_sgid');
-            $table->boolean('enable')->default(true);;
+            $table->boolean('enable')->default(true);
             $table->timestamps();
 
             $table->primary(['corporation_id', 'teamspeak_sgid']);
@@ -67,8 +69,9 @@ class CreateTeamspeakTables extends Migration
 
         Schema::create('teamspeak_group_roles', function (Blueprint $table) {
             $table->unsignedInteger('role_id');
+
             $table->string('teamspeak_sgid');
-            $table->boolean('enable')->default(true);;
+            $table->boolean('enable')->default(true);
             $table->timestamps();
 
             $table->primary(['role_id', 'teamspeak_sgid']);
@@ -86,6 +89,7 @@ class CreateTeamspeakTables extends Migration
 
         Schema::create('teamspeak_group_users', function (Blueprint $table) {
             $table->unsignedInteger('group_id');
+
             $table->string('teamspeak_sgid');
             $table->boolean('enable')->default(true);
             $table->timestamps();
@@ -104,8 +108,9 @@ class CreateTeamspeakTables extends Migration
         });
 
         Schema::create('teamspeak_group_public', function (Blueprint $table) {
+
             $table->string('teamspeak_sgid');
-            $table->boolean('enable')->default(true);;
+            $table->boolean('enable')->default(true);
             $table->timestamps();
 
             $table->primary('teamspeak_sgid');

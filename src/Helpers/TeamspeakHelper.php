@@ -83,27 +83,28 @@ class TeamspeakHelper
     /**
      * Invite an user to each group
      *
-     * @param \TeamSpeak3_Node_Client $teamspeak_client_node
      * @param array $groups
-     */
-    public function processGroupsInvitation(TeamSpeak3_Node_Client $teamspeak_client_node, $groups)
+
+     */	
+	public function processGroupsInvitation($teamspeak_client_dbid, $groups)
     {
         // iterate over each group ID and add the user
-        foreach ($groups as $group_id) {
-            $this->teamspeak->serverGroupClientAdd($group_id, $teamspeak_client_node->client_database_id);
+        foreach ($groups as $groupId) {
+            $this->teamspeak->serverGroupClientAdd($groupId, $teamspeak_client_dbid);
+
         }
     }
 
     /**
      * Kick an user from each group
      *
-     * @param \TeamSpeak3_Node_Client $teamspeak_client_node
      * @param $groups
      */
-    public function processGroupsKick(\TeamSpeak3_Node_Client $teamspeak_client_node, $groups)
+    public function processGroupsKick($teamspeak_client_dbid, $groups)
     {
-        foreach ($groups as $group_id) {
-            $this->teamspeak->serverGroupClientDel($group_id, $teamspeak_client_node->client_database_id);
+        foreach ($groups as $groupId) {
+            $this->teamspeak->serverGroupClientDel($groupId, $teamspeak_client_dbid);
+
         }
     }
 
@@ -129,31 +130,36 @@ class TeamspeakHelper
         ]);
     }
 	
-
-    public static function allowedGroups(TeamspeakUser $teamspeak_user, bool $private)
+public function allowedGroups($teamspeak_user, $private)
     {
+        $groups = [];
+		
+		$user = User::where('group_id', $teamspeak_user->group_id)->first();
+		
+		$group_id = $teamspeak_user->group_id;
+		
 		$rows = TeamspeakGroupUser::join('groups', 'teamspeak_group_users.group_id', '=', 'groups.id')
             ->join('teamspeak_groups', 'teamspeak_group_users.teamspeak_sgid' , '=', 'teamspeak_groups.id')
-            ->where('groups.id', $teamspeak_user->group->id)
+            ->where('groups.id', $group_id)
             ->where('teamspeak_groups.is_server_group', (int) $private)
             ->select('teamspeak_sgid')
             ->union(
                 // fix model declaration calling the table directly
                 TeamspeakGroupRole::join('group_role', 'teamspeak_group_roles.role_id', '=', 'group_role.role_id')
             ->join('teamspeak_groups', 'teamspeak_group_roles.teamspeak_sgid' , '=', 'teamspeak_groups.id')
-                    ->where('group_role.group_id', $teamspeak_user->group_id)
+                    ->where('group_role.group_id', $group_id)
                     ->where('teamspeak_groups.is_server_group', (int) $private)
                     ->select('teamspeak_sgid')
             )->union(
                 TeamspeakGroupCorporation::join('character_infos', 'teamspeak_group_corporations.corporation_id', '=', 'character_infos.corporation_id')
             ->join('teamspeak_groups', 'teamspeak_group_corporations.teamspeak_sgid' , '=', 'teamspeak_groups.id')
-                    ->whereIn('character_infos.character_id', $teamspeak_user->group->users->pluck('id')->toArray())
+                    ->where('character_infos.character_id', $user->id)
                     ->where('teamspeak_groups.is_server_group', (int) $private)
                     ->select('teamspeak_sgid')
             )->union(
                 TeamspeakGroupAlliance::join('character_infos', 'teamspeak_group_alliances.alliance_id', '=', 'character_infos.alliance_id')
             ->join('teamspeak_groups', 'teamspeak_group_alliances.teamspeak_sgid' , '=', 'teamspeak_groups.id')
-                    ->whereIn('character_infos.character_id', $teamspeak_user->group->users->pluck('id')->toArray())
+                    ->where('character_infos.character_id', $user->id)
                     ->where('teamspeak_groups.is_server_group', (int) $private)
                     ->select('teamspeak_sgid')
             )->union(
@@ -161,8 +167,12 @@ class TeamspeakHelper
                     ->where('teamspeak_groups.is_server_group', (int) $private)
                     ->select('teamspeak_sgid')
             )->get();
+
         
-		return $rows->unique('teamspeak_sgid')->pluck('teamspeak_sgid')->toArray();
+		$groups = $rows->unique('teamspeak_sgid')->pluck('teamspeak_sgid')->toArray();
+		
+        return $groups;
+		
     }
 
 }
