@@ -139,37 +139,37 @@ public function allowedGroups($teamspeak_user, $private)
 		$group_id = $teamspeak_user->group_id;
 		
 		$rows = TeamspeakGroupUser::join('groups', 'teamspeak_group_users.group_id', '=', 'groups.id')
-            ->join('teamspeak_groups', 'teamspeak_group_users.tsgrp_id' , '=', 'teamspeak_groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_users.teamspeak_sgid' , '=', 'teamspeak_groups.id')
             ->where('groups.id', $group_id)
             ->where('teamspeak_groups.is_server_group', (int) $private)
-            ->select('tsgrp_id')
+            ->select('teamspeak_sgid')
             ->union(
                 // fix model declaration calling the table directly
                 TeamspeakGroupRole::join('group_role', 'teamspeak_group_roles.role_id', '=', 'group_role.role_id')
-            ->join('teamspeak_groups', 'teamspeak_group_roles.tsgrp_id' , '=', 'teamspeak_groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_roles.teamspeak_sgid' , '=', 'teamspeak_groups.id')
                     ->where('group_role.group_id', $group_id)
                     ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('tsgrp_id')
+                    ->select('teamspeak_sgid')
             )->union(
                 TeamspeakGroupCorporation::join('character_infos', 'teamspeak_group_corporations.corporation_id', '=', 'character_infos.corporation_id')
-            ->join('teamspeak_groups', 'teamspeak_group_corporations.tsgrp_id' , '=', 'teamspeak_groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_corporations.teamspeak_sgid' , '=', 'teamspeak_groups.id')
                     ->where('character_infos.character_id', $user->id)
                     ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('tsgrp_id')
+                    ->select('teamspeak_sgid')
             )->union(
                 TeamspeakGroupAlliance::join('character_infos', 'teamspeak_group_alliances.alliance_id', '=', 'character_infos.alliance_id')
-            ->join('teamspeak_groups', 'teamspeak_group_alliances.tsgrp_id' , '=', 'teamspeak_groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_alliances.teamspeak_sgid' , '=', 'teamspeak_groups.id')
                     ->where('character_infos.character_id', $user->id)
                     ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('tsgrp_id')
+                    ->select('teamspeak_sgid')
             )->union(
-                TeamspeakGroupPublic::join('teamspeak_groups', 'teamspeak_group_public.tsgrp_id', '=', 'teamspeak_groups.id')
+                TeamspeakGroupPublic::join('teamspeak_groups', 'teamspeak_group_public.teamspeak_sgid', '=', 'teamspeak_groups.id')
                     ->where('teamspeak_groups.is_server_group', (int) $private)
-                    ->select('tsgrp_id')
+                    ->select('teamspeak_sgid')
             )->get();
 
         
-		$groups = $rows->unique('tsgrp_id')->pluck('tsgrp_id')->toArray();
+		$groups = $rows->unique('teamspeak_sgid')->pluck('teamspeak_sgid')->toArray();
 		
         return $groups;
 		
