@@ -30,38 +30,38 @@ class TeamspeakGroupsUpdate extends Command
 	 */
     public function handle()
     {
-        $tsUsername = setting('teamspeak_username', true);
-        $tsPassword = setting('teamspeak_password', true);
-        $tsHostname = setting('teamspeak_hostname', true);
-        $tsServerQuery = setting('teamspeak_server_query', true);
-        $tsServerPort = setting('teamspeak_server_port', true);
+        $ts_username = setting('teamspeak_username', true);
+        $ts_password = setting('teamspeak_password', true);
+        $ts_hostname = setting('teamspeak_hostname', true);
+        $ts_server_query = setting('teamspeak_server_query', true);
+        $ts_server_voice = setting('teamspeak_server_port', true);
 
-        if ($tsUsername == null || $tsPassword == null || $tsHostname == null || $tsServerQuery == null ||
-            $tsServerPort == null) {
+        if ($ts_username == null || $ts_password == null || $ts_hostname == null || $ts_server_query == null ||
+            $ts_server_voice == null) {
             throw new TeamspeakSettingException("missing teamspeak_username, teamspeak_password, teamspeak_hostname, ".
                 "teamspeak_server_query or teamspeak_server_port in settings");
         }
 
-        $tsServer = TeamspeakHelper::connect($tsUsername, $tsPassword, $tsHostname, $tsServerQuery, $tsServerPort);
+        $ts_server = TeamspeakHelper::connect($ts_username, $ts_password, $ts_hostname, $ts_server_query, $ts_server_voice);
 
         // type : {0 = template, 1 = normal, 2 = query}
-        $groups = $tsServer->serverGroupList(['type' => 1]);
+        $serer_groups = $ts_server->serverGroupList(['type' => 1]);
 
-        foreach ($groups as $group) {
-            $teamspeakGroup = TeamspeakGroup::find($group->sgid);
+        foreach ($serer_groups as $server_group) {
+            $teamspeak_group = TeamspeakGroup::find($server_group->sgid);
 
-            if ($teamspeakGroup == null) {
+            if ($teamspeak_group == null) {
                 TeamspeakGroup::create([
-                    'id' => $group->sgid,
-                    'name' => $group->name,
+                    'id' => $server_group->sgid,
+                    'name' => $server_group->name,
                     'is_server_group' => true,
                 ]);
 
                 continue;
             }
 
-            $teamspeakGroup->update([
-                'name' => $group->name
+            $teamspeak_group->update([
+                'name' => $server_group->name
             ]);
         }
 

@@ -7,20 +7,19 @@
 
 namespace Seat\Warlof\Teamspeak\Helpers;
 
+use Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException;
+use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use TeamSpeak3;
 use Illuminate\Support\Facades\Log;
 use Seat\Eveapi\Models\Corporation\CorporationInfo;
 use Seat\Eveapi\Models\Corporation\Title;
 use Seat\Eveapi\Models\Character\CharacterInfo;
 use Seat\Eveapi\Models\Alliances\Alliance;
-use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupRole;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupCorporation;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupAlliance;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupTitle;
 use Seat\Warlof\Teamspeak\Models\TeamspeakLog;
 use Seat\Web\Models\Acl\Role;
 use Seat\Web\Models\Group;
@@ -41,10 +40,10 @@ class TeamspeakHelper
      */
     public static function connect( $username, $password, $hostname, $server_query_port, $instance_port)
     {
-        $serverQuery = sprintf("serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0", $username, $password,
+        $server_query = sprintf("serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0", $username, $password,
             $hostname, $server_query_port, $instance_port);
 
-        return TeamSpeak3::factory($serverQuery);
+        return TeamSpeak3::factory($server_query);
 
     }
 
@@ -85,12 +84,14 @@ class TeamspeakHelper
      * Invite an user to each group
      *
      * @param array $groups
+
      */	
 	public function processGroupsInvitation($teamspeak_client_dbid, $groups)
     {
         // iterate over each group ID and add the user
         foreach ($groups as $groupId) {
             $this->teamspeak->serverGroupClientAdd($groupId, $teamspeak_client_dbid);
+
         }
     }
 
@@ -103,6 +104,7 @@ class TeamspeakHelper
     {
         foreach ($groups as $groupId) {
             $this->teamspeak->serverGroupClientDel($groupId, $teamspeak_client_dbid);
+
         }
     }
 
@@ -128,7 +130,6 @@ class TeamspeakHelper
         ]);
     }
 	
-
 public function allowedGroups($teamspeak_user, $private)
     {
         $groups = [];
@@ -171,6 +172,7 @@ public function allowedGroups($teamspeak_user, $private)
 		$groups = $rows->unique('tsgrp_id')->pluck('tsgrp_id')->toArray();
 		
         return $groups;
+		
     }
 
 }

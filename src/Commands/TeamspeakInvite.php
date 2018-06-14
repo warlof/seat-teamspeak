@@ -9,7 +9,7 @@ namespace Seat\Warlof\Teamspeak\Commands;
 
 
 use Illuminate\Console\Command;
-use Seat\Warlof\Teamspeak\Jobs\TeamspeakInviter;
+use Seat\Warlof\Teamspeak\Jobs\TeamspeakReceptionist;
 use Seat\Web\Models\User;
 
 class TeamspeakInvite extends Command
@@ -25,7 +25,6 @@ class TeamspeakInvite extends Command
 
     public function handle()
     {
-        TeamspeakInviter::dispatch();
+        TeamspeakReceptionist::dispatch();
     }
 }
-

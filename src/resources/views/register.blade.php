@@ -12,7 +12,9 @@
             <p>Log into the Teamspeak server with your nickname set to the EXACT SAME as your Main character's name.</p>
 	    
             <p>TS Name should be: <b>
+
               {{ main_character }}
+			  
             <div class="form-group has-feedback" id="forms">
               <div class="input-group input-group-sm">
                   <input type="text" class="form-control loading" id="ts3id" name="ts3id" value="" />

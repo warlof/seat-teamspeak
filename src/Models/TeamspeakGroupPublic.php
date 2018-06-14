@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class TeamspeakGroupPublic extends Model
 {
-    protected $primaryKey = 'tsgrp_id';
+    protected $primaryKey = 'teamspeak_sgid';
 
-    protected $fillable = ['tsgrp_id', 'enable'];
+    protected $fillable = ['teamspeak_sgid', 'enable'];
 
     protected $table = 'teamspeak_group_public';
 
     public function group()
     {
-        return $this->belongsTo(TeamspeakGroup::class, 'tsgrp_id', 'id');
+        return $this->belongsTo(TeamspeakGroup::class, 'teamspeak_sgid', 'id');
     }
 }

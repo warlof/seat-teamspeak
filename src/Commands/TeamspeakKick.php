@@ -9,7 +9,7 @@ namespace Seat\Warlof\Teamspeak\Commands;
 
 
 use Illuminate\Console\Command;
-use Seat\Warlof\Teamspeak\Jobs\TeamspeakKicker;
+use Seat\Warlof\Teamspeak\Jobs\TeamspeakAssKicker;
 use Seat\Web\Models\User;
 
 class TeamspeakKick extends Command
@@ -25,7 +25,6 @@ class TeamspeakKick extends Command
 
     public function handle()
     {
-        TeamspeakKicker::dispatch();
+        TeamspeakAssKicker::dispatch();
     }
 }
-
