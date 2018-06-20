@@ -101,7 +101,7 @@ class TeamspeakHelper
     public function processGroupsKick($teamspeak_client_dbid, $groups)
     {
         foreach ($groups as $group_id) {
-            $this->teamspeak->serverGroupClientDel($groupId, $teamspeak_client_dbid);
+            $this->teamspeak->serverGroupClientDel($group_id, $teamspeak_client_dbid);
         }
     }
 
