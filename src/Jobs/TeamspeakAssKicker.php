@@ -43,7 +43,7 @@ class TeamspeakAssKicker extends TeamspeakBase
                 $teamspeak_groups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($user_info['cldbid']);
 
                 $member_of_groups = [];
-                foreach ($teamspeakGroups as $g) {
+                foreach ($teamspeak_groups as $g) {
                     if ($g['name'] != "Guest") {
                    		$member_of_groups[] = $g['sgid'];
                     }
