@@ -135,7 +135,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($groupPublic as $group)
+                        @foreach($group_public as $group)
                             <tr>
                                 <td></td>
                                 <td>{{ $group->group->name }}</td>
@@ -167,7 +167,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                       @foreach($groupUsers as $group)
+                       @foreach($group_users as $group)
                             <tr>
                                 <td>{{ $group->user->main_character->name }}</td>
                                 <td>{{ $group->group->name }}</td>
@@ -199,7 +199,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                       @foreach($groupRoles as $group)
+                       @foreach($group_roles as $group)
                             <tr>
                                 <td>{{ $group->role->title }}</td>
                                 <td>{{ $group->group->name }}</td>
@@ -232,7 +232,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                       @foreach($groupTitles as $group)
+                       @foreach($group_titles as $group)
                             <tr>
                                 <td>{{ $group->corporation->corporationName }}</td>
                                 <td>{{ strip_tags($group->title->titleName) }}</td>
@@ -265,7 +265,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($groupCorporations as $group)
+                        @foreach($group_corporations as $group)
                             <tr>
                                 <td>{{ $group->corporation->name }}</td>
                                 <td>{{ $group->group->name }}</td>
@@ -297,7 +297,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($groupAlliances as $group)
+                        @foreach($group_alliances as $group)
                             <tr>
                                 <td>{{ $group->alliance->name }}</td>
                                 <td>{{ $group->group->name }}</td>
