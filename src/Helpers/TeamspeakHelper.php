@@ -89,7 +89,7 @@ class TeamspeakHelper
     {
         // iterate over each group ID and add the user
         foreach ($groups as $group_id) {
-            $this->teamspeak->serverGroupClientAdd($group_id, $teamspeak_client_node->client_database_id);
+            $this->teamspeak->serverGroupClientAdd($group_id, $teamspeak_client_dbid);
         }
     }
 
