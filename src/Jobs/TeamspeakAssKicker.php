@@ -45,7 +45,7 @@ class TeamspeakAssKicker extends TeamspeakBase
                 $member_of_groups = [];
                 foreach ($teamspeakGroups as $g) {
                     if ($g['name'] != "Guest") {
-                   		$memberOfGroups[] = $g['sgid'];
+                   		$member_of_groups[] = $g['sgid'];
                     }
                 }
 
