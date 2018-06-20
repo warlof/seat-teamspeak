@@ -460,7 +460,7 @@ class TeamspeakController extends Controller
         $ts_tags = setting('teamspeak_tags', true);
         
         if ($ts_tags != '') {
-            $main_character = sprintf('%s | %s', $corp->ticker, $main_character);
+            $main_character = sprintf('%s | %s', $corp->ticker, $main_character->name);
         }
 
         // Teamspeak has a 30 char limit on names. Trim it.
