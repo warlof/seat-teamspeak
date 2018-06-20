@@ -41,7 +41,7 @@ class TeamspeakReceptionist extends TeamspeakBase
 				
 				$allowed_groups = $thelper->allowedGroups($teamspeak_user, true);
 				
-				$teamspeak_groups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($userInfo['cldbid']);
+				$teamspeak_groups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($user_info['cldbid']);
 				
 				$member_of_groups = [];
                 foreach ($teamspeak_groups as $g) {
@@ -51,8 +51,8 @@ class TeamspeakReceptionist extends TeamspeakBase
                 $missing_groups = array_diff($allowed_groups, $member_of_groups);
 				
 				if (!empty($missing_groups)) {
-                   $thelper->processGroupsInvitation($userInfo['cldbid'], $missing_groups);
-                   $thelper->logEvent($userInfo['name'], 'invite', $missing_groups);
+                   $thelper->processGroupsInvitation($user_info['cldbid'], $missing_groups);
+                   $thelper->logEvent($user_info['name'], 'invite', $missing_groups);
                 }
             }
         }

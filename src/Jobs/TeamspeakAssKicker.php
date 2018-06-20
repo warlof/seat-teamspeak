@@ -40,7 +40,7 @@ class TeamspeakAssKicker extends TeamspeakBase
                 $user_info = $thelper->getTeamspeak()->clientGetNameByUid($teamspeak_user->teamspeak_id, true);
 
                 $allowed_groups = $thelper->allowedGroups($teamspeak_user, true);
-                $teamspeak_groups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($userInfo['cldbid']);
+                $teamspeak_groups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($user_info['cldbid']);
 
                 $member_of_groups = [];
                 foreach ($teamspeakGroups as $g) {
@@ -52,8 +52,8 @@ class TeamspeakAssKicker extends TeamspeakBase
                 $missing_groups = array_diff($member_of_groups, $allowed_groups);
 
                 if (!empty($missing_groups)) {
-                   $thelper->processGroupsKick($userInfo['cldbid'], $missing_groups);
-                   $thelper->logEvent($userInfo['name'], 'kick', $missing_groups);
+                   $thelper->processGroupsKick($user_info['cldbid'], $missing_groups);
+                   $thelper->logEvent($user_info['name'], 'kick', $missing_groups);
                 }
             }
         }
