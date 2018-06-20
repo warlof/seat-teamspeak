@@ -83,10 +83,9 @@ class TeamspeakHelper
     /**
      * Invite an user to each group
      *
-     * @param \TeamSpeak3_Node_Client $teamspeak_client_node
      * @param array $groups
      */
-    public function processGroupsInvitation(TeamSpeak3_Node_Client $teamspeak_client_node, $groups)
+    public function processGroupsInvitation($teamspeak_client_dbid, $groups)
     {
         // iterate over each group ID and add the user
         foreach ($groups as $group_id) {
@@ -97,13 +96,12 @@ class TeamspeakHelper
     /**
      * Kick an user from each group
      *
-     * @param \TeamSpeak3_Node_Client $teamspeak_client_node
      * @param $groups
      */
-    public function processGroupsKick(\TeamSpeak3_Node_Client $teamspeak_client_node, $groups)
+    public function processGroupsKick($teamspeak_client_dbid, $groups)
     {
         foreach ($groups as $group_id) {
-            $this->teamspeak->serverGroupClientDel($group_id, $teamspeak_client_node->client_database_id);
+            $this->teamspeak->serverGroupClientDel($groupId, $teamspeak_client_dbid);
         }
     }
 
