@@ -144,7 +144,7 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.public.remove', ['group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.public.remove', ['group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
@@ -176,7 +176,7 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.user.remove', ['user_id' => $group->group_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.user.remove', ['user_id' => $group->group_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
@@ -208,7 +208,7 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.role.remove', ['role_id' => $group->role_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.role.remove', ['role_id' => $group->role_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
@@ -242,7 +242,7 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.title.remove', ['corporation_id' => $group->corporation_id, 'title_id' => $group->title_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.title.remove', ['corporation_id' => $group->corporation_id, 'title_id' => $group->title_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
@@ -274,7 +274,7 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.corporation.remove', ['corporation_id' => $group->corporation_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.corporation.remove', ['corporation_id' => $group->corporation_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
@@ -306,7 +306,7 @@
                                 <td>{{ $group->enable }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('teamspeak.alliance.remove', ['alliance_id' => $group->alliance_id, 'group_id' => $group->tsgrp_id]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
+                                        <a href="{{ route('teamspeak.alliance.remove', ['alliance_id' => $group->alliance_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
                                             {{ trans('web::seat.remove') }}
                                         </a>
                                     </div>
