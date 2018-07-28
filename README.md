@@ -3,55 +3,41 @@ This plugin write for [SeAT](https://github.com/eveseat/seat) is providing to yo
 
 [![Latest Unstable Version](https://poser.pugx.org/warlof/seat-teamspeak/v/unstable)](https://packagist.org/packages/warlof/seat-teamspeak)
 [![Latest Stable Version](https://poser.pugx.org/warlof/seat-teamspeak/v/stable)](https://packagist.org/packages/warlof/seat-teamspeak)
-[![Build Status](https://img.shields.io/travis/warlof/seat-teamspeak.svg?style=flat-square)](https://travis-ci.org/warlof/seat-teamspeak)
-[![Code Climate](https://img.shields.io/codeclimate/github/warlof/seat-teamspeak.svg?style=flat-square)](https://codeclimate.com/github/warlof/seat-teamspeak)
-[![Coverage Status](https://img.shields.io/coveralls/warlof/seat-teamspeak.svg?style=flat-square)](https://coveralls.io/github/warlof/seat-teamspeak?branch=master)
-[![License](https://poser.pugx.org/warlof/seat-teamspeak/license)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![Maintainability](https://api.codeclimate.com/v1/badges/b7d8d113d57ba075b975/maintainability)](https://codeclimate.com/github/warlof/seat-teamspeak/maintainability)
+[![License](https://poser.pugx.org/warlof/seat-teamspeak/license)](https://packagist.org/packages/warlof/seat-teamspeak)
 
 ## Quick Installation:
 
-In your seat directory (By default:  /var/www/seat), type the following:
+In your seat directory (by default:  `/var/www/seat`), type the following:
 
 ```
 php artisan down
 composer require warlof/seat-teamspeak
-```
 
-After a successful installation, you can include the actual plugin by editing **config/app.php** and adding the following after:
-
-```
-        /*
-         * Package Service Providers...
-         */
-```
-add
-```
-        Seat\Warlof\Teamspeak\TeamSpeakServiceProvider::class,
-
-```
-and save the file.  Now you're ready to tell SeAT how to use the plugin:
-
-```
-php artisan vendor:publish --force
+php artisan vendor:publish --force --all
 php artisan migrate
 php artisan up
 ```
 
-And now, when you log into 'Seat', you should see a 'Teamspeak' link on the left.
+And now, when you log into `SeAT`, you should see a `Teamspeak` category in the sidebar.
 
-Access your Teamspeak server and find the query_ip_whitelist.txt file. Add the IP address of your Seat install server to the list to avoid ServerQuery flood bans when running jobs.
+Access your Teamspeak server and find the `query_ip_whitelist.txt` file.
+Add the IP address of your Seat install server to the list to avoid ServerQuery flood bans when running jobs.
 Don't forget to add an empty line at the end of the query_ip_whitelist.txt.
 
 Click on 'Teamspeak' and then click on 'Settings'.
 
-Change the Configuration to meet your Teamspeak server's settings.  The Query port is 10011 by default.  Setting the ServerQuery username/password is beyond the scope of this and can be found at (https://www.teamspeak3.com/support/teamspeak-3-add-server-query-user.php).
+Change the Configuration to meet your Teamspeak server's settings.
+The Query port is `10011` by default.
 
-Click 'Update', then click 'Update Teamspeak server groups' to load in all of your currently defined groups.
+Setting the ServerQuery username/password is beyond the scope of this documentation and can be found on
+[official teamspeak website](https://www.teamspeak3.com/support/teamspeak-3-add-server-query-user.php).
 
-Access is granted through the 'Access Management' section.
+Click `Update`, then click `Update Teamspeak server groups` to load in all of your currently defined groups.
 
+Access is granted through the `Access Management` section.
 
-Click on 'Settings' and then click on 'Schedule'. 
-Add 'teamspeak:users:invite' and 'teamspeak:users:kick' (recommended 5 minutes).
+Click on `Settings` and then click on `Schedule`. 
+Add `teamspeak:users:invite` and `teamspeak:users:kick` (recommended every 5 minutes).
 
 Good luck, and Happy Hunting!!  o7
