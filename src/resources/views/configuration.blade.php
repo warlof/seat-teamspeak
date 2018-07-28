@@ -137,7 +137,7 @@
         <div class="panel-body">
             <div class="form-group">
                 <div class="col-md-12">
-                    @if($greenSettings == '')
+                    @if($green_settings == '')
                         <a href="#" type="button" class="btn btn-success btn-md col-md-12 disabled" role="button">Update Teamspeak server groups</a>
                     @else
                         <a href="{{ route('teamspeak.command.run', ['commandName' => 'teamspeak:groups:update']) }}" type="button" class="btn btn-success btn-md col-md-12" role="button">Update Teamspeak server groups</a>
