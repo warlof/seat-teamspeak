@@ -11,8 +11,8 @@
         <div class="box-body">
             <p>Log into the Teamspeak server with your nickname set to the EXACT SAME as your Main character's name.</p>
 	    
-            <p>TS Name should be: <b>
-            {{ main_character }}
+            <p>TS Name should be: </p>
+            {{ $main_character }}
             <div class="form-group has-feedback" id="forms">
               <div class="input-group input-group-sm">
                   <input type="text" class="form-control loading" id="ts3id" name="ts3id" value="" />
@@ -30,11 +30,9 @@
 
 @push('javascript')
 <style>
-.loading {    
-    background-color: #ffffff;
+.loading {
     background-size: 20px 20px;
-    background-position:right center;
-    background-repeat: no-repeat;
+    background: #ffffff no-repeat right center;
 }
 
 </style>
@@ -48,8 +46,7 @@
         headers: function() {},
         url: "{{ route('teamspeak.getclients') }}",
         dataType: 'json',
-        jsonp: false,
-        contentType: "application/json",
+        contentType: "application/json"
       }).done(function (data) {
         $('.loading').css('background-image', 'none');
         if (data.id) {
@@ -58,8 +55,7 @@
           $('#verify').removeClass('fa-times text-red');
           $('#verify').addClass('fa-check text-green');
           $('#ts3id').val(data.id);
-        }
-        else {
+        } else {
           $('#forms').removeClass('has-success');
           $('#forms').addClass('has-error');
           $('#verify').removeClass('fa-check text-green');

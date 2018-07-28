@@ -8,7 +8,6 @@
 
 namespace Seat\Warlof\Teamspeak\Http\Controllers;
 
-use Seat\Eveapi\Models\Corporation\Title;
 use Seat\Web\Http\Controllers\Controller;
 
 class TeamspeakJsonController extends Controller

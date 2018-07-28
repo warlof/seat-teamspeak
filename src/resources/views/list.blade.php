@@ -342,14 +342,14 @@
 
         $('#teamspeak-type').change(function(){
             $.each(['teamspeak-user-id', 'teamspeak-role-id', 'teamspeak-corporation-id', 'teamspeak-title-id', 'teamspeak-alliance-id'], function(key, value){
-                if (value == ('teamspeak-' + $('#teamspeak-type').val() + '-id')) {
+                if (value === ('teamspeak-' + $('#teamspeak-type').val() + '-id')) {
                     $(('#' + value)).prop('disabled', false);
                 } else {
                     $(('#' + value)).prop('disabled', true);
                 }
             });
 
-            if ($('#teamspeak-type').val() == 'title') {
+            if ($('#teamspeak-type').val() === 'title') {
                 $('#teamspeak-corporation-id, #teamspeak-title-id').prop('disabled', false);
             }
         }).select2();

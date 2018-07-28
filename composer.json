@@ -11,6 +11,8 @@
         "eveseat/eveapi": "^3.0",
         "eveseat/web": "^3.0",
         "erusev/parsedown": "^1.6",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "~6.0",
         "planetteamspeak/ts3-php-framework": "^1.1"
     },
     "require-dev": {

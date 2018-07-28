@@ -7,14 +7,13 @@
 
 namespace Seat\Warlof\Teamspeak\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException;
 use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Parsedown;
 use Seat\Eveapi\Models\Corporation\CorporationInfo;
-use Seat\Eveapi\Models\Corporation\Title;
-use Seat\Eveapi\Models\Character\CharacterInfo;
 use Seat\Eveapi\Models\Alliances\Alliance;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
@@ -29,9 +28,7 @@ use Seat\Warlof\Teamspeak\Validation\AddRelation;
 use Seat\Warlof\Teamspeak\Validation\ValidateConfiguration;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 use Seat\Web\Models\Acl\Role;
-use Seat\Web\Models\Group;
 use Seat\Web\Models\User;
-use TeamSpeak3;
 use TeamSpeak3_Node_Client;
 
 class TeamspeakController extends Controller
@@ -251,13 +248,21 @@ class TeamspeakController extends Controller
             ->with('success', 'The command has been run.');
     }
 
-    private function getChangelog()
+    private function getChangelog() : string
     {
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "https://raw.githubusercontent.com/warlof/seat-teamspeak/master/CHANGELOG.md");
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        try {
+            $response = (new Client())
+                ->request('GET', 'https://raw.githubusercontent.com/warlof/seat-teamspeak/master/CHANGELOG.md');
 
-        return curl_exec($curl);
+            if ($response->getStatusCode() != 200) {
+                return 'Error while fetching changelog';
+            }
+
+            $parser = new Parsedown();
+            return $parser->parse($response->getBody());
+        } catch (RequestException $e) {
+            return 'Error while fetching changelog';
+        }
     }
 
     private function postPublicRelation($teamspeak_sgid)
@@ -356,6 +361,11 @@ class TeamspeakController extends Controller
             ->with('error', 'This relation already exists');
     }
 
+    /**
+     * @param $teamspeak_sgid
+     * @param $alliance_id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     private function postAllianceRelation($teamspeak_sgid, $alliance_id)
     {
         $filter = TeamspeakGroupAlliance::where('alliance_id', '=', $alliance_id)
@@ -379,7 +389,8 @@ class TeamspeakController extends Controller
     /**
      * @return string
      * @throws \Seat\Services\Exceptions\SettingException
-    */
+     * @throws \Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException
+     */
     public function getUserID() {
 
         $this->getTeamspeak();
@@ -443,7 +454,10 @@ class TeamspeakController extends Controller
         }
     }
 
-
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Seat\Services\Exceptions\SettingException
+     */
     public function getRegisterUser() {
         $main_character = auth()->user()->group->main_character;
 
@@ -465,8 +479,6 @@ class TeamspeakController extends Controller
 
         // Teamspeak has a 30 char limit on names. Trim it.
         $main_character = substr($main_character, 0, 30);
-        
-        define('main_character', $main_character);
 
         return view('teamspeak::register', compact('main_character'));
     }

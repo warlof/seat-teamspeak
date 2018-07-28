@@ -16,7 +16,7 @@
                     <legend>Teamspeak</legend>
 
                     <div class="form-group">
-                        <label for="teamspeak-configuration-token" class="col-md-4">Server Hostname</label>
+                        <label for="teamspeak-configuration-hostname" class="col-md-4">Server Hostname</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
                                 @if (is_null(setting('teamspeak_hostname', true)))

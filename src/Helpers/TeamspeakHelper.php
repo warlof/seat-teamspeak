@@ -10,23 +10,18 @@ namespace Seat\Warlof\Teamspeak\Helpers;
 use Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use TeamSpeak3;
-use Illuminate\Support\Facades\Log;
-use Seat\Eveapi\Models\Corporation\CorporationInfo;
-use Seat\Eveapi\Models\Corporation\Title;
-use Seat\Eveapi\Models\Character\CharacterInfo;
-use Seat\Eveapi\Models\Alliances\Alliance;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupUser;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupRole;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupCorporation;
 use Seat\Warlof\Teamspeak\Models\TeamspeakGroupAlliance;
 use Seat\Warlof\Teamspeak\Models\TeamspeakLog;
-use Seat\Web\Models\Acl\Role;
-use Seat\Web\Models\Group;
-use Seat\Web\Models\User;
 
 class TeamspeakHelper
 {
+    /**
+     * @var \TeamSpeak3_Node_Server
+     */
     private $teamspeak;
 
     /**
@@ -78,30 +73,31 @@ class TeamspeakHelper
         return $this->teamspeak;
     }
 
-    
 
     /**
      * Invite an user to each group
      *
+     * @param $client_dbid
      * @param array $groups
      */
-    public function processGroupsInvitation($teamspeak_client_dbid, $groups)
+    public function processGroupsInvitation($client_dbid, $groups)
     {
         // iterate over each group ID and add the user
         foreach ($groups as $group_id) {
-            $this->teamspeak->serverGroupClientAdd($group_id, $teamspeak_client_dbid);
+            $this->teamspeak->serverGroupClientAdd($group_id, $client_dbid);
         }
     }
 
     /**
      * Kick an user from each group
      *
+     * @param $client_dbid
      * @param $groups
      */
-    public function processGroupsKick($teamspeak_client_dbid, $groups)
+    public function processGroupsKick($client_dbid, $groups)
     {
         foreach ($groups as $group_id) {
-            $this->teamspeak->serverGroupClientDel($group_id, $teamspeak_client_dbid);
+            $this->teamspeak->serverGroupClientDel($group_id, $client_dbid);
         }
     }
 
@@ -162,5 +158,4 @@ class TeamspeakHelper
         
 		return $rows->unique('teamspeak_sgid')->pluck('teamspeak_sgid')->toArray();
     }
-
 }

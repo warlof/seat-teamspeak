@@ -2,15 +2,8 @@
 
 namespace Seat\Warlof\Teamspeak\Jobs;
 
-use Illuminate\Support\Facades\Log;
-use Teamspeak3;
 use Seat\Web\Models\User;
-use Seat\Eveapi\Jobs\EsiBase;
 use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
-use Seat\Eseye\Configuration;
-use Seat\Eseye\Eseye;
-use Seat\Eseye\Exceptions\EsiScopeAccessDeniedException;
-use Seat\Eseye\Exceptions\RequestFailedException;
 use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
 
 class TeamspeakAssKicker extends TeamspeakBase
@@ -25,8 +18,8 @@ class TeamspeakAssKicker extends TeamspeakBase
     public function handle()
     {
         $users = User::all();
-        $thelper = new TeamspeakHelper;
-        $thelper->joinTeamspeak();
+        $helper = new TeamspeakHelper;
+        $helper->joinTeamspeak();
 
         foreach ($users as $user) {
 
@@ -37,23 +30,23 @@ class TeamspeakAssKicker extends TeamspeakBase
 			// control that we already know it's Teamspeak ID
             if ($teamspeak_user != null) {
                 // search client information using client unique ID
-                $user_info = $thelper->getTeamspeak()->clientGetNameByUid($teamspeak_user->teamspeak_id, true);
+                $user_info = $helper->getTeamspeak()->clientGetNameByUid($teamspeak_user->teamspeak_id);
 
-                $allowed_groups = $thelper->allowedGroups($teamspeak_user, true);
-                $teamspeak_groups = $thelper->getTeamspeak()->clientGetServerGroupsByDbid($user_info['cldbid']);
+                $allowed_groups = $helper->allowedGroups($teamspeak_user, true);
+                $teamspeak_groups = $helper->getTeamspeak()->clientGetServerGroupsByDbid($user_info['cldbid']);
 
                 $member_of_groups = [];
-                foreach ($teamspeak_groups as $g) {
-                    if ($g['name'] != "Guest") {
-                   		$member_of_groups[] = $g['sgid'];
+                foreach ($teamspeak_groups as $teamspeak_group) {
+                    if ($teamspeak_group['name'] != "Guest") {
+                   		$member_of_groups[] = $teamspeak_group['sgid'];
                     }
                 }
 
                 $missing_groups = array_diff($member_of_groups, $allowed_groups);
 
                 if (!empty($missing_groups)) {
-                   $thelper->processGroupsKick($user_info['cldbid'], $missing_groups);
-                   $thelper->logEvent($user_info['name'], 'kick', $missing_groups);
+                   $helper->processGroupsKick($user_info['cldbid'], $missing_groups);
+                   $helper->logEvent($user_info['name'], 'kick', $missing_groups);
                 }
             }
         }

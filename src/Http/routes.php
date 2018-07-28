@@ -19,12 +19,6 @@ Route::group([
             'uses' => 'TeamspeakController@getRelations'
         ]);
 
-/*        Route::get('/getclients', [
-            'as' => 'teamspeak.getclients',
-            'uses' => 'TeamspeakController@getClientUserList',
-            'middleware' => 'bouncer:teamspeak.view'
-        ]);
-*/
         Route::get('/getuserid', [
             'as' => 'teamspeak.getclients',
             'uses' => 'TeamspeakController@getUserID'

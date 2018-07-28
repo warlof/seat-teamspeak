@@ -4,7 +4,7 @@ namespace Seat\Warlof\Teamspeak\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Seat\Eveapi\Models\Corporation\CorporationInfo;
-use Seat\Eveapi\Models\Corporation\Title;
+use Seat\Eveapi\Models\Corporation\CorporationTitle;
 
 class TeamspeakGroupTitle extends Model
 {
@@ -13,7 +13,7 @@ class TeamspeakGroupTitle extends Model
     public static function create(array $attributes = [])
     {
         // search for primary key assigned to the surrogate key
-        $title = Title::where('corporation_id', $attributes['corporation_id'])
+        $title = CorporationTitle::where('corporation_id', $attributes['corporation_id'])
             ->where('titleID', $attributes['title_id'])
             ->first();
 
@@ -34,6 +34,6 @@ class TeamspeakGroupTitle extends Model
 
     public function title()
     {
-        return $this->belongsTo(Title::class, 'title_surrogate_key', 'id');
+        return $this->belongsTo(CorporationTitle::class, 'title_surrogate_key', 'id');
     }
 }

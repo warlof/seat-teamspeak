@@ -4,7 +4,6 @@ namespace Seat\Warlof\Teamspeak\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Seat\Web\Models\Group;
-use Seat\Web\Models\User;
 
 class TeamspeakGroupUser extends Model
 {
