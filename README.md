@@ -23,7 +23,7 @@ And now, when you log into `SeAT`, you should see a `Teamspeak` category in the 
 
 Access your Teamspeak server and find the `query_ip_whitelist.txt` file.
 Add the IP address of your Seat install server to the list to avoid ServerQuery flood bans when running jobs.
-Don't forget to add an empty line at the end of the query_ip_whitelist.txt.
+Don't forget to add an empty line at the end of the `query_ip_whitelist.txt`.
 
 Click on 'Teamspeak' and then click on 'Settings'.
 
