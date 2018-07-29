@@ -20,7 +20,7 @@
  */
 
 Route::group([
-    'namespace' => 'Seat\Warlof\Teamspeak\Http\Controllers',
+    'namespace' => 'Warlof\Seat\Connector\Teamspeak\Http\Controllers',
     'prefix' => 'teamspeak'
 ], function(){
 

@@ -19,11 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak\Commands;
-
+namespace Warlof\Seat\Connector\Teamspeak\Commands;
 
 use Illuminate\Console\Command;
-use Seat\Warlof\Teamspeak\Models\TeamspeakLog;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakLog;
 
 class TeamspeakLogsClear extends Command
 {

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * This file is part of SeAT Teamspeak Connector.
@@ -19,35 +19,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak\Http\Controllers;
+namespace Warlof\Seat\Connector\Teamspeak\Http\Controllers;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException;
-use Seat\Web\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Parsedown;
 use Seat\Eveapi\Models\Corporation\CorporationInfo;
 use Seat\Eveapi\Models\Alliances\Alliance;
-use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupUser;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupRole;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupCorporation;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupAlliance;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupTitle;
-use Seat\Warlof\Teamspeak\Models\TeamspeakLog;
-use Seat\Warlof\Teamspeak\Validation\AddRelation;
-use Seat\Warlof\Teamspeak\Validation\ValidateConfiguration;
-use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
+use Seat\Web\Http\Controllers\Controller;
 use Seat\Web\Models\Acl\Role;
 use Seat\Web\Models\User;
 use TeamSpeak3_Node_Client;
+use Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException;
+use Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakHelper;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakUser;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroup;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupPublic;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupUser;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupRole;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupCorporation;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupAlliance;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupTitle;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakLog;
+use Warlof\Seat\Connector\Teamspeak\Validation\AddRelation;
+use Warlof\Seat\Connector\Teamspeak\Validation\ValidateConfiguration;
 
 class TeamspeakController extends Controller
 {
 
+    /**
+     * @var \TeamSpeak3_Node_Server
+     */
     private $teamspeak;
 
     public function getRelations()
@@ -403,7 +406,7 @@ class TeamspeakController extends Controller
     /**
      * @return string
      * @throws \Seat\Services\Exceptions\SettingException
-     * @throws \Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
      */
     public function getUserID() {
 
@@ -517,7 +520,7 @@ class TeamspeakController extends Controller
     /**
      * Set the Teamspeak Server object
      *
-     * @throws \Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
      * @throws \Seat\Services\Exceptions\SettingException
      */
     public function getTeamspeak()

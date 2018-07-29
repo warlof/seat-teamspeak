@@ -19,13 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak\Commands;
-
+namespace Warlof\Seat\Connector\Teamspeak\Commands;
 
 use Illuminate\Console\Command;
-use Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException;
-use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroup;
+use Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException;
+use Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakHelper;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroup;
 
 class TeamspeakGroupsUpdate extends Command
 {

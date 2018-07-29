@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak\Jobs;
+namespace Warlof\Seat\Connector\Teamspeak\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -29,7 +29,7 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Class TeamspeakJobBase
- * @package Seat\Warlof\Teamspeak\Jobs
+ * @package Warlof\Seat\Connector\Teamspeak\Jobs
  */
 abstract class TeamspeakBase implements ShouldQueue
 {

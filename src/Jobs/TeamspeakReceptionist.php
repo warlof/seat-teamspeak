@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak\Jobs;
+namespace Warlof\Seat\Connector\Teamspeak\Jobs;
 
 use Seat\Web\Models\User;
-use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
-use Seat\Warlof\Teamspeak\Helpers\TeamspeakHelper;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakUser;
+use Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakHelper;
 
 class TeamspeakReceptionist extends TeamspeakBase
 {
@@ -32,7 +32,7 @@ class TeamspeakReceptionist extends TeamspeakBase
 
 	/**
 	 * @throws \Seat\Services\Exceptions\SettingException
-	 * @throws \Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException
+	 * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
 	 */
     public function handle()
     {

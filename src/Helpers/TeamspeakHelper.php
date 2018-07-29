@@ -19,17 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak\Helpers;
+namespace Warlof\Seat\Connector\Teamspeak\Helpers;
 
-use Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException;
-use Seat\Warlof\Teamspeak\Models\TeamspeakUser;
 use TeamSpeak3;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupPublic;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupUser;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupRole;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupCorporation;
-use Seat\Warlof\Teamspeak\Models\TeamspeakGroupAlliance;
-use Seat\Warlof\Teamspeak\Models\TeamspeakLog;
+use Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakUser;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupPublic;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupUser;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupRole;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupCorporation;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakGroupAlliance;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakLog;
 
 class TeamspeakHelper
 {
@@ -59,7 +59,7 @@ class TeamspeakHelper
     /**
      * Set the Teamspeak Server object
      *
-     * @throws \Seat\Warlof\Teamspeak\Exceptions\TeamspeakSettingException
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
      * @throws \Seat\Services\Exceptions\SettingException
      */
     public function joinTeamspeak()

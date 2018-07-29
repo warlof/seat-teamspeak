@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak\Validation;
+namespace Warlof\Seat\Connector\Teamspeak\Validation;
 
 use Illuminate\Foundation\Http\FormRequest;
 

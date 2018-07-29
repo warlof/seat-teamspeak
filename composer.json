@@ -1,34 +1,41 @@
 {
-    "name": "warlof/seat-teamspeak",
-    "description": "This plugin provide an extension to the standard SeAT character Job which handle automatic graduation for Teamspeak user",
-    "type": "seat-plugin",
-    "autoload":{
-        "psr-4":{
-            "Seat\\Warlof\\Teamspeak\\": "src/"
-        }
+  "name": "warlof/seat-teamspeak",
+  "description": "This plugin provide an extension to the standard SeAT character Job which handle automatic graduation for Teamspeak user",
+  "type": "seat-plugin",
+  "license": "GPL-3.0-or-later",
+  "minimum-stability": "stable",
+  "authors": [
+    {
+      "name": "Warlof Tutsimo",
+      "email": "loic.leuilliot@gmail.com"
     },
-    "require": {
-        "eveseat/eveapi": "^3.0",
-        "eveseat/web": "^3.0",
-        "erusev/parsedown": "^1.6",
-        "ext-json": "*",
-        "guzzlehttp/guzzle": "~6.0",
-        "planetteamspeak/ts3-php-framework": "^1.1"
+    {
+      "name": "Denngarr B'tarn",
+      "email": "ed.stafford@gmail.com"
     },
-    "license": "GPL-3.0-or-later",
-    "authors": [
-        {
-            "name": "Warlof Tutsimo",
-            "email": "loic.leuilliot@gmail.com"
-        },
-        {
-            "name": "Denngarr B'tarn",
-            "email": "ed.stafford@gmail.com"
-        },
-        {
-            "name": "hderp886",
-            "email": "hderp886@gmail.com"
-        }
-    ],
-    "minimum-stability": "stable"
+    {
+      "name": "hderp886",
+      "email": "hderp886@gmail.com"
+    }
+  ],
+  "autoload":{
+      "psr-4":{
+          "Seat\\Warlof\\Teamspeak\\": "src/"
+      }
+  },
+  "require": {
+      "eveseat/eveapi": "^3.0",
+      "eveseat/web": "^3.0",
+      "erusev/parsedown": "^1.6",
+      "ext-json": "*",
+      "guzzlehttp/guzzle": "~6.0",
+      "planetteamspeak/ts3-php-framework": "^1.1"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Warlof\\Seat\\Connector\\Teamspeak\\TeamSpeakServiceProvider"
+      ]
+    }
+  }
 }

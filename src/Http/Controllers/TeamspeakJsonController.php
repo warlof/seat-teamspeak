@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak\Http\Controllers;
+namespace Warlof\Seat\Connector\Teamspeak\Http\Controllers;
 
 use Seat\Web\Http\Controllers\Controller;
 

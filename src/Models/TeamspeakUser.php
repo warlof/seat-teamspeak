@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak\Models;
+namespace Warlof\Seat\Connector\Teamspeak\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Seat\Web\Models\Group;

@@ -19,15 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Seat\Warlof\Teamspeak;
+namespace Warlof\Seat\Connector\Teamspeak;
 
 use Illuminate\Support\ServiceProvider;
-use Seat\Warlof\Teamspeak\Commands\TeamspeakLogsClear;
-use Seat\Warlof\Teamspeak\Commands\TeamspeakInvite;
-use Seat\Warlof\Teamspeak\Commands\TeamspeakKick;
-use Seat\Warlof\Teamspeak\Commands\TeamspeakGroupsUpdate;
+use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakLogsClear;
+use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakInvite;
+use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakKick;
+use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakGroupsUpdate;
 
-class TeamSpeakServiceProvider extends ServiceProvider
+class TeamspeakConnectorServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
