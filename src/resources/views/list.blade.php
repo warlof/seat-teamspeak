@@ -29,9 +29,9 @@
                         <label for="teamspeak-user-id">{{ trans('teamspeak::seat.username') }}</label>
                         <select name="teamspeak-user-id" id="teamspeak-user-id" class="col-md-12">
                             @foreach($users as $user)
-								@if ($user->id != 1)
+                            @if ($user->id != 1)
                             <option value="{{ $user->group_id }}">{{ $user->name }}</option>
-								@endif
+                            @endif
                             @endforeach
                         </select>
                     </div>
@@ -135,7 +135,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($group_public as $group)
+                            @foreach($group_public as $group)
                             <tr>
                                 <td></td>
                                 <td>{{ $group->group->name }}</td>
@@ -150,7 +150,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -167,7 +167,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                       @foreach($group_users as $group)
+                            @foreach($group_users as $group)
                             <tr>
                                 <td>{{ $group->user->main_character->name }}</td>
                                 <td>{{ $group->group->name }}</td>
@@ -182,7 +182,7 @@
                                     </div>
                                 </td>
                             </tr>
-@endforeach
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -199,7 +199,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                       @foreach($group_roles as $group)
+                            @foreach($group_roles as $group)
                             <tr>
                                 <td>{{ $group->role->title }}</td>
                                 <td>{{ $group->group->name }}</td>
@@ -214,7 +214,7 @@
                                     </div>
                                 </td>
                             </tr>
-@endforeach
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -232,10 +232,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                       @foreach($group_titles as $group)
+                            @foreach($group_titles as $group)
                             <tr>
-                                <td>{{ $group->corporation->corporationName }}</td>
-                                <td>{{ strip_tags($group->title->titleName) }}</td>
+                                <td>{{ $group->corporation->name }}</td>
+                                <td>{{ strip_tags($group->title->name) }}</td>
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>
@@ -248,7 +248,7 @@
                                     </div>
                                 </td>
                             </tr>
-@endforeach
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -265,7 +265,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($group_corporations as $group)
+                            @foreach($group_corporations as $group)
                             <tr>
                                 <td>{{ $group->corporation->name }}</td>
                                 <td>{{ $group->group->name }}</td>
@@ -280,7 +280,7 @@
                                     </div>
                                 </td>
                             </tr>
-@endforeach
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -297,7 +297,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($group_alliances as $group)
+                            @foreach($group_alliances as $group)
                             <tr>
                                 <td>{{ $group->alliance->name }}</td>
                                 <td>{{ $group->group->name }}</td>
@@ -312,7 +312,7 @@
                                     </div>
                                 </td>
                             </tr>
-@endforeach
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -326,7 +326,7 @@
         function getCorporationTitle() {
             $('#teamspeak-title-id').empty();
 
-            $.ajax('{{ route('teamspeak.json.titles') }}', {
+            $.ajax('{{ route('teamspeak.api.acl.titles') }}', {
                 data: {
                     corporation_id: $('#teamspeak-corporation-id').val()
                 },
@@ -334,7 +334,7 @@
                 method: 'GET',
                 success: function(data){
                     for (var i = 0; i < data.length; i++) {
-                        $('#teamspeak-title-id').append($('<option></option>').attr('value', data[i].titleID).text(data[i].titleName));
+                        $('#teamspeak-title-id').append($('<option></option>').attr('value', data[i].id).text(data[i].name));
                     }
                 }
             });
@@ -358,7 +358,7 @@
             getCorporationTitle();
         });
 
-        $('#teamspeak-user-id, #teamspeak-role-id, #teamspeak-corporation-id, #teamspeak-title-id, #teamspeak-alliance-id, #teamspeak-channel-id').select2();
+        $('#teamspeak-user-id, #teamspeak-role-id, #teamspeak-corporation-id, #teamspeak-title-id, #teamspeak-alliance-id, #teamspeak-channel-id, #teamspeak-group-id').select2();
 
         $('#teamspeak-tabs').find('a').click(function(e){
             e.preventDefault();

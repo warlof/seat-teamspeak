@@ -26,15 +26,19 @@ use Warlof\Seat\Connector\Teamspeak\Jobs\TeamspeakReceptionist;
 
 class TeamspeakInvite extends Command
 {
+    /**
+     * @var string
+     */
     protected $signature = 'teamspeak:users:invite';
 
+    /**
+     * @var string
+     */
     protected $description = 'Auto invite based on white list/teamspeak relation';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     *
+     */
     public function handle()
     {
         TeamspeakReceptionist::dispatch();

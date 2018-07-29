@@ -33,7 +33,6 @@ use Illuminate\Queue\SerializesModels;
  */
 abstract class TeamspeakBase implements ShouldQueue
 {
-
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
@@ -58,7 +57,6 @@ abstract class TeamspeakBase implements ShouldQueue
      */
     public function tags(): array
     {
-
         $tags = ['teamspeak'];
 
         if (property_exists($this, 'tags'))
@@ -74,5 +72,4 @@ abstract class TeamspeakBase implements ShouldQueue
      * @return void
      */
     public abstract function handle();
-
 }

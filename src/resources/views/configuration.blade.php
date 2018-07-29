@@ -175,7 +175,7 @@
     </div>
 @stop
 
-@section('javascript')
+@push('javascript')
     <script type="application/javascript">
         $('#hostname-eraser').click(function(){
             $('#teamspeak-configuration-hostname').val('');
@@ -199,4 +199,4 @@
 
         $('[data-toggle="tooltip"]').tooltip();
     </script>
-@stop
+@endpush

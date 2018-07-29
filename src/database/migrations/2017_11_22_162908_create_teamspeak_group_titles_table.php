@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTitlesTable extends Migration
+class CreateTeamspeakGroupTitlesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -33,14 +33,23 @@ class CreateTitlesTable extends Migration
     public function up()
     {
         Schema::create('teamspeak_group_titles', function (Blueprint $table) {
-            $table->integer('corporation_id');
+            $table->bigInteger('corporation_id');
             $table->integer('title_id');
-            $table->integer('title_surrogate_key');
             $table->string('teamspeak_sgid');
             $table->boolean('enable')->default(true);
             $table->timestamps();
 
-            $table->primary(['corporation_id', 'title_id', 'teamspeak_sgid']);
+            $table->primary(['corporation_id', 'title_id', 'teamspeak_sgid'], 'teamspeak_group_titles_pk');
+
+            $table->foreign(['corporation_id', 'title_id'])
+                ->references(['corporation_id', 'title_id'])
+                ->on('corporation_titles')
+                ->onDelete('cascade');
+
+            $table->foreign('teamspeak_sgid')
+                ->references('id')
+                ->on('teamspeak_groups')
+                ->onDelete('cascade');
         });
     }
 

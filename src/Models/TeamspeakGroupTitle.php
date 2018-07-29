@@ -27,19 +27,7 @@ use Seat\Eveapi\Models\Corporation\CorporationTitle;
 
 class TeamspeakGroupTitle extends Model
 {
-    protected $fillable = ['title_id', 'teamspeak_sgid', 'title_surrogate_key', 'corporation_id', 'enable'];
-
-    public static function create(array $attributes = [])
-    {
-        // search for primary key assigned to the surrogate key
-        $title = CorporationTitle::where('corporation_id', $attributes['corporation_id'])
-            ->where('titleID', $attributes['title_id'])
-            ->first();
-
-        $attributes['title_surrogate_key'] = $title->id;
-
-        parent::create($attributes);
-    }
+    protected $fillable = ['title_id', 'teamspeak_sgid', 'corporation_id', 'enable'];
 
     public function group()
     {
@@ -51,8 +39,10 @@ class TeamspeakGroupTitle extends Model
         return $this->belongsTo(CorporationInfo::class, 'corporation_id', 'corporation_id');
     }
 
-    public function title()
+    public function getTitleAttribute()
     {
-        return $this->belongsTo(CorporationTitle::class, 'title_surrogate_key', 'id');
+        return CorporationTitle::where('corporation_id', $this->corporation_id)
+            ->where('title_id', $this->title_id)
+            ->first();
     }
 }

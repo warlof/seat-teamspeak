@@ -64,23 +64,32 @@ class CreateTeamspeakTables extends Migration
             $table->primary(['alliance_id', 'teamspeak_sgid']);
 
             $table->foreign('teamspeak_sgid')
-                ->references('id')
+                ->references('id', 'teamspeak_group_alliances_fk_groups')
                 ->on('teamspeak_groups')
                 ->onDelete('cascade');
 
+            $table->foreign('alliance_id')
+                ->references('alliance_id')
+                ->on('alliances')
+                ->onDelete('cascade');
         });
 
         Schema::create('teamspeak_group_corporations', function (Blueprint $table) {
-            $table->integer('corporation_id');
+            $table->bigInteger('corporation_id');
             $table->string('teamspeak_sgid');
             $table->boolean('enable')->default(true);;
             $table->timestamps();
 
-            $table->primary(['corporation_id', 'teamspeak_sgid']);
+            $table->primary(['corporation_id', 'teamspeak_sgid'], 'teamspeak_group_corporations_pk');
 
             $table->foreign('teamspeak_sgid')
                 ->references('id')
                 ->on('teamspeak_groups')
+                ->onDelete('cascade');
+
+            $table->foreign('corporation_id')
+                ->references('corporation_id')
+                ->on('corporation_infos')
                 ->onDelete('cascade');
         });
 

@@ -26,15 +26,19 @@ use Warlof\Seat\Connector\Teamspeak\Jobs\TeamspeakAssKicker;
 
 class TeamspeakKick extends Command
 {
+    /**
+     * @var string
+     */
     protected $signature = 'teamspeak:users:kick';
 
+    /**
+     * @var string
+     */
     protected $description = 'Auto kick based on white list/teamspeak relation';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     *
+     */
     public function handle()
     {
         TeamspeakAssKicker::dispatch();

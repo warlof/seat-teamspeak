@@ -26,15 +26,19 @@ use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakLog;
 
 class TeamspeakLogsClear extends Command
 {
+    /**
+     * @var string
+     */
     protected $signature = 'teamspeak:logs:clear';
 
+    /**
+     * @var string
+     */
     protected $description = 'Clearing slack logs';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     *
+     */
     public function handle()
     {
         TeamspeakLog::truncate();

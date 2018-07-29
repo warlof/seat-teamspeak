@@ -39,6 +39,14 @@ class TeamspeakHelper
     private $teamspeak;
 
     /**
+     * @return \TeamSpeak3_Node_Server
+     */
+    public function getTeamspeak()
+    {
+        return $this->teamspeak;
+    }
+
+    /**
      * @param $username
      * @param $password
      * @param $hostname
@@ -49,11 +57,10 @@ class TeamspeakHelper
      */
     public static function connect( $username, $password, $hostname, $server_query_port, $instance_port)
     {
-        $server_query = sprintf("serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0", $username, $password,
+        $server_query = sprintf("serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0&nickname=SeAT", $username, $password,
             $hostname, $server_query_port, $instance_port);
 
         return TeamSpeak3::factory($server_query);
-
     }
 
     /**
@@ -78,13 +85,6 @@ class TeamspeakHelper
         }
 
         $this->teamspeak = $this->connect($tsUsername, $tsPassword, $tsHostname, $tsServerQuery, $tsServerPort);
-    }
-
-
-    public function getTeamspeak()
-    {
-
-        return $this->teamspeak;
     }
 
 
@@ -115,7 +115,12 @@ class TeamspeakHelper
         }
     }
 
-    public function logEvent($user, $event_type, $groups)
+    /**
+     * @param $user
+     * @param $event_type
+     * @param $groups
+     */
+    public static function logEvent($user, $event_type, $groups)
     {
         $message = '';
 

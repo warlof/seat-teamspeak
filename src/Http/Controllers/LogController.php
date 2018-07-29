@@ -21,28 +21,19 @@
 
 namespace Warlof\Seat\Connector\Teamspeak\Http\Controllers;
 
+
 use Seat\Web\Http\Controllers\Controller;
+use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakLog;
 
-class TeamspeakJsonController extends Controller
+class LogController extends Controller
 {
-    public function getJsonTitle()
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getLogs()
     {
-        $corporationId = request()->input('corporation_id');
+        $logs = TeamspeakLog::orderBy('created_at', 'desc')->take(30)->get();
 
-        if (!empty($corporation_id)) {
-            $titles = Title::where('corporation_id', $corporationId)->select('titleID', 'titleName')
-                ->get();
-
-            return response()->json($titles->map(
-                function($item){
-                    return [
-                        'titleID' => $item->titleID,
-                        'titleName' => strip_tags($item->titleName)
-                    ];
-                })
-            );
-        }
-
-        return response()->json([]);
+        return view('teamspeak::logs', compact('logs'));
     }
 }

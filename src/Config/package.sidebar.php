@@ -20,35 +20,36 @@
  */
 
 return [
-    'ts3register' => [
-        'name'          => 'Teamspeak Register',
-        'icon'          => 'fa-microphone',
-        'route_segment' => 'teamspeak',
-        'route'         => 'ts3.register',
-        'permission'    => 'teamspeak.view'
-    ],
     'teamspeak' => [
-        'name'          => 'Teamspeak',
+        'name'          => 'Teamspeak Connector',
         'icon'          => 'fa-microphone',
         'route_segment' => 'teamspeak',
         'entries' => [
             [
-                'name'  => 'Access Management',
-                'icon'  => 'fa-shield',
-                'route' => 'teamspeak.list',
+                'name'          => 'Join Server',
+                'icon'          => 'fa-sign-in',
+                'route_segment' => 'teamspeak',
+                'route'         => 'teamspeak.register',
+                'permission'    => 'teamspeak.view',
             ],
             [
-                'name'  => 'Settings',
-                'icon'  => 'fa-cogs',
-                'route' => 'teamspeak.configuration',
-                'permission' => 'teamspeak:setup'
+                'name'       => 'Access Management',
+                'icon'       => 'fa-shield',
+                'route'      => 'teamspeak.list',
+                'permission' => 'teamspeak.setup',
             ],
             [
-                'name'  => 'Logs',
-                'icon'  => 'fa-list',
-                'route' => 'teamspeak.logs'
+                'name'       => 'Settings',
+                'icon'       => 'fa-cogs',
+                'route'      => 'teamspeak.configuration',
+                'permission' => 'teamspeak:setup',
+            ],
+            [
+                'name'       => 'Logs',
+                'icon'       => 'fa-list',
+                'route'      => 'teamspeak.logs',
+                'permission' => 'teamspeak.setup',
             ]
         ],
-        'permission' => 'teamspeak.setup'
     ]
 ];

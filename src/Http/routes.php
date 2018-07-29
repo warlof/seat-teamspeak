@@ -22,103 +22,110 @@
 Route::group([
     'namespace' => 'Warlof\Seat\Connector\Teamspeak\Http\Controllers',
     'prefix' => 'teamspeak'
-], function(){
+], function() {
 
     Route::group([
         'middleware' => 'web'
     ], function () {
 
-        Route::get('/', [
-            'as' => 'teamspeak.list',
-            'uses' => 'TeamspeakController@getRelations'
-        ]);
-
-        Route::get('/getuserid', [
-            'as' => 'teamspeak.getclients',
-            'uses' => 'TeamspeakController@getUserID'
-        ]);
-
-        Route::get('/ts3register', [
-            'as' => 'ts3.register',
+        Route::get('/register', [
+            'as' => 'teamspeak.register',
             'uses' => 'TeamspeakController@getRegisterUser'
         ]);
 
-        Route::get('/public/{group_id}/remove', [
-            'as' => 'teamspeak.public.remove',
-            'uses' => 'TeamspeakController@getRemovePublic',
-            'middleware' => 'bouncer:teamspeak.create'
-        ]);
+        Route::group([
+            'prefix' => 'api',
+        ], function() {
+            Route::post('/user', [
+                'as'   => 'teamspeak.api.user',
+                'uses' => 'TeamspeakController@postGetUserUid',
+            ]);
 
-        Route::get('/users/{user_id}/{group_id}/remove', [
-            'as' => 'teamspeak.user.remove',
-            'uses' => 'TeamspeakController@getRemoveUser',
-            'middleware' => 'bouncer:teamspeak.create'
-        ]);
+            Route::group([
+                'prefix' => 'acl',
+            ], function() {
+                Route::get('/titles', [
+                    'as' => 'teamspeak.api.acl.titles',
+                    'uses' => 'AccessManagementController@getTitles',
+                    'middleware' => 'bouncer:teamspeak.setup'
+                ]);
+            });
+        });
 
-        Route::get('/roles/{role_id}/{group_id}/remove', [
-            'as' => 'teamspeak.role.remove',
-            'uses' => 'TeamspeakController@getRemoveRole',
-            'middleware' => 'bouncer:teamspeak.create'
-        ]);
+        Route::group([
+            'prefix' => 'acl',
+            'middleware' => 'bouncer:teamspeak.setup',
+        ], function() {
+            Route::get('/', [
+                'as' => 'teamspeak.list',
+                'uses' => 'AccessManagementController@getRelations'
+            ]);
 
-        Route::get('/corporations/{corporation_id}/{group_id}/remove', [
-            'as' => 'teamspeak.corporation.remove',
-            'uses' => 'TeamspeakController@getRemoveCorporation',
-            'middleware' => 'bouncer:teamspeak.create'
-        ]);
+            Route::post('/', [
+                'as' => 'teamspeak.add',
+                'uses' => 'AccessManagementController@postRelation',
+            ]);
 
-        Route::get('/alliances/{alliance_id}/{group_id}/remove', [
-            'as' => 'teamspeak.alliance.remove',
-            'uses' => 'TeamspeakController@getRemoveAlliance',
-            'middleware' => 'bouncer:teamspeak.create'
-        ]);
+            Route::get('/public/{group_id}/remove', [
+                'as' => 'teamspeak.public.remove',
+                'uses' => 'AccessManagementController@getRemovePublic',
+            ]);
 
-        Route::get('/titles/{corporation_id}/{title_id}/{group_id}/remove', [
-            'as' => 'teamspeak.title.remove',
-            'uses' => 'TeamspeakController@getRemoveTitle',
-            'middleware' => 'bouncer:teamspeak.create'
-        ]);
+            Route::get('/users/{user_id}/{group_id}/remove', [
+                'as' => 'teamspeak.user.remove',
+                'uses' => 'AccessManagementController@getRemoveUser',
+            ]);
 
-        Route::post('/', [
-            'as' => 'teamspeak.add',
-            'uses' => 'TeamspeakController@postRelation',
-            'middleware' => 'bouncer:teamspeak.create'
-        ]);
+            Route::get('/roles/{role_id}/{group_id}/remove', [
+                'as' => 'teamspeak.role.remove',
+                'uses' => 'AccessManagementController@getRemoveRole',
+            ]);
 
-        Route::get('/configuration', [
-            'as' => 'teamspeak.configuration',
-            'uses' => 'TeamspeakController@getConfiguration',
-            'middleware' => 'bouncer:teamspeak.setup'
-        ]);
-    
-        Route::get('/logs', [
-            'as' => 'teamspeak.logs',
-            'uses' => 'TeamspeakController@getLogs',
-            'middleware' => 'bouncer:teamspeak.setup'
-        ]);
+            Route::get('/corporations/{corporation_id}/{group_id}/remove', [
+                'as' => 'teamspeak.corporation.remove',
+                'uses' => 'AccessManagementController@getRemoveCorporation',
+            ]);
 
-        Route::get('/run/{commandName}', [
-            'as' => 'teamspeak.command.run',
-            'uses' => 'TeamspeakController@getSubmitJob',
-            'middleware' => 'bouncer:teamspeak.setup'
-        ]);
+            Route::get('/alliances/{alliance_id}/{group_id}/remove', [
+                'as' => 'teamspeak.alliance.remove',
+                'uses' => 'AccessManagementController@getRemoveAlliance',
+            ]);
 
-        Route::post('/configuration', [
-            'as' => 'teamspeak.configuration.post',
-            'uses' => 'TeamspeakController@postConfiguration',
-            'middleware' => 'bouncer:teamspeak.setup'
-        ]);
+            Route::get('/titles/{corporation_id}/{title_id}/{group_id}/remove', [
+                'as' => 'teamspeak.title.remove',
+                'uses' => 'AccessManagementController@getRemoveTitle',
+            ]);
+        });
 
-    Route::group([
-         'prefix' => 'json'
-    ], function(){
+        Route::group([
+            'prefix' => 'configuration',
+            'middleware' => 'bouncer:teamspeak.setup',
+        ], function() {
+            Route::get('/', [
+                'as' => 'teamspeak.configuration',
+                'uses' => 'SettingsController@getConfiguration',
+            ]);
 
-        Route::get('/titles', [
-            'as' => 'teamspeak.json.titles',
-            'uses' => 'TeamspeakJsonController@getJsonTitle',
-            'middleware' => 'bouncer:teamspeak.create'
-        ]);
+            Route::post('/', [
+                'as' => 'teamspeak.configuration.post',
+                'uses' => 'SettingsController@postConfiguration',
+            ]);
+
+            Route::get('/run/{commandName}', [
+                'as' => 'teamspeak.command.run',
+                'uses' => 'SettingsController@getSubmitJob',
+            ]);
+        });
+
+        Route::group([
+            'prefix' => 'logs',
+            'middleware' => 'bouncer:teamspeak.setup',
+        ], function() {
+            Route::get('/', [
+                'as' => 'teamspeak.logs',
+                'uses' => 'LogController@getLogs',
+            ]);
+        });
+
     });
-
-});
 });

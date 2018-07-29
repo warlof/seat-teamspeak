@@ -22,7 +22,6 @@
 return [
     'teamspeak' => [
         'view',
-        'create',
         'setup'
     ]
 ];
