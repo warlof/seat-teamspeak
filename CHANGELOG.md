@@ -1,3 +1,6 @@
+# 3.0.1
+Fix service registration process.
+
 # 3.0.0
 Initial release of teamspeak connector for SeAT 3.x
 
