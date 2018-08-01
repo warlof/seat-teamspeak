@@ -20,7 +20,7 @@
   ],
   "autoload":{
       "psr-4":{
-          "Seat\\Warlof\\Teamspeak\\": "src/"
+          "Warlof\\Seat\\Connector\\Teamspeak\\": "src/"
       }
   },
   "require": {
