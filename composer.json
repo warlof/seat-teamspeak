@@ -34,7 +34,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Warlof\\Seat\\Connector\\Teamspeak\\TeamspeakServiceProvider"
+        "Warlof\\Seat\\Connector\\Teamspeak\\TeamspeakConnectorServiceProvider"
       ]
     }
   }
