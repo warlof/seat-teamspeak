@@ -25,7 +25,7 @@ Access your Teamspeak server and find the `query_ip_whitelist.txt` file.
 Add the IP address of your Seat install server to the list to avoid ServerQuery flood bans when running jobs.
 Don't forget to add an empty line at the end of the `query_ip_whitelist.txt`.
 
-Click on 'Teamspeak' and then click on 'Settings'.
+Click on `Teamspeak` and then click on `Settings`.
 
 Change the Configuration to meet your Teamspeak server's settings.
 The Query port is `10011` by default.
@@ -38,6 +38,6 @@ Click `Update`, then click `Update Teamspeak server groups` to load in all of yo
 Access is granted through the `Access Management` section.
 
 Click on `Settings` and then click on `Schedule`. 
-Add `teamspeak:users:invite` and `teamspeak:users:kick` (recommended every 5 minutes).
+Add `teamspeak:user:policy` (recommended every 30 minutes).
 
-Good luck, and Happy Hunting!!  o7
+Good luck, and Happy Hunting !  o7
