@@ -1,6 +1,7 @@
 # 3.0.3
 - Address issues related to nickname already in use triggered by the query user
 - Address an issue which was preventing user with revoked token to be kick
+- Address an issue which was preventing user without `teamspeak.view` permission to see the menu entry
 - Refactor jobs
 - Refactor connector link
 
@@ -10,6 +11,13 @@ Be certain you're putting your SeAT server address into your Teamspeak query whi
 >
 > Due to modification applied on settings level, you may need to setup your teamspeak again.
 > It should be handled by migration, so take a look into settings.
+
+> **/ ! \ Warning**
+>
+> Commands has been updated.
+> - `teamspeak:groups:update` is now `teamspeak:group:sync`
+> - `teamspeak:users:invite` is now `teamspeak:user:policy`
+> - `teamspeak:users:kick` has been removed
 
 # 3.0.1
 Fix service registration process.
