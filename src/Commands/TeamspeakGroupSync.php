@@ -22,25 +22,28 @@
 namespace Warlof\Seat\Connector\Teamspeak\Commands;
 
 use Illuminate\Console\Command;
-use Warlof\Seat\Connector\Teamspeak\Jobs\TeamspeakReceptionist;
+use Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException;
 
-class TeamspeakInvite extends Command
+class TeamspeakGroupSync extends Command
 {
     /**
      * @var string
      */
-    protected $signature = 'teamspeak:users:invite';
+    protected $signature = 'teamspeak:group:sync';
 
     /**
      * @var string
      */
-    protected $description = 'Auto invite based on white list/teamspeak relation';
+    protected $description = 'Discovering Teamspeak groups (both server and channel)';
 
-    /**
-     *
-     */
+	/**
+	 * @throws TeamspeakSettingException
+	 * @throws \Seat\Services\Exceptions\SettingException
+	 */
     public function handle()
     {
-        TeamspeakReceptionist::dispatch();
+        dispatch(new \Warlof\Seat\Connector\Teamspeak\Jobs\TeamspeakGroupsUpdate());
+
+        $this->info('A job to sync Teamspeak Server Groups with SeAT has been queued.');
     }
 }

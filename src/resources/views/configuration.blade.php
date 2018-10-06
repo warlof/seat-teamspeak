@@ -15,14 +15,21 @@
 
                     <legend>Teamspeak</legend>
 
+                    @if(! is_null(setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_HOSTNAME_KEY, true)))
+                    <p class="callout callout-warning text-justify">It appears you already have a Teamspeak Server access setup.
+                        In order to prevent any mistakes, <code>Server Hostname</code>, <code>Server Port</code>, <code>Server Query Port</code>,
+                        <code>Server Query Username</code> and <code>Server Query Password</code> fields have been disabled.<br/>
+                        Please use the rubber in order to enable modifications.</p>
+                    @endif
+
                     <div class="form-group">
                         <label for="teamspeak-configuration-hostname" class="col-md-4">Server Hostname</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if (is_null(setting('teamspeak_hostname', true)))
+                                @if (is_null(setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_HOSTNAME_KEY, true)))
                                 <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" />
                                 @else
-                                <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" value="{{ setting('teamspeak_hostname', true) }}" />
+                                <input type="text" class="form-control" id="teamspeak-configuration-hostname" name="teamspeak-configuration-hostname" value="{{ setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_HOSTNAME_KEY, true) }}" readonly />
                                 @endif
                                 {{ csrf_field() }}
                                 <span class="input-group-btn">
@@ -38,10 +45,10 @@
                         <label for="teamspeak-configuration-port" class="col-md-4">Server Port</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if (is_null(setting('teamspeak_server_port', true)))
+                                @if (is_null(setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_INSTANCE_PORT_KEY, true)))
                                     <input type="text" class="form-control" id="teamspeak-configuration-port" name="teamspeak-configuration-port" />
                                 @else
-                                    <input type="text" class="form-control" id="teamspeak-configuration-port" name="teamspeak-configuration-port" value="{{ setting('teamspeak_server_port', true) }}" />
+                                    <input type="text" class="form-control" id="teamspeak-configuration-port" name="teamspeak-configuration-port" value="{{ setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_INSTANCE_PORT_KEY, true) }}" readonly />
                                 @endif
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="port-eraser">
@@ -56,10 +63,10 @@
                         <label for="teamspeak-configuration-query" class="col-md-4">Server Query Port</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if (is_null(setting('teamspeak_server_query', true)))
+                                @if (is_null(setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_QUERY_PORT_KEY, true)))
                                     <input type="text" class="form-control" id="teamspeak-configuration-query" name="teamspeak-configuration-query" />
                                 @else
-                                    <input type="text" class="form-control" id="teamspeak-configuration-query" name="teamspeak-configuration-query" value="{{ setting('teamspeak_server_query', true) }}" />
+                                    <input type="text" class="form-control" id="teamspeak-configuration-query" name="teamspeak-configuration-query" value="{{ setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_QUERY_PORT_KEY, true) }}" readonly />
                                 @endif
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="query-eraser">
@@ -74,10 +81,10 @@
                         <label for="teamspeak-configuration-username" class="col-md-4">Server Query Username</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if (is_null(setting('teamspeak_username', true)))
+                                @if (is_null(setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_QUERY_USERNAME_KEY, true)))
                                     <input type="text" class="form-control" id="teamspeak-configuration-username" name="teamspeak-configuration-username" />
                                 @else
-                                    <input type="text" class="form-control" id="teamspeak-configuration-username" name="teamspeak-configuration-username" value="{{ setting('teamspeak_username', true) }}" />
+                                    <input type="text" class="form-control" id="teamspeak-configuration-username" name="teamspeak-configuration-username" value="{{ setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_QUERY_USERNAME_KEY, true) }}" readonly />
                                 @endif
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="username-eraser">
@@ -92,10 +99,10 @@
                         <label for="teamspeak-configuration-password" class="col-md-4">Server Query Password</label>
                         <div class="col-md-7">
                             <div class="input-group input-group-sm">
-                                @if (is_null(setting('teamspeak_password', true)))
+                                @if (is_null(setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_QUERY_PASSWORD_KEY, true)))
                                     <input type="text" class="form-control" id="teamspeak-configuration-password" name="teamspeak-configuration-password" />
                                 @else
-                                    <input type="text" class="form-control" id="teamspeak-configuration-password" name="teamspeak-configuration-password" value="{{ setting('teamspeak_password', true) }}" />
+                                    <input type="text" class="form-control" id="teamspeak-configuration-password" name="teamspeak-configuration-password" value="{{ setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_QUERY_PASSWORD_KEY, true) }}" readonly />
                                 @endif
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-danger btn-flat" id="password-eraser">
@@ -110,7 +117,7 @@
                         <label for="teamspeak-configuration-tags" class="col-md-4">Use Corp Tags?</label>
                         <div class="col-md-7">
                             <div class="form-check">
-                                @if (setting('teamspeak_tags', true) == '')
+                                @if (setting('warlof.teamspeak-connector.tags', true) !== true)
                                     <input type="checkbox" class="form-check-input" id="teamspeak-configuration-tags" name="teamspeak-configuration-tags" />
                                 @else
                                     <input type="checkbox" class="form-check-input" id="teamspeak-configuration-tags" name="teamspeak-configuration-tags" checked />
@@ -137,13 +144,26 @@
         <div class="panel-body">
             <div class="form-group">
                 <div class="col-md-12">
-                    @if($green_settings == '')
-                        <a href="#" type="button" class="btn btn-success btn-md col-md-12 disabled" role="button">Update Teamspeak server groups</a>
+                    @if(is_null(setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_HOSTNAME_KEY, true)))
+                        <button type="button"  id="sync-groups" class="btn btn-success btn-md col-md-12 disabled" role="button">Update Teamspeak server groups</button>
                     @else
-                        <a href="{{ route('teamspeak.command.run', ['commandName' => 'teamspeak:groups:update']) }}" type="button" class="btn btn-success btn-md col-md-12" role="button">Update Teamspeak server groups</a>
+                        <button type="button" id="sync-groups" class="btn btn-success btn-md col-md-12" role="button">Update Teamspeak server groups</button>
                     @endif
                     <span class="help-block">
                         This will update known Teamspeak server groups.
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    @if(is_null(setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_HOSTNAME_KEY, true)))
+                        <button type="button" id="reset-command" class="btn btn-danger btn-md col-md-12 disabled" role="button">Reset everybody</button>
+                    @else
+                        <button type="button" id="reset-command" class="btn btn-danger btn-md col-md-12" role="button">Reset everybody</button>
+                    @endif
+                    <span class="help-block">
+                        This will remove roles from every members into the connected Teamspeak Server.
+                        Please proceed carefully.
                     </span>
                 </div>
             </div>
@@ -177,24 +197,31 @@
 
 @push('javascript')
     <script type="application/javascript">
-        $('#hostname-eraser').click(function(){
-            $('#teamspeak-configuration-hostname').val('');
-        });
+        $(function() {
+            ['hostname', 'port', 'query', 'username', 'password'].forEach(function(value) {
+                $('#' + value + '-eraser').on('click', function() {
+                    var element = $('#teamspeak-configuration-' + value);
 
-        $('#port-eraser').click(function(){
-            $('#teamspeak-configuration-port').val('');
-        });
+                    element.val('');
+                    element.removeAttr('readonly');
+                    element.focus();
+                });
+            });
 
-        $('#query-eraser').click(function(){
-            $('#teamspeak-configuration-query').val('');
-        });
+            $('#sync-groups').on('click', function() {
+                $.post('{{ route('teamspeak.command.run') }}', {
+                    command: 'teamspeak:group:sync'
+                });
+            });
 
-        $('#username-eraser').click(function(){
-            $('#teamspeak-configuration-username').val('');
-        });
-
-        $('#password-eraser').click(function(){
-            $('#teamspeak-configuration-password').val('');
+            $('#reset-command').on('click', function() {
+                $.post('{{ route('teamspeak.command.run') }}', {
+                    command: 'teamspeak:user:policy',
+                    parameters: {
+                        '--terminator': true
+                    }
+                });
+            });
         });
 
         $('[data-toggle="tooltip"]').tooltip();

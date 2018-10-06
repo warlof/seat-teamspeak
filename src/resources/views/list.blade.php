@@ -19,8 +19,8 @@
                             <option value="user">{{ trans('teamspeak::seat.user_filter') }}</option>
                             <option value="role">{{ trans('teamspeak::seat.role_filter') }}</option>
                             <option value="corporation">{{ trans('teamspeak::seat.corporation_filter') }}</option>
-                            <option value="alliance">{{ trans('teamspeak::seat.alliance_filter') }}</option>
                             <option value="title">{{ trans('teamspeak::seat.title_filter') }}</option>
+                            <option value="alliance">{{ trans('teamspeak::seat.alliance_filter') }}</option>
                             <option value="public">{{ trans('teamspeak::seat.public_filter') }}</option>
                         </select>
                     </div>
@@ -55,17 +55,17 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="teamspeak-title-id">{{ trans('teamspeak::seat.title') }}</label>
+                        <select name="teamspeak-title-id" id="teamspeak-title-id" class="col-md-12" disabled="disabled"></select>
+                    </div>
+
+                    <div class="form-group">
                         <label for="teamspeak-alliance-id">{{ trans('teamspeak::seat.alliance') }}</label>
                         <select name="teamspeak-alliance-id" id="teamspeak-alliance-id" class="col-md-12" disabled="disabled">
                             @foreach($alliances as $alliance)
                             <option value="{{ $alliance->alliance_id }}">{{ $alliance->name }}</option>
                             @endforeach
                         </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="teamspeak-title-id">{{ trans('teamspeak::seat.title') }}</label>
-                        <select name="teamspeak-title-id" id="teamspeak-title-id" class="col-md-12" disabled="disabled"></select>
                     </div>
 
                     <div class="form-group">
@@ -141,7 +141,12 @@
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>
-                                <td>{{ $group->enable }}</td>
+                                <td>
+                                    @if($group->enable)
+                                        <span class="fa fa-check text-success"></span>
+                                    @else
+                                        <span class="fa fa-times text-danger"></span>
+                                    @endif
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('teamspeak.public.remove', ['group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
@@ -173,7 +178,13 @@
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>
-                                <td>{{ $group->enable }}</td>
+                                <td>
+                                    @if($group->enable)
+                                        <span class="fa fa-check text-success"></span>
+                                    @else
+                                        <span class="fa fa-times text-danger"></span>
+                                    @endif
+                                </td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('teamspeak.user.remove', ['user_id' => $group->group_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
@@ -205,7 +216,13 @@
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>
-                                <td>{{ $group->enable }}</td>
+                                <td>
+                                    @if($group->enable)
+                                        <span class="fa fa-check text-success"></span>
+                                    @else
+                                        <span class="fa fa-times text-danger"></span>
+                                    @endif
+                                </td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('teamspeak.role.remove', ['role_id' => $group->role_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
@@ -239,7 +256,13 @@
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>
-                                <td>{{ $group->enable }}</td>
+                                <td>
+                                    @if($group->enable)
+                                        <span class="fa fa-check text-success"></span>
+                                    @else
+                                        <span class="fa fa-times text-danger"></span>
+                                    @endif
+                                </td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('teamspeak.title.remove', ['corporation_id' => $group->corporation_id, 'title_id' => $group->title_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
@@ -271,7 +294,13 @@
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>
-                                <td>{{ $group->enable }}</td>
+                                <td>
+                                    @if($group->enable)
+                                        <span class="fa fa-check text-success"></span>
+                                    @else
+                                        <span class="fa fa-times text-danger"></span>
+                                    @endif
+                                </td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('teamspeak.corporation.remove', ['corporation_id' => $group->corporation_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">
@@ -303,7 +332,13 @@
                                 <td>{{ $group->group->name }}</td>
                                 <td>{{ $group->created_at }}</td>
                                 <td>{{ $group->updated_at }}</td>
-                                <td>{{ $group->enable }}</td>
+                                <td>
+                                    @if($group->enable)
+                                        <span class="fa fa-check text-success"></span>
+                                    @else
+                                        <span class="fa fa-times text-danger"></span>
+                                    @endif
+                                </td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('teamspeak.alliance.remove', ['alliance_id' => $group->alliance_id, 'group_id' => $group->teamspeak_sgid]) }}" type="button" class="btn btn-danger btn-xs col-xs-12">

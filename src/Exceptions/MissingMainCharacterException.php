@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of SeAT Teamspeak Connector.
  *
@@ -19,28 +18,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Warlof\Seat\Connector\Teamspeak\Commands;
+namespace Warlof\Seat\Connector\Teamspeak\Exceptions;
 
-use Illuminate\Console\Command;
-use Warlof\Seat\Connector\Teamspeak\Jobs\TeamspeakAssKicker;
 
-class TeamspeakKick extends Command
+use Exception;
+use Seat\Web\Models\Group;
+
+class MissingMainCharacterException extends Exception
 {
-    /**
-     * @var string
-     */
-    protected $signature = 'teamspeak:users:kick';
-
-    /**
-     * @var string
-     */
-    protected $description = 'Auto kick based on white list/teamspeak relation';
-
-    /**
-     *
-     */
-    public function handle()
+    public function __construct(Group $group)
     {
-        TeamspeakAssKicker::dispatch();
+        $message = sprintf('The group with ID %d does not have a main character set, ' .
+            'or related character information is missing.', $group->id);
+        parent::__construct($message, 0, null);
     }
 }

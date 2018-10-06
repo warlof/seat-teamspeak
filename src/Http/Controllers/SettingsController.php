@@ -26,6 +26,7 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Artisan;
 use Parsedown;
 use Seat\Web\Http\Controllers\Controller;
+use Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup;
 use Warlof\Seat\Connector\Teamspeak\Validation\ValidateConfiguration;
 
 class SettingsController extends Controller
@@ -36,21 +37,10 @@ class SettingsController extends Controller
      **/
     public function getConfiguration()
     {
-        $ts_username = setting('teamspeak_username', true);
-        $ts_password = setting('teamspeak_password', true);
-        $ts_hostname = setting('teamspeak_hostname', true);
-        $ts_server_query = setting('teamspeak_server_query', true);
-        $ts_server_voice = setting('teamspeak_server_port', true);
-        $green_settings = false;
-
-        if ($ts_username != "" && $ts_password != "" && $ts_hostname != "" && $ts_server_query != "" && $ts_server_voice != "") {
-            $green_settings = true;
-        }
-
         $parser = new Parsedown();
         $changelog = $parser->parse($this->getChangelog());
 
-        return view('teamspeak::configuration', compact('changelog', 'green_settings'));
+        return view('teamspeak::configuration', compact('changelog'));
     }
 
     /**
@@ -61,16 +51,16 @@ class SettingsController extends Controller
      */
     public function postConfiguration(ValidateConfiguration $request)
     {
-        setting(['teamspeak_username', $request->input('teamspeak-configuration-username')], true);
-        setting(['teamspeak_password', $request->input('teamspeak-configuration-password')], true);
-        setting(['teamspeak_hostname', $request->input('teamspeak-configuration-hostname')], true);
-        setting(['teamspeak_server_query', $request->input('teamspeak-configuration-query')], true);
-        setting(['teamspeak_server_port', $request->input('teamspeak-configuration-port')], true);
+        setting([TeamspeakSetup::SERVER_HOSTNAME_KEY, $request->input('teamspeak-configuration-hostname')], true);
+        setting([TeamspeakSetup::SERVER_INSTANCE_PORT_KEY, $request->input('teamspeak-configuration-port')], true);
+        setting([TeamspeakSetup::SERVER_QUERY_PASSWORD_KEY, $request->input('teamspeak-configuration-password')], true);
+        setting([TeamspeakSetup::SERVER_QUERY_PORT_KEY, $request->input('teamspeak-configuration-query')], true);
+        setting([TeamspeakSetup::SERVER_QUERY_USERNAME_KEY, $request->input('teamspeak-configuration-username')], true);
 
         if ($request->input('teamspeak-configuration-tags') === null) {
-            setting(['teamspeak_tags', ''], true);
+            setting(['warlof.teamspeak-connector.tags', false], true);
         } else {
-            setting(['teamspeak_tags', $request->input('teamspeak-configuration-tags')], true);
+            setting(['warlof.teamspeak-connector.tags', (bool) $request->input('teamspeak-configuration-tags')], true);
         }
 
         return redirect()->back()
@@ -78,22 +68,24 @@ class SettingsController extends Controller
     }
 
     /**
-     * @param $command_name
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function getSubmitJob($command_name)
+    public function postSubmitJob()
     {
         $accepted_commands = [
-            'teamspeak:groups:update',
-            'teamspeak:users:update',
+            'teamspeak:group:sync',
+            'teamspeak:user:policy',
             'teamspeak:logs:clear'
         ];
 
-        if (!in_array($command_name, $accepted_commands)) {
-            abort(401);
+        $command    = request()->input('command');
+        $parameters = request()->input('parameters');
+
+        if (!in_array($command, $accepted_commands)) {
+            abort(400);
         }
 
-        Artisan::call($command_name);
+        Artisan::call($command, $parameters ?: []);
 
         return redirect()->back()
             ->with('success', 'The command has been run.');

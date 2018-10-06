@@ -24,13 +24,13 @@ return [
         'name'          => 'Teamspeak Connector',
         'icon'          => 'fa-microphone',
         'route_segment' => 'teamspeak',
+        'permission'    => 'teamspeak.view',
         'entries' => [
             [
                 'name'          => 'Join Server',
                 'icon'          => 'fa-sign-in',
                 'route_segment' => 'teamspeak',
                 'route'         => 'teamspeak.register',
-                'permission'    => 'teamspeak.view',
             ],
             [
                 'name'       => 'Access Management',

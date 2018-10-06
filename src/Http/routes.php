@@ -25,12 +25,13 @@ Route::group([
 ], function() {
 
     Route::group([
-        'middleware' => 'web'
+        'middleware' => ['web', 'auth'],
     ], function () {
 
         Route::get('/register', [
             'as' => 'teamspeak.register',
-            'uses' => 'TeamspeakController@getRegisterUser'
+            'uses' => 'TeamspeakController@getRegisterUser',
+            'middleware' => 'bouncer:teamspeak.view',
         ]);
 
         Route::group([
@@ -39,6 +40,7 @@ Route::group([
             Route::post('/user', [
                 'as'   => 'teamspeak.api.user',
                 'uses' => 'TeamspeakController@postGetUserUid',
+                'middleware' => 'bouncer:teamspeak.view',
             ]);
 
             Route::group([
@@ -111,9 +113,9 @@ Route::group([
                 'uses' => 'SettingsController@postConfiguration',
             ]);
 
-            Route::get('/run/{commandName}', [
+            Route::post('/run', [
                 'as' => 'teamspeak.command.run',
-                'uses' => 'SettingsController@getSubmitJob',
+                'uses' => 'SettingsController@postSubmitJob',
             ]);
         });
 

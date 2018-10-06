@@ -26,14 +26,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use TeamSpeak3_Node_Server;
 
 /**
  * Class TeamspeakJobBase
  * @package Warlof\Seat\Connector\Teamspeak\Jobs
  */
-abstract class TeamspeakBase implements ShouldQueue
+abstract class TeamspeakJobBase implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /**
+     * @var \TeamSpeak3_Node_Server
+     */
+    protected $client;
 
     /**
      * @var array
@@ -63,7 +69,6 @@ abstract class TeamspeakBase implements ShouldQueue
             return array_merge($this->tags, $tags);
 
         return $tags;
-
     }
 
     /**
@@ -72,4 +77,10 @@ abstract class TeamspeakBase implements ShouldQueue
      * @return void
      */
     public abstract function handle();
+
+    /**
+     * @return \TeamSpeak3_Node_Server
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
+     */
+    protected abstract function teamspeak() : TeamSpeak3_Node_Server;
 }

@@ -23,9 +23,8 @@ namespace Warlof\Seat\Connector\Teamspeak;
 
 use Illuminate\Support\ServiceProvider;
 use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakLogsClear;
-use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakInvite;
-use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakKick;
-use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakGroupsUpdate;
+use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakGroupSync;
+use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakUserPolicy;
 
 class TeamspeakConnectorServiceProvider extends ServiceProvider
 {
@@ -63,9 +62,8 @@ class TeamspeakConnectorServiceProvider extends ServiceProvider
     public function addCommands()
     {
         $this->commands([
-            TeamspeakInvite::class,
-            TeamspeakKick::class,
-            TeamspeakGroupsUpdate::class,
+            TeamspeakUserPolicy::class,
+            TeamspeakGroupSync::class,
             TeamspeakLogsClear::class
         ]);
     }
