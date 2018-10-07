@@ -53,7 +53,7 @@ class TeamspeakUser extends Model
     /**
      * @return bool
      */
-    public function isGranted() : bool
+    public function isGranted(): bool
     {
         return $this->group->refresh_tokens->count() === $this->group->refresh_tokens()->withTrashed()->count();
     }
@@ -63,12 +63,12 @@ class TeamspeakUser extends Model
      *
      * @return array An array of unique server group ID
      */
-    public function allowedGroups() : array
+    public function allowedGroups(): array
     {
-        $rows = $this->getServerGroupsUserBased($this,false)
-            ->union($this->getServerGroupsRoleBased($this,false))
-            ->union($this->getServerGroupsCorporationBased($this,false))
-            ->union($this->getServerGroupsAllianceBased($this,false))
+        $rows = $this->getServerGroupsUserBased($this, false)
+            ->union($this->getServerGroupsRoleBased($this, false))
+            ->union($this->getServerGroupsCorporationBased($this, false))
+            ->union($this->getServerGroupsAllianceBased($this, false))
             ->union($this->getServerGroupsPublicBased(false))
             ->get();
 
@@ -85,7 +85,7 @@ class TeamspeakUser extends Model
     public function getServerGroupsUserBased(TeamspeakUser $user, bool $get = true)
     {
         $roles = TeamspeakGroupUser::join('groups', 'teamspeak_group_users.group_id', '=', 'groups.id')
-            ->join('teamspeak_groups', 'teamspeak_group_users.teamspeak_sgid' , '=', 'teamspeak_groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_users.teamspeak_sgid', '=', 'teamspeak_groups.id')
             ->where('groups.id', $user->group_id)
             ->where('teamspeak_groups.is_server_group', true)
             ->select('teamspeak_sgid');
@@ -106,7 +106,7 @@ class TeamspeakUser extends Model
     public function getServerGroupsRoleBased(TeamspeakUser $user, bool $get = true)
     {
         $roles = TeamspeakGroupRole::join('group_role', 'teamspeak_group_roles.role_id', '=', 'group_role.role_id')
-            ->join('teamspeak_groups', 'teamspeak_group_roles.teamspeak_sgid' , '=', 'teamspeak_groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_roles.teamspeak_sgid', '=', 'teamspeak_groups.id')
             ->where('group_role.group_id', $user->group_id)
             ->where('teamspeak_groups.is_server_group', true)
             ->select('teamspeak_sgid');
@@ -127,7 +127,7 @@ class TeamspeakUser extends Model
     public function getServerGroupsCorporationBased(TeamspeakUser $user, bool $get = true)
     {
         $roles = TeamspeakGroupCorporation::join('character_infos', 'teamspeak_group_corporations.corporation_id', '=', 'character_infos.corporation_id')
-            ->join('teamspeak_groups', 'teamspeak_group_corporations.teamspeak_sgid' , '=', 'teamspeak_groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_corporations.teamspeak_sgid', '=', 'teamspeak_groups.id')
             ->whereIn('character_infos.character_id', $user->group->users->pluck('id')->toArray())
             ->where('teamspeak_groups.is_server_group', true)
             ->select('teamspeak_sgid');
@@ -148,7 +148,7 @@ class TeamspeakUser extends Model
     public function getServerGroupsAllianceBased(TeamspeakUser $user, bool $get = true)
     {
         $roles = TeamspeakGroupAlliance::join('character_infos', 'teamspeak_group_alliances.alliance_id', '=', 'character_infos.alliance_id')
-            ->join('teamspeak_groups', 'teamspeak_group_alliances.teamspeak_sgid' , '=', 'teamspeak_groups.id')
+            ->join('teamspeak_groups', 'teamspeak_group_alliances.teamspeak_sgid', '=', 'teamspeak_groups.id')
             ->whereIn('character_infos.character_id', $user->group->users->pluck('id')->toArray())
             ->where('teamspeak_groups.is_server_group', true)
             ->select('teamspeak_sgid');

@@ -22,8 +22,8 @@
 namespace Warlof\Seat\Connector\Teamspeak;
 
 use Illuminate\Support\ServiceProvider;
-use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakLogsClear;
 use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakGroupSync;
+use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakLogsClear;
 use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakUserPolicy;
 
 class TeamspeakConnectorServiceProvider extends ServiceProvider
@@ -42,6 +42,39 @@ class TeamspeakConnectorServiceProvider extends ServiceProvider
         $this->addTranslations();
     }
 
+    public function addCommands()
+    {
+        $this->commands([
+            TeamspeakUserPolicy::class,
+            TeamspeakGroupSync::class,
+            TeamspeakLogsClear::class
+        ]);
+    }
+
+    public function addRoutes()
+    {
+        if (!$this->app->routesAreCached()) {
+            include __DIR__ . '/Http/routes.php';
+        }
+    }
+
+    public function addViews()
+    {
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'teamspeak');
+    }
+
+    public function addPublications()
+    {
+        $this->publishes([
+            __DIR__ . '/database/migrations/' => database_path('migrations')
+        ]);
+    }
+
+    public function addTranslations()
+    {
+        $this->loadTranslationsFrom(__DIR__ . '/lang', 'teamspeak');
+    }
+
     /**
      * Register the application services.
      *
@@ -54,41 +87,8 @@ class TeamspeakConnectorServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(
             __DIR__ . '/Config/teamspeak.permissions.php', 'web.permissions');
-        
+
         $this->mergeConfigFrom(
             __DIR__ . '/Config/package.sidebar.php', 'package.sidebar');
-    }
-
-    public function addCommands()
-    {
-        $this->commands([
-            TeamspeakUserPolicy::class,
-            TeamspeakGroupSync::class,
-            TeamspeakLogsClear::class
-        ]);
-    }
-    
-    public function addTranslations()
-    {
-        $this->loadTranslationsFrom(__DIR__ . '/lang', 'teamspeak');
-    }
-    
-    public function addRoutes()
-    {
-        if (!$this->app->routesAreCached()) {
-            include __DIR__ . '/Http/routes.php';
-        }
-    }
-    
-    public function addViews()
-    {
-        $this->loadViewsFrom(__DIR__ . '/resources/views', 'teamspeak');
-    }
-    
-    public function addPublications()
-    {
-        $this->publishes([
-            __DIR__ . '/database/migrations/' => database_path('migrations')
-        ]);
     }
 }

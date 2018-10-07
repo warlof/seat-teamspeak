@@ -19,19 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class UpgradeSettingsTo303 extends Migration
 {
     const SETTINGS_MAP = [
-        'teamspeak_hostname'     => 'warlof.teamspeak-connector.server.hostname',
-        'teamspeak_server_port'  => 'warlof.teamspeak-connector.server.instance.port',
-        'teamspeak_password'     => 'warlof.teamspeak-connector.server.query.password',
-        'teamspeak_username'     => 'warlof.teamspeak-connector.server.query.username',
+        'teamspeak_hostname' => 'warlof.teamspeak-connector.server.hostname',
+        'teamspeak_server_port' => 'warlof.teamspeak-connector.server.instance.port',
+        'teamspeak_password' => 'warlof.teamspeak-connector.server.query.password',
+        'teamspeak_username' => 'warlof.teamspeak-connector.server.query.username',
         'teamspeak_server_query' => 'warlof.teamspeak-connector.server.query.port',
-        'teamspeak_tags'         => 'warlof.teamspeak-connector.tags',
+        'teamspeak_tags' => 'warlof.teamspeak-connector.tags',
     ];
 
     /**
@@ -47,7 +45,7 @@ class UpgradeSettingsTo303 extends Migration
             $value = setting($old_key, true);
 
             // if it's set, create new setting entry
-            if (! is_null($value))
+            if (!is_null($value))
                 setting([$new_key, $value], true);
         }
     }
@@ -65,7 +63,7 @@ class UpgradeSettingsTo303 extends Migration
             $value = setting($new_key, true);
 
             // if it's set, create new setting entry
-            if (! is_null($value))
+            if (!is_null($value))
                 setting([$old_key, $value], true);
         }
     }

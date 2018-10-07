@@ -27,10 +27,10 @@ use Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException;
 
 class TeamspeakSetup
 {
-    const SERVER_HOSTNAME_KEY       = 'warlof.teamspeak-connector.server.hostname';
-    const SERVER_INSTANCE_PORT_KEY  = 'warlof.teamspeak-connector.server.instance.port';
+    const SERVER_HOSTNAME_KEY = 'warlof.teamspeak-connector.server.hostname';
+    const SERVER_INSTANCE_PORT_KEY = 'warlof.teamspeak-connector.server.instance.port';
     const SERVER_QUERY_PASSWORD_KEY = 'warlof.teamspeak-connector.server.query.password';
-    const SERVER_QUERY_PORT_KEY     = 'warlof.teamspeak-connector.server.query.port';
+    const SERVER_QUERY_PORT_KEY = 'warlof.teamspeak-connector.server.query.port';
     const SERVER_QUERY_USERNAME_KEY = 'warlof.teamspeak-connector.server.query.username';
 
     /**
@@ -42,10 +42,10 @@ class TeamspeakSetup
      * @var array
      */
     private $settings = [
-        'username'      => null,
-        'password'      => null,
-        'hostname'      => null,
-        'query_port'    => null,
+        'username' => null,
+        'password' => null,
+        'hostname' => null,
+        'query_port' => null,
         'instance_port' => null,
     ];
 
@@ -61,11 +61,11 @@ class TeamspeakSetup
     public function __construct()
     {
         $this->settings = [
-            'hostname'      => setting(self::SERVER_HOSTNAME_KEY, true),
+            'hostname' => setting(self::SERVER_HOSTNAME_KEY, true),
             'instance_port' => setting(self::SERVER_INSTANCE_PORT_KEY, true),
-            'password'      => setting(self::SERVER_QUERY_PASSWORD_KEY, true),
-            'query_port'    => setting(self::SERVER_QUERY_PORT_KEY, true),
-            'username'      => setting(self::SERVER_QUERY_USERNAME_KEY, true),
+            'password' => setting(self::SERVER_QUERY_PASSWORD_KEY, true),
+            'query_port' => setting(self::SERVER_QUERY_PORT_KEY, true),
+            'username' => setting(self::SERVER_QUERY_USERNAME_KEY, true),
         ];
 
         // generating a unique ID prefixed by SeAT with 23 characters length (bump to 28)
@@ -74,35 +74,6 @@ class TeamspeakSetup
         logger()->debug(sprintf('Spawning a new %s instance with UID %s', self::class, $this->query_nickname));
 
         $this->validateSettings();
-    }
-
-    /**
-     * @return TeamSpeak3_Node_Server
-     * @throws TeamspeakSettingException
-     */
-    public function getInstance() : TeamSpeak3_Node_Server
-    {
-        if (is_null($this->teamspeak)) {
-
-            // preparing server query URI to which open a socket
-            $uri = sprintf('serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0&nickname=%s',
-                $this->settings['username'],
-                $this->settings['password'],
-                $this->settings['hostname'],
-                $this->settings['query_port'],
-                $this->settings['instance_port'],
-                $this->query_nickname);
-
-            // building a Teamspeak server instance
-            $this->teamspeak = TeamSpeak3::factory($uri);
-        }
-
-        return $this->teamspeak;
-    }
-
-    public function getQueryNickname() : string
-    {
-        return $this->query_nickname;
     }
 
     /**
@@ -126,5 +97,34 @@ class TeamspeakSetup
 
         if (is_null($this->settings['query_port']) || empty($this->settings['query_port']))
             throw new TeamspeakSettingException('Teamspeak query port has not been set.');
+    }
+
+    /**
+     * @return TeamSpeak3_Node_Server
+     * @throws TeamspeakSettingException
+     */
+    public function getInstance(): TeamSpeak3_Node_Server
+    {
+        if (is_null($this->teamspeak)) {
+
+            // preparing server query URI to which open a socket
+            $uri = sprintf('serverquery://%s:%s@%s:%s/?server_port=%s&blocking=0&nickname=%s',
+                $this->settings['username'],
+                $this->settings['password'],
+                $this->settings['hostname'],
+                $this->settings['query_port'],
+                $this->settings['instance_port'],
+                $this->query_nickname);
+
+            // building a Teamspeak server instance
+            $this->teamspeak = TeamSpeak3::factory($uri);
+        }
+
+        return $this->teamspeak;
+    }
+
+    public function getQueryNickname(): string
+    {
+        return $this->query_nickname;
     }
 }

@@ -36,10 +36,10 @@ class TeamspeakGroupSync extends Command
      */
     protected $description = 'Discovering Teamspeak groups (both server and channel)';
 
-	/**
-	 * @throws TeamspeakSettingException
-	 * @throws \Seat\Services\Exceptions\SettingException
-	 */
+    /**
+     * @throws TeamspeakSettingException
+     * @throws \Seat\Services\Exceptions\SettingException
+     */
     public function handle()
     {
         dispatch(new \Warlof\Seat\Connector\Teamspeak\Jobs\TeamspeakGroupsUpdate());

@@ -21,33 +21,33 @@
 
 return [
     'teamspeak' => [
-        'name'          => 'Teamspeak Connector',
-        'icon'          => 'fa-microphone',
+        'name' => 'Teamspeak Connector',
+        'icon' => 'fa-microphone',
         'route_segment' => 'teamspeak',
-        'permission'    => 'teamspeak.view',
+        'permission' => 'teamspeak.view',
         'entries' => [
             [
-                'name'          => 'Join Server',
-                'icon'          => 'fa-sign-in',
+                'name' => 'Join Server',
+                'icon' => 'fa-sign-in',
                 'route_segment' => 'teamspeak',
-                'route'         => 'teamspeak.register',
+                'route' => 'teamspeak.register',
             ],
             [
-                'name'       => 'Access Management',
-                'icon'       => 'fa-shield',
-                'route'      => 'teamspeak.list',
+                'name' => 'Access Management',
+                'icon' => 'fa-shield',
+                'route' => 'teamspeak.list',
                 'permission' => 'teamspeak.setup',
             ],
             [
-                'name'       => 'Settings',
-                'icon'       => 'fa-cogs',
-                'route'      => 'teamspeak.configuration',
+                'name' => 'Settings',
+                'icon' => 'fa-cogs',
+                'route' => 'teamspeak.configuration',
                 'permission' => 'teamspeak:setup',
             ],
             [
-                'name'       => 'Logs',
-                'icon'       => 'fa-list',
-                'route'      => 'teamspeak.logs',
+                'name' => 'Logs',
+                'icon' => 'fa-list',
+                'route' => 'teamspeak.logs',
                 'permission' => 'teamspeak.setup',
             ]
         ],

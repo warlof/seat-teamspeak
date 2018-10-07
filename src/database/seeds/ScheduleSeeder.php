@@ -28,12 +28,12 @@ class ScheduleSeeder extends Seeder
 {
     protected $schedule = [
         [
-            'command'           => 'teamspeak:update',
-            'expression'        => '*/5 * * * * *',
-            'allow_overlap'     => false,
+            'command' => 'teamspeak:update',
+            'expression' => '*/5 * * * * *',
+            'allow_overlap' => false,
             'allow_maintenance' => false,
-            'ping_before'       => null,
-            'ping_after'        => null
+            'ping_before' => null,
+            'ping_after' => null
         ]
     ];
 

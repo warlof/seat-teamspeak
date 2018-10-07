@@ -22,7 +22,7 @@
 Route::group([
     'namespace' => 'Warlof\Seat\Connector\Teamspeak\Http\Controllers',
     'prefix' => 'teamspeak'
-], function() {
+], function () {
 
     Route::group([
         'middleware' => ['web', 'auth'],
@@ -36,16 +36,16 @@ Route::group([
 
         Route::group([
             'prefix' => 'api',
-        ], function() {
+        ], function () {
             Route::post('/user', [
-                'as'   => 'teamspeak.api.user',
+                'as' => 'teamspeak.api.user',
                 'uses' => 'TeamspeakController@postGetUserUid',
                 'middleware' => 'bouncer:teamspeak.view',
             ]);
 
             Route::group([
                 'prefix' => 'acl',
-            ], function() {
+            ], function () {
                 Route::get('/titles', [
                     'as' => 'teamspeak.api.acl.titles',
                     'uses' => 'AccessManagementController@getTitles',
@@ -57,7 +57,7 @@ Route::group([
         Route::group([
             'prefix' => 'acl',
             'middleware' => 'bouncer:teamspeak.setup',
-        ], function() {
+        ], function () {
             Route::get('/', [
                 'as' => 'teamspeak.list',
                 'uses' => 'AccessManagementController@getRelations'
@@ -102,7 +102,7 @@ Route::group([
         Route::group([
             'prefix' => 'configuration',
             'middleware' => 'bouncer:teamspeak.setup',
-        ], function() {
+        ], function () {
             Route::get('/', [
                 'as' => 'teamspeak.configuration',
                 'uses' => 'SettingsController@getConfiguration',
@@ -122,7 +122,7 @@ Route::group([
         Route::group([
             'prefix' => 'logs',
             'middleware' => 'bouncer:teamspeak.setup',
-        ], function() {
+        ], function () {
             Route::get('/', [
                 'as' => 'teamspeak.logs',
                 'uses' => 'LogController@getLogs',

@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 class CreateTeamspeakTables extends Migration
@@ -37,12 +37,12 @@ class CreateTeamspeakTables extends Migration
             $table->string('name');
             $table->boolean('is_server_group')->default(true);
             $table->timestamps();
-            
+
             $table->primary('id');
         });
 
-        		
-		Schema::create('teamspeak_users', function (Blueprint $table) {
+
+        Schema::create('teamspeak_users', function (Blueprint $table) {
             $table->unsignedInteger('group_id');
             $table->string('teamspeak_id');
             $table->timestamps();

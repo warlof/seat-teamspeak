@@ -57,7 +57,7 @@ class TeamspeakUserOrchestrator extends TeamspeakJobBase
             'teamspeak_uid' => $user->teamspeak_id,
         ]);
 
-        $this->user       = $user;
+        $this->user = $user;
         $this->terminator = $terminator;
 
         array_push($this->tags, sprintf('teamspeak_uid:%s', $this->user->teamspeak_id));
@@ -93,34 +93,6 @@ class TeamspeakUserOrchestrator extends TeamspeakJobBase
     }
 
     /**
-     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
-     */
-    public function failed()
-    {
-        $this->onAfterJob();
-    }
-
-    /**
-     * @return TeamSpeak3_Node_Server
-     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
-     */
-    protected function teamspeak(): TeamSpeak3_Node_Server
-    {
-        if (is_null($this->client))
-            $this->client = new TeamspeakSetup();
-
-        return $this->client->getInstance();
-    }
-
-    /**
-     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
-     */
-    private function onAfterJob()
-    {
-        $this->teamspeak()->logout();
-    }
-
-    /**
      * Update server groups for the current running user
      *
      * @return void
@@ -147,8 +119,8 @@ class TeamspeakUserOrchestrator extends TeamspeakJobBase
         }
 
         // in case terminator has been turned on or user got revoked token, revoke all groups assigned to the user
-        if ($this->terminator || ! $this->user->isGranted()) {
-            if (! empty($member_of_groups)) {
+        if ($this->terminator || !$this->user->isGranted()) {
+            if (!empty($member_of_groups)) {
                 foreach ($member_of_groups as $group)
                     $this->teamspeak()->serverGroupClientDel($group, $user_info['cldbid']);
             }
@@ -161,7 +133,7 @@ class TeamspeakUserOrchestrator extends TeamspeakJobBase
 
         // get the delta
         $missing_groups = array_diff($allowed_groups, $member_of_groups);
-        $extra_groups   = array_diff($member_of_groups, $allowed_groups);
+        $extra_groups = array_diff($member_of_groups, $allowed_groups);
 
         logger()->debug(sprintf('%s - Updating user Server Groups', self::class), [
             'group_id' => $this->user->group_id,
@@ -194,5 +166,33 @@ class TeamspeakUserOrchestrator extends TeamspeakJobBase
 
             $this->teamspeak()->serverGroupClientDel($group, $user_info['cldbid']);
         }
+    }
+
+    /**
+     * @return TeamSpeak3_Node_Server
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
+     */
+    protected function teamspeak(): TeamSpeak3_Node_Server
+    {
+        if (is_null($this->client))
+            $this->client = new TeamspeakSetup();
+
+        return $this->client->getInstance();
+    }
+
+    /**
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
+     */
+    private function onAfterJob()
+    {
+        $this->teamspeak()->logout();
+    }
+
+    /**
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
+     */
+    public function failed()
+    {
+        $this->onAfterJob();
     }
 }

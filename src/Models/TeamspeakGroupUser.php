@@ -37,5 +37,5 @@ class TeamspeakGroupUser extends Model
     {
         return $this->belongsTo(Group::class, 'group_id', 'id');
     }
-	
+
 }

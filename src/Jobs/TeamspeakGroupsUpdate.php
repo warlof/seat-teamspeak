@@ -54,34 +54,6 @@ class TeamspeakGroupsUpdate extends TeamspeakJobBase
         });
     }
 
-    /**
-     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
-     */
-    public function failed()
-    {
-        $this->onAfterJob();
-    }
-
-    /**
-     * @return \TeamSpeak3_Node_Server
-     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
-     */
-    protected function teamspeak(): TeamSpeak3_Node_Server
-    {
-        if (is_null($this->client))
-            $this->client = new TeamspeakSetup();
-
-        return $this->client->getInstance();
-    }
-
-    /**
-     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
-     */
-    private function onAfterJob()
-    {
-        $this->teamspeak()->logout();
-    }
-
     private function updateServerGroups()
     {
         // type : {0 = template, 1 = normal, 2 = query}
@@ -108,5 +80,33 @@ class TeamspeakGroupsUpdate extends TeamspeakJobBase
                 ]
             );
         }
+    }
+
+    /**
+     * @return \TeamSpeak3_Node_Server
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
+     */
+    protected function teamspeak(): TeamSpeak3_Node_Server
+    {
+        if (is_null($this->client))
+            $this->client = new TeamspeakSetup();
+
+        return $this->client->getInstance();
+    }
+
+    /**
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
+     */
+    private function onAfterJob()
+    {
+        $this->teamspeak()->logout();
+    }
+
+    /**
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
+     */
+    public function failed()
+    {
+        $this->onAfterJob();
     }
 }

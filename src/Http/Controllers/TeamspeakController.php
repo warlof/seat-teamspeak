@@ -39,19 +39,41 @@ class TeamspeakController extends Controller
     {
         $main_character = auth()->user()->group->main_character;
 
-        if (! $main_character) {
+        if (!$main_character) {
             redirect()->back()->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
         }
 
         $corp = CorporationInfo::find($main_character->corporation_id);
 
-        if (! $corp) {
+        if (!$corp) {
             redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
         }
 
         $teamspeak_username = $this->getTeamspeakFormattedNickname();
 
         return view('teamspeak::register', compact('teamspeak_username'));
+    }
+
+    /**
+     * @return bool|string
+     * @throws \Seat\Services\Exceptions\SettingException
+     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\MissingMainCharacterException
+     */
+    private function getTeamspeakFormattedNickname()
+    {
+        $main_character = auth()->user()->group->main_character;
+        if (is_null($main_character))
+            throw new MissingMainCharacterException(auth()->user()->group);
+
+        $teamspeak_name = $main_character->name;
+
+        if (setting('warlof.teamspeak-connector.tags', true) === true) {
+            $corp = CorporationInfo::find($main_character->corporation_id);
+            $teamspeak_name = sprintf('%s | %s', $corp->ticker, $main_character->name);
+        }
+
+        // Teamspeak has a 30 char limit on names. Trim it.
+        return substr($teamspeak_name, 0, 30);
     }
 
     /**
@@ -85,28 +107,6 @@ class TeamspeakController extends Controller
         return response()->json([
             'error' => 'Unable to retrieve you on Teamspeak. Ensure you have the proper nickname.',
         ], 404);
-    }
-
-    /**
-     * @return bool|string
-     * @throws \Seat\Services\Exceptions\SettingException
-     * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\MissingMainCharacterException
-     */
-    private function getTeamspeakFormattedNickname()
-    {
-        $main_character = auth()->user()->group->main_character;
-        if (is_null($main_character))
-            throw new MissingMainCharacterException(auth()->user()->group);
-
-        $teamspeak_name = $main_character->name;
-
-        if (setting('warlof.teamspeak-connector.tags', true) === true) {
-            $corp = CorporationInfo::find($main_character->corporation_id);
-            $teamspeak_name = sprintf('%s | %s', $corp->ticker, $main_character->name);
-        }
-
-        // Teamspeak has a 30 char limit on names. Trim it.
-        return substr($teamspeak_name, 0, 30);
     }
 
     /**

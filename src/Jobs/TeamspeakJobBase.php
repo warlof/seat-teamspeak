@@ -37,21 +37,19 @@ abstract class TeamspeakJobBase implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var \TeamSpeak3_Node_Server
-     */
-    protected $client;
-
-    /**
-     * @var array
-     */
-    protected $tags = [];
-
-    /**
      * The number of times the job may be attempted.
      *
      * @var int
      */
     public $tries = 1;
+    /**
+     * @var \TeamSpeak3_Node_Server
+     */
+    protected $client;
+    /**
+     * @var array
+     */
+    protected $tags = [];
 
     /**
      * Assign this job a tag so that Horizon can categorize and allow
@@ -82,5 +80,5 @@ abstract class TeamspeakJobBase implements ShouldQueue
      * @return \TeamSpeak3_Node_Server
      * @throws \Warlof\Seat\Connector\Teamspeak\Exceptions\TeamspeakSettingException
      */
-    protected abstract function teamspeak() : TeamSpeak3_Node_Server;
+    protected abstract function teamspeak(): TeamSpeak3_Node_Server;
 }

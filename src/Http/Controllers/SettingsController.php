@@ -44,6 +44,27 @@ class SettingsController extends Controller
     }
 
     /**
+     * @return string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    private function getChangelog(): string
+    {
+        try {
+            $response = (new Client())
+                ->request('GET', 'https://raw.githubusercontent.com/warlof/seat-teamspeak/master/CHANGELOG.md');
+
+            if ($response->getStatusCode() != 200) {
+                return 'Error while fetching changelog';
+            }
+
+            $parser = new Parsedown();
+            return $parser->parse($response->getBody());
+        } catch (RequestException $e) {
+            return 'Error while fetching changelog';
+        }
+    }
+
+    /**
      * @param ValidateConfiguration $request
      *
      * @return \Illuminate\Http\RedirectResponse
@@ -60,7 +81,7 @@ class SettingsController extends Controller
         if ($request->input('teamspeak-configuration-tags') === null) {
             setting(['warlof.teamspeak-connector.tags', false], true);
         } else {
-            setting(['warlof.teamspeak-connector.tags', (bool) $request->input('teamspeak-configuration-tags')], true);
+            setting(['warlof.teamspeak-connector.tags', (bool)$request->input('teamspeak-configuration-tags')], true);
         }
 
         return redirect()->back()
@@ -78,7 +99,7 @@ class SettingsController extends Controller
             'teamspeak:logs:clear'
         ];
 
-        $command    = request()->input('command');
+        $command = request()->input('command');
         $parameters = request()->input('parameters');
 
         if (!in_array($command, $accepted_commands)) {
@@ -89,26 +110,5 @@ class SettingsController extends Controller
 
         return redirect()->back()
             ->with('success', 'The command has been run.');
-    }
-
-    /**
-     * @return string
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    private function getChangelog() : string
-    {
-        try {
-            $response = (new Client())
-                ->request('GET', 'https://raw.githubusercontent.com/warlof/seat-teamspeak/master/CHANGELOG.md');
-
-            if ($response->getStatusCode() != 200) {
-                return 'Error while fetching changelog';
-            }
-
-            $parser = new Parsedown();
-            return $parser->parse($response->getBody());
-        } catch (RequestException $e) {
-            return 'Error while fetching changelog';
-        }
     }
 }

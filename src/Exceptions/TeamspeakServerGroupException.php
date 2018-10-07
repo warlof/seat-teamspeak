@@ -25,5 +25,5 @@ use Exception;
 
 class TeamspeakServerGroupException extends Exception
 {
-    
+
 }

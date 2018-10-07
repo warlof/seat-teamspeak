@@ -72,7 +72,7 @@ class AccessManagementController
                 ->get();
 
             return response()->json($titles->map(
-                function($item){
+                function ($item) {
                     return [
                         'id' => $item->title_id,
                         'name' => strip_tags($item->name)
@@ -111,11 +111,157 @@ class AccessManagementController
             case 'alliance':
                 return $this->postAllianceRelation($group_id, $alliance_id);
             case 'title':
-                return $this->postTitleRelation($group_id, $corporation_id,  $title_id);
+                return $this->postTitleRelation($group_id, $corporation_id, $title_id);
             default:
                 return redirect()->back()
                     ->with('error', 'Unknown relation type');
         }
+    }
+
+    /**
+     * @param $teamspeak_sgid
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function postPublicRelation($teamspeak_sgid)
+    {
+        if (TeamspeakGroupPublic::find($teamspeak_sgid) == null) {
+            TeamspeakGroupPublic::create([
+                'teamspeak_sgid' => $teamspeak_sgid
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'New public teamspeak relation has been created');
+        }
+
+        return redirect()->back()
+            ->with('error', 'This relation already exists');
+    }
+
+    /**
+     * @param $teamspeak_sgid
+     * @param $user_id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function postUserRelation($teamspeak_sgid, $user_id)
+    {
+        $filter = TeamspeakGroupUser::where('teamspeak_sgid', '=', $teamspeak_sgid)
+            ->where('group_id', '=', $user_id)
+            ->get();
+
+        if ($filter->count() == 0) {
+            TeamspeakGroupUser::create([
+                'group_id' => $user_id,
+                'teamspeak_sgid' => $teamspeak_sgid]);
+
+            return redirect()->back()
+                ->with('success', 'New teamspeak user relation has been created');
+        }
+
+        return redirect()->back()
+            ->with('error', 'This relation already exists');
+    }
+
+    /**
+     * @param $teamspeak_sgid
+     * @param $role_id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function postRoleRelation($teamspeak_sgid, $role_id)
+    {
+        $filter = TeamspeakGroupRole::where('role_id', '=', $role_id)
+            ->where('teamspeak_sgid', '=', $teamspeak_sgid)
+            ->get();
+
+        if ($filter->count() == 0) {
+            TeamspeakGroupRole::create([
+                'role_id' => $role_id,
+                'teamspeak_sgid' => $teamspeak_sgid
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'New teamspeak role relation has been created');
+        }
+
+        return redirect()->back()
+            ->with('error', 'This relation already exists');
+    }
+
+    /**
+     * @param $teamspeak_sgid
+     * @param $corporation_id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function postCorporationRelation($teamspeak_sgid, $corporation_id)
+    {
+        $filter = TeamspeakGroupCorporation::where('corporation_id', '=', $corporation_id)
+            ->where('teamspeak_sgid', '=', $teamspeak_sgid)
+            ->get();
+
+        if ($filter->count() == 0) {
+            TeamspeakGroupCorporation::create([
+                'corporation_id' => $corporation_id,
+                'teamspeak_sgid' => $teamspeak_sgid
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'New teamspeak corporation relation has been created');
+        }
+
+        return redirect()->back()
+            ->with('error', 'This relation already exists');
+    }
+
+    /**
+     * @param $teamspeak_sgid
+     * @param $alliance_id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function postAllianceRelation($teamspeak_sgid, $alliance_id)
+    {
+        $filter = TeamspeakGroupAlliance::where('alliance_id', '=', $alliance_id)
+            ->where('teamspeak_sgid', '=', $teamspeak_sgid)
+            ->get();
+
+        if ($filter->count() == 0) {
+            TeamspeakGroupAlliance::create([
+                'alliance_id' => $alliance_id,
+                'teamspeak_sgid' => $teamspeak_sgid
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'New teamspeak alliance relation has been created');
+        }
+
+        return redirect()->back()
+            ->with('error', 'This relation already exists');
+    }
+
+    /**
+     * @param $teamspeak_sgid
+     * @param $corporation_id
+     * @param $title_id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function postTitleRelation($teamspeak_sgid, $corporation_id, $title_id)
+    {
+        $filter = TeamspeakGroupTitle::where('corporation_id', '=', $corporation_id)
+            ->where('title_id', '=', $title_id)
+            ->where('teamspeak_sgid', '=', $teamspeak_sgid)
+            ->get();
+
+        if ($filter->count() == 0) {
+            TeamspeakGroupTitle::create([
+                'corporation_id' => $corporation_id,
+                'title_id' => $title_id,
+                'teamspeak_sgid' => $teamspeak_sgid
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'New teamspeak title relation has been created');
+        }
+
+        return redirect()->back()
+            ->with('error', 'This relation already exists');
     }
 
     /**
@@ -236,151 +382,5 @@ class AccessManagementController
 
         return redirect()->back()
             ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the title.');
-    }
-
-    /**
-     * @param $teamspeak_sgid
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    private function postPublicRelation($teamspeak_sgid)
-    {
-        if (TeamspeakGroupPublic::find($teamspeak_sgid) == null) {
-            TeamspeakGroupPublic::create([
-                'teamspeak_sgid' => $teamspeak_sgid
-            ]);
-
-            return redirect()->back()
-                ->with('success', 'New public teamspeak relation has been created');
-        }
-
-        return redirect()->back()
-            ->with('error', 'This relation already exists');
-    }
-
-    /**
-     * @param $teamspeak_sgid
-     * @param $user_id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    private function postUserRelation($teamspeak_sgid, $user_id)
-    {
-        $filter = TeamspeakGroupUser::where('teamspeak_sgid', '=', $teamspeak_sgid)
-            ->where('group_id', '=', $user_id)
-            ->get();
-
-        if ($filter->count() == 0) {
-            TeamspeakGroupUser::create([
-                'group_id' => $user_id,
-                'teamspeak_sgid' => $teamspeak_sgid]);
-
-            return redirect()->back()
-                ->with('success', 'New teamspeak user relation has been created');
-        }
-
-        return redirect()->back()
-            ->with('error', 'This relation already exists');
-    }
-
-    /**
-     * @param $teamspeak_sgid
-     * @param $role_id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    private function postRoleRelation($teamspeak_sgid, $role_id)
-    {
-        $filter = TeamspeakGroupRole::where('role_id', '=', $role_id)
-            ->where('teamspeak_sgid', '=', $teamspeak_sgid)
-            ->get();
-
-        if ($filter->count() == 0) {
-            TeamspeakGroupRole::create([
-                'role_id' => $role_id,
-                'teamspeak_sgid' => $teamspeak_sgid
-            ]);
-
-            return redirect()->back()
-                ->with('success', 'New teamspeak role relation has been created');
-        }
-
-        return redirect()->back()
-            ->with('error', 'This relation already exists');
-    }
-
-    /**
-     * @param $teamspeak_sgid
-     * @param $corporation_id
-     * @param $title_id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    private function postTitleRelation($teamspeak_sgid, $corporation_id, $title_id)
-    {
-        $filter = TeamspeakGroupTitle::where('corporation_id', '=', $corporation_id)
-            ->where('title_id', '=', $title_id)
-            ->where('teamspeak_sgid', '=', $teamspeak_sgid)
-            ->get();
-
-        if ($filter->count() == 0) {
-            TeamspeakGroupTitle::create([
-                'corporation_id' => $corporation_id,
-                'title_id' => $title_id,
-                'teamspeak_sgid' => $teamspeak_sgid
-            ]);
-
-            return redirect()->back()
-                ->with('success', 'New teamspeak title relation has been created');
-        }
-
-        return redirect()->back()
-            ->with('error', 'This relation already exists');
-    }
-
-    /**
-     * @param $teamspeak_sgid
-     * @param $corporation_id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    private function postCorporationRelation($teamspeak_sgid, $corporation_id)
-    {
-        $filter = TeamspeakGroupCorporation::where('corporation_id', '=', $corporation_id)
-            ->where('teamspeak_sgid', '=', $teamspeak_sgid)
-            ->get();
-
-        if ($filter->count() == 0) {
-            TeamspeakGroupCorporation::create([
-                'corporation_id' => $corporation_id,
-                'teamspeak_sgid' => $teamspeak_sgid
-            ]);
-
-            return redirect()->back()
-                ->with('success', 'New teamspeak corporation relation has been created');
-        }
-
-        return redirect()->back()
-            ->with('error', 'This relation already exists');
-    }
-
-    /**
-     * @param $teamspeak_sgid
-     * @param $alliance_id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    private function postAllianceRelation($teamspeak_sgid, $alliance_id)
-    {
-        $filter = TeamspeakGroupAlliance::where('alliance_id', '=', $alliance_id)
-            ->where('teamspeak_sgid', '=', $teamspeak_sgid)
-            ->get();
-
-        if ($filter->count() == 0) {
-            TeamspeakGroupAlliance::create([
-                'alliance_id' => $alliance_id,
-                'teamspeak_sgid' => $teamspeak_sgid
-            ]);
-
-            return redirect()->back()
-                ->with('success', 'New teamspeak alliance relation has been created');
-        }
-
-        return redirect()->back()
-            ->with('error', 'This relation already exists');
     }
 }
