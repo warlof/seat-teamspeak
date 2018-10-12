@@ -39,14 +39,14 @@ class TeamspeakController extends Controller
     {
         $main_character = auth()->user()->group->main_character;
 
-        if (!$main_character) {
-            redirect()->back()->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
+        if (! $main_character) {
+            return redirect('home')->with('error', 'Could not find your Main Character.  Check your Profile for the correct Main.');
         }
 
-        $corp = CorporationInfo::find($main_character->corporation_id);
+        $corporation = CorporationInfo::find($main_character->corporation_id);
 
-        if (!$corp) {
-            redirect()->back()->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
+        if (! $corporation) {
+            return redirect('home')->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
         }
 
         $teamspeak_username = $this->getTeamspeakFormattedNickname();
