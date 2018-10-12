@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <a href="ts3server://{{ setting('teamspeak_hostname', true) }}?port={{ setting('teamspeak_server_port', true) }}&nickname={{ $teamspeak_username }}"
+      <a href="ts3server://{{ setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_HOSTNAME_KEY, true) }}?port={{ setting(\Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup::SERVER_INSTANCE_PORT_KEY, true) }}&nickname={{ $teamspeak_username }}"
          class="btn btn-success pull-right">Join the server</a>
     </div>
   </div>
