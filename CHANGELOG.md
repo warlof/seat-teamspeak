@@ -1,3 +1,7 @@
+# 3.0.4
+- Address an issue which was generating an empty address on the `join the server` button
+- Address an issue which was thrown when an user doesn't have either a main character or a corporation set
+
 # 3.0.3
 - Address issues related to nickname already in use triggered by the query user
 - Address an issue which was preventing user with revoked token to be kick
