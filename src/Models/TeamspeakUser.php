@@ -31,10 +31,15 @@ use Seat\Web\Models\Group;
 class TeamspeakUser extends Model
 {
     /**
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
      * @var array
      */
     protected $fillable = [
-        'group_id', 'teamspeak_id'
+        'group_id', 'teamspeak_id',
     ];
 
     /**
