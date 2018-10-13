@@ -39,6 +39,12 @@ return [
                 'permission' => 'teamspeak.setup',
             ],
             [
+                'name' => 'User Mapping',
+                'icon' => 'fa-exchange',
+                'route' => 'teamspeak.users',
+                'permission' => 'teamspeak.setup',
+            ],
+            [
                 'name' => 'Settings',
                 'icon' => 'fa-cogs',
                 'route' => 'teamspeak.configuration',
@@ -49,7 +55,7 @@ return [
                 'icon' => 'fa-list',
                 'route' => 'teamspeak.logs',
                 'permission' => 'teamspeak.setup',
-            ]
+            ],
         ],
-    ]
+    ],
 ];

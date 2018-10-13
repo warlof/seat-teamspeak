@@ -120,6 +120,21 @@ Route::group([
         });
 
         Route::group([
+            'prefix' => 'users',
+            'middleware' => 'bouncer:teamspeak.setup',
+        ], function () {
+            Route::get('/', [
+                'as' => 'teamspeak.users',
+                'uses' => 'TeamspeakController@getUsers',
+            ]);
+
+            Route::post('/remove', [
+                'as' => 'teamspeak.users.remove',
+                'uses' => 'TeamspeakController@postRemoveUserMapping',
+            ]);
+        });
+
+        Route::group([
             'prefix' => 'logs',
             'middleware' => 'bouncer:teamspeak.setup',
         ], function () {

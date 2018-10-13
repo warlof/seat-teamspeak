@@ -30,6 +30,40 @@ use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakUser;
 
 class TeamspeakController extends Controller
 {
+    public function getUsers()
+    {
+        if (! request()->ajax())
+            return view('teamspeak::users.list');
+
+        $teamspeak_users = TeamspeakUser::with('group')->get();
+
+        return app('DataTables')::of($teamspeak_users)
+            ->addColumn('user_id', function ($row) {
+                return $row->group->main_character_id;
+            })
+            ->addColumn('username', function($row) {
+                return optional($row->group->main_character)->name ?: 'Unknown Character';
+            })
+            ->make(true);
+    }
+
+    public function postRemoveUserMapping()
+    {
+        $teamspeak_id = request()->input('teamspeak_id');
+
+        if ($teamspeak_id == '')
+            return redirect()->back('error', 'An error occurred while processing the request.');
+
+        if (is_null($teamspeak_user = TeamspeakUser::where('teamspeak_id', $teamspeak_id)->first()))
+            return redirect()->back()->with('error', sprintf('System cannot find any suitable mapping for Teamspeak (%s).', $teamspeak_id));
+
+        $teamspeak_user->delete();
+
+        return redirect()->back()->with('success',
+            sprintf('System sucessfully remove the mapping between SeAT (%s) and Teamspeak (%s)',
+                optional($teamspeak_user->group->main_character)->name, $teamspeak_user->teamspeak_id));
+    }
+
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      * @throws \Seat\Services\Exceptions\SettingException
@@ -98,7 +132,7 @@ class TeamspeakController extends Controller
                 $found_user['nick'] = $nickname;
                 $teamspeak_user = $this->postRegisterUser($uid);
 
-                dispatch(new TeamspeakUserOrchestrator($teamspeak_user));
+                dispatch(new TeamspeakUserOrchestrator($teamspeak_user))->onQueue('high');
 
                 return response()->json($found_user);
             }
