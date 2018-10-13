@@ -1,3 +1,8 @@
+# 3.0.5
+- Increase jobs priority
+- Add user mapping information
+- Address an issue which was preventing old known server groups to be removed while the command `teamspeak:group:sync` was call
+
 # 3.0.4
 - Address an issue which was generating an empty address on the `join the server` button
 - Address an issue which was thrown when an user doesn't have either a main character or a corporation set
