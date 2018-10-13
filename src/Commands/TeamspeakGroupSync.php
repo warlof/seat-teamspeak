@@ -42,7 +42,7 @@ class TeamspeakGroupSync extends Command
      */
     public function handle()
     {
-        dispatch(new \Warlof\Seat\Connector\Teamspeak\Jobs\TeamspeakGroupsUpdate());
+        dispatch(new \Warlof\Seat\Connector\Teamspeak\Jobs\TeamspeakGroupsUpdate())->onQueue('high');
 
         $this->info('A job to sync Teamspeak Server Groups with SeAT has been queued.');
     }
