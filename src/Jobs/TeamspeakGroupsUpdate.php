@@ -57,29 +57,36 @@ class TeamspeakGroupsUpdate extends TeamspeakJobBase
     private function updateServerGroups()
     {
         // type : {0 = template, 1 = normal, 2 = query}
-        $server_groups = $this->teamspeak()->serverGroupList(['type' => 1]);
+        $server_groups = collect($this->teamspeak()->serverGroupList(['type' => 1]));
 
         // retrieve the default server group assigned to this instance
         $default_sgid = $this->teamspeak()->getInfo()['virtualserver_default_server_group'];
 
-        foreach ($server_groups as $server_group) {
+        // updating server groups and removing those who are non longer existing or the default one
+        TeamspeakGroup::whereNotIn('id', $server_groups->filter(function ($server_group) use ($default_sgid) {
 
-            // skip the default server group as we can do nothing with it
-            if ($server_group->sgid == $default_sgid) {
-                TeamspeakGroup::destroy($server_group->sgid);
-                continue;
-            }
+                // skip the default server group as we can do nothing with it
+                return $server_group->sgid != $default_sgid;
+            })
+            ->each(function ($server_group) {
 
-            TeamspeakGroup::updateOrCreate(
-                [
-                    'id' => $server_group->sgid,
-                ],
-                [
-                    'name' => $server_group->name,
-                    'is_server_group' => true,
-                ]
-            );
-        }
+                // either create a new server group entry or update the existing one
+                TeamspeakGroup::updateOrCreate(
+                    [
+                        'id' => $server_group->sgid,
+                    ],
+                    [
+                        'name' => $server_group->name,
+                        'is_server_group' => true,
+                    ]
+                );
+            })
+            ->pluck('sgid')
+            ->flatten()
+            ->toArray()
+        )
+        ->orWhere('id', $default_sgid)
+        ->delete();
     }
 
     /**
