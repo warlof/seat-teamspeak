@@ -49,7 +49,7 @@ class TeamspeakUserPolicy extends Command
         $teamspeak_users = TeamspeakUser::all();
 
         $teamspeak_users->each(function ($teamspeak_user) {
-            dispatch(new TeamspeakUserOrchestrator($teamspeak_user, $this->option('terminator')));
+            dispatch(new TeamspeakUserOrchestrator($teamspeak_user, $this->option('terminator')))->onQueue('medium');
             $this->info(sprintf('A job has been register in order to add or removed groups from user group %d, teamspeak UID %s.',
                 $teamspeak_user->group_id,
                 $teamspeak_user->teamspeak_id));
