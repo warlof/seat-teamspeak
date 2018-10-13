@@ -37,7 +37,7 @@ class TeamspeakController extends Controller
 
         $teamspeak_users = TeamspeakUser::with('group')->get();
 
-        return app('DataTables')::of($teamspeak_users)
+        return app('Datatables')::of($teamspeak_users)
             ->addColumn('user_id', function ($row) {
                 return $row->group->main_character_id;
             })
