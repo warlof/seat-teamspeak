@@ -1,3 +1,6 @@
+# 3.0.6
+- Address an issue which was preventing user to get their access the first time they click on the `click to find your and register` button
+
 # 3.0.5
 - Increase jobs priority
 - Add user mapping information
