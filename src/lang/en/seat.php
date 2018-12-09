@@ -42,5 +42,6 @@ return [
     'enabled' => 'Enabled',
     'settings' => 'Teamspeak Settings',
     'title' => 'Title',
-    'title_filter' => 'Title Filter'
+    'title_filter' => 'Title Filter',
+    'user_mapping ' => 'Teamspeak User Mapping',
 ];
