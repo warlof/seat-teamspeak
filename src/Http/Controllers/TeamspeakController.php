@@ -79,7 +79,7 @@ class TeamspeakController extends Controller
 
         $corporation = CorporationInfo::find($main_character->corporation_id);
 
-        if (! $corporation) {
+        if (! $corporation && setting('warlof.teamspeak-connector.tags', true) === true) {
             return redirect('home')->with('error', 'Could not find your Corporation.  Please have your CEO upload a Corp API key to this website.');
         }
 
