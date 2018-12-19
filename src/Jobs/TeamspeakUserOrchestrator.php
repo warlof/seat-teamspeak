@@ -21,6 +21,7 @@
 namespace Warlof\Seat\Connector\Teamspeak\Jobs;
 
 use Illuminate\Support\Facades\Redis;
+use TeamSpeak3_Adapter_ServerQuery_Exception;
 use TeamSpeak3_Node_Server;
 use Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup;
 use Warlof\Seat\Connector\Teamspeak\Models\TeamspeakUser;
@@ -100,71 +101,77 @@ class TeamspeakUserOrchestrator extends TeamspeakJobBase
      */
     private function updateServerGroups()
     {
-        $member_of_groups = [];
+        try {
+            $member_of_groups = [];
 
-        // retrieve server default group
-        $default_sgid = $this->teamspeak()->getInfo()['virtualserver_default_server_group'];
+            // retrieve server default group
+            $default_sgid = $this->teamspeak()->getInfo()['virtualserver_default_server_group'];
 
-        // retrieve teamspeak user information
-        $user_info = $this->teamspeak()->clientGetNameByUid($this->user->teamspeak_id);
+            // retrieve teamspeak user information
+            $user_info = $this->teamspeak()->clientGetNameByUid($this->user->teamspeak_id);
 
-        // retrieve all groups currently granted to the user
-        $teamspeak_groups = $this->teamspeak()->clientGetServerGroupsByDbid($user_info['cldbid']);
+            // retrieve all groups currently granted to the user
+            $teamspeak_groups = $this->teamspeak()->clientGetServerGroupsByDbid($user_info['cldbid']);
 
-        foreach ($teamspeak_groups as $teamspeak_group) {
-            if ($teamspeak_group['sgid'] === $default_sgid)
-                continue;
+            foreach ($teamspeak_groups as $teamspeak_group) {
+                if ($teamspeak_group['sgid'] === $default_sgid)
+                    continue;
 
-            $member_of_groups[] = $teamspeak_group['sgid'];
-        }
-
-        // in case terminator has been turned on or user got revoked token, revoke all groups assigned to the user
-        if ($this->terminator || !$this->user->isGranted()) {
-            if (!empty($member_of_groups)) {
-                foreach ($member_of_groups as $group)
-                    $this->teamspeak()->serverGroupClientDel($group, $user_info['cldbid']);
+                $member_of_groups[] = $teamspeak_group['sgid'];
             }
 
-            return;
-        }
+            // in case terminator has been turned on or user got revoked token, revoke all groups assigned to the user
+            if ($this->terminator || !$this->user->isGranted()) {
+                if (!empty($member_of_groups)) {
+                    foreach ($member_of_groups as $group)
+                        $this->teamspeak()->serverGroupClientDel($group, $user_info['cldbid']);
+                }
 
-        // retrieve all eligible groups for the current user
-        $allowed_groups = $this->user->allowedGroups();
+                return;
+            }
 
-        // get the delta
-        $missing_groups = array_diff($allowed_groups, $member_of_groups);
-        $extra_groups = array_diff($member_of_groups, $allowed_groups);
+            // retrieve all eligible groups for the current user
+            $allowed_groups = $this->user->allowedGroups();
 
-        logger()->debug(sprintf('%s - Updating user Server Groups', self::class), [
-            'group_id' => $this->user->group_id,
-            'teamspeak_uid' => $this->user->teamspeak_id,
-            'allowed_groups' => $allowed_groups,
-            'missing_groups' => $missing_groups,
-            'extra_groups' => $extra_groups,
-        ]);
+            // get the delta
+            $missing_groups = array_diff($allowed_groups, $member_of_groups);
+            $extra_groups = array_diff($member_of_groups, $allowed_groups);
 
-        // add all missing groups to the user
-        foreach ($missing_groups as $group) {
-            logger()->debug(sprintf('%s - Adding user to a new server group.', self::class), [
+            logger()->debug(sprintf('%s - Updating user Server Groups', self::class), [
                 'group_id' => $this->user->group_id,
                 'teamspeak_uid' => $this->user->teamspeak_id,
-                'teamspeak_cldbid' => $user_info['cldbid'],
-                'teamspeak_sgid' => $group,
+                'allowed_groups' => $allowed_groups,
+                'missing_groups' => $missing_groups,
+                'extra_groups' => $extra_groups,
             ]);
 
-            $this->teamspeak()->serverGroupClientAdd($group, $user_info['cldbid']);
-        }
+            // add all missing groups to the user
+            foreach ($missing_groups as $group) {
+                logger()->debug(sprintf('%s - Adding user to a new server group.', self::class), [
+                    'group_id' => $this->user->group_id,
+                    'teamspeak_uid' => $this->user->teamspeak_id,
+                    'teamspeak_cldbid' => $user_info['cldbid'],
+                    'teamspeak_sgid' => $group,
+                ]);
 
-        // remove all extra groups from the user
-        foreach ($extra_groups as $group) {
-            logger()->debug(sprintf('%s - Removing user from a server group.', self::class), [
-                'group_id' => $this->user->group_id,
-                'teamspeak_uid' => $this->user->teamspeak_id,
-                'teamspeak_cldbid' => $user_info['cldbid'],
-                'teamspeak_sgid' => $group,
-            ]);
+                $this->teamspeak()->serverGroupClientAdd($group, $user_info['cldbid']);
+            }
 
-            $this->teamspeak()->serverGroupClientDel($group, $user_info['cldbid']);
+            // remove all extra groups from the user
+            foreach ($extra_groups as $group) {
+                logger()->debug(sprintf('%s - Removing user from a server group.', self::class), [
+                    'group_id' => $this->user->group_id,
+                    'teamspeak_uid' => $this->user->teamspeak_id,
+                    'teamspeak_cldbid' => $user_info['cldbid'],
+                    'teamspeak_sgid' => $group,
+                ]);
+
+                $this->teamspeak()->serverGroupClientDel($group, $user_info['cldbid']);
+            }
+        } catch (TeamSpeak3_Adapter_ServerQuery_Exception $e) {
+            // (code: 512) invalid clientID
+            if ($e->getReturnCode() === 512)
+                $this->user->delete();
         }
     }
 
