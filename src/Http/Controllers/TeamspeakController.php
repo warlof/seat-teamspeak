@@ -119,23 +119,43 @@ class TeamspeakController extends Controller
     public function postGetUserUid()
     {
         $client = new TeamspeakSetup();
+        $group_id = auth()->user()->group_id;
 
         $user_list = $client->getInstance()->clientList();
 
+        $teamspeak_user = TeamspeakUser::find($group_id);
+
+        // in case we already had an existing binding for the current user, we will drop its access
+        if (! is_null($teamspeak_user)) {
+            $user_info = $client->getInstance()->clientGetNameByUid($teamspeak_user->teamspeak_id);
+            $user_groups = $client->getInstance()->clientGetServerGroupsByDbid($user_info['cldbid']);
+
+            foreach ($user_groups as $user_group) {
+                $client->getInstance()->serverGroupClientDel($user_group['sgid'], $user_info['cldbid']);
+            }
+        }
+
         foreach ($user_list as $user) {
+
+            // escape the nickname returned by Teamspeak
             $nickname = preg_replace('/’/', '\'', $user->client_nickname->toString());
 
-            if ($nickname === $this->getTeamspeakFormattedNickname()) {
-                $uid = $user->client_unique_identifier->toString();
-                $found_user = [];
-                $found_user['id'] = $uid;
-                $found_user['nick'] = $nickname;
-                $teamspeak_user = $this->postRegisterUser($uid);
+            if ($nickname !== $this->getTeamspeakFormattedNickname())
+                continue;
 
-                dispatch(new TeamspeakUserOrchestrator($teamspeak_user))->onQueue('high');
+            // extract the UID from the user element
+            $uid = $user->client_unique_identifier->toString();
 
-                return response()->json($found_user);
-            }
+            // update the binding into SeAT
+            $teamspeak_user = $this->postRegisterUser($uid);
+
+            // queue a job which will grant server groups to the user
+            dispatch(new TeamspeakUserOrchestrator($teamspeak_user))->onQueue('high');
+
+            return response()->json([
+                'id' => $uid,
+                'nick' => $nickname,
+            ]);
         }
 
         return response()->json([
@@ -148,7 +168,7 @@ class TeamspeakController extends Controller
      */
     private function postRegisterUser($uid)
     {
-        $group_id = auth()->user()->group->id;
+        $group_id = auth()->user()->group_id;
 
         return TeamspeakUser::updateOrCreate(
             ['group_id' => $group_id],
