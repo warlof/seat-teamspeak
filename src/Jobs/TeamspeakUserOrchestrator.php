@@ -170,8 +170,10 @@ class TeamspeakUserOrchestrator extends TeamspeakJobBase
             }
         } catch (TeamSpeak3_Adapter_ServerQuery_Exception $e) {
             // (code: 512) invalid clientID
-            if ($e->getReturnCode() === 512)
-                $this->user->delete();
+            if ($e->getCode() !== 512)
+                throw $e;
+
+            $this->user->delete();
         }
     }
 

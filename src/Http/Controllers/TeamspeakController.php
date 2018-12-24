@@ -23,6 +23,7 @@ namespace Warlof\Seat\Connector\Teamspeak\Http\Controllers;
 
 use Seat\Eveapi\Models\Corporation\CorporationInfo;
 use Seat\Web\Http\Controllers\Controller;
+use TeamSpeak3_Adapter_ServerQuery_Exception;
 use Warlof\Seat\Connector\Teamspeak\Exceptions\MissingMainCharacterException;
 use Warlof\Seat\Connector\Teamspeak\Helpers\TeamspeakSetup;
 use Warlof\Seat\Connector\Teamspeak\Jobs\TeamspeakUserOrchestrator;
@@ -127,11 +128,27 @@ class TeamspeakController extends Controller
 
         // in case we already had an existing binding for the current user, we will drop its access
         if (! is_null($teamspeak_user)) {
-            $user_info = $client->getInstance()->clientGetNameByUid($teamspeak_user->teamspeak_id);
-            $user_groups = $client->getInstance()->clientGetServerGroupsByDbid($user_info['cldbid']);
 
-            foreach ($user_groups as $user_group) {
-                $client->getInstance()->serverGroupClientDel($user_group['sgid'], $user_info['cldbid']);
+            // retrieve user information
+            try {
+                $user_info = $client->getInstance()->clientGetNameByUid($teamspeak_user->teamspeak_id);
+                // retrieve server default group
+                $default_sgid = $client->getInstance()->getInfo()['virtualserver_default_server_group'];
+                // retrieve user server groups
+                $user_groups = $client->getInstance()->clientGetServerGroupsByDbid($user_info['cldbid']);
+
+                foreach ($user_groups as $user_group) {
+                    if ($user_group['sgid'] === $default_sgid)
+                        continue;
+
+                    $client->getInstance()->serverGroupClientDel($user_group['sgid'], $user_info['cldbid']);
+                }
+            } catch (TeamSpeak3_Adapter_ServerQuery_Exception $e) {
+                // (code: 512) invalid clientID
+                if ($e->getCode() !== 512)
+                    throw $e;
+
+                $teamspeak_user->delete();
             }
         }
 
