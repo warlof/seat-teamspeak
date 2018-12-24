@@ -44,4 +44,6 @@ return [
     'title' => 'Title',
     'title_filter' => 'Title Filter',
     'user_mapping ' => 'Teamspeak User Mapping',
+    'register' => 'Teamspeak Registration',
+    'user_mapping' => 'Teamspeak User Mapping'
 ];

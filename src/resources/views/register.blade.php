@@ -1,7 +1,7 @@
 @extends('web::layouts.grids.6-6')
 
-@section('title', trans('teamspeak::register'))
-@section('page_header', trans('teamspeak::register'))
+@section('title', trans('teamspeak::seat.register'))
+@section('page_header', trans('teamspeak::seat.register'))
 
 @section('left')
   <div class="box box-primary" id="register-box">
