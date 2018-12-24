@@ -38,7 +38,7 @@ class TeamspeakConnectorServiceProvider extends ServiceProvider
         $this->addCommands();
         $this->addRoutes();
         $this->addViews();
-        $this->addPublications();
+        $this->addMigrations();
         $this->addTranslations();
     }
 
@@ -63,11 +63,9 @@ class TeamspeakConnectorServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/resources/views', 'teamspeak');
     }
 
-    public function addPublications()
+    public function addMigrations()
     {
-        $this->publishes([
-            __DIR__ . '/database/migrations/' => database_path('migrations')
-        ]);
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations/');
     }
 
     public function addTranslations()
