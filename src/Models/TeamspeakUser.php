@@ -22,6 +22,7 @@
 namespace Warlof\Seat\Connector\Teamspeak\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Seat\Eveapi\Models\Character\CharacterInfo;
 use Seat\Web\Models\Group;
 
 /**
@@ -73,6 +74,7 @@ class TeamspeakUser extends Model
         $rows = $this->getServerGroupsUserBased($this, false)
             ->union($this->getServerGroupsRoleBased($this, false))
             ->union($this->getServerGroupsCorporationBased($this, false))
+            ->union($this->getServerGroupsCorporationTitleBased($this, false))
             ->union($this->getServerGroupsAllianceBased($this, false))
             ->union($this->getServerGroupsPublicBased(false))
             ->get();
@@ -136,6 +138,32 @@ class TeamspeakUser extends Model
             ->whereIn('character_infos.character_id', $user->group->users->pluck('id')->toArray())
             ->where('teamspeak_groups.is_server_group', true)
             ->select('teamspeak_sgid');
+
+        if ($get)
+            return $roles->get();
+
+        return $roles;
+    }
+
+    /**
+     * Return all servers groups ID related to title mapping matching to the TeamspeakUser.
+     *
+     * @param TeamspeakUser $user The user to which mapping have to be applied
+     * @param bool $get If false, the return is a QueryBuilder; otherwise it's a Collection
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Collection
+     */
+    public function getServerGroupsCorporationTitleBased(TeamspeakUser $user, bool $get = true)
+    {
+        $roles = CharacterInfo::join('character_titles',
+                    'character_infos.character_id', '=', 'character_titles.character_id')
+                ->join('teamspeak_group_titles', function ($join) {
+                    $join->on('teamspeak_group_titles.title_id', '=', 'character_titles.title_id');
+                    $join->on('teamspeak_group_titles.corporation_id', '=', 'character_infos.corporation_id');
+                })
+                ->join('teamspeak_groups', 'teamspeak_group_titles.teamspeak_sgid', '=', 'teamspeak_groups.id')
+                ->whereIn('character_infos.character_id', $user->group->users->pluck('id')->toArray())
+                ->where('teamspeak_groups.is_server_group', true)
+                ->select('teamspeak_sgid');
 
         if ($get)
             return $roles->get();
