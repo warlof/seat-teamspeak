@@ -21,12 +21,12 @@
 
 namespace Warlof\Seat\Connector\Teamspeak;
 
-use Illuminate\Support\ServiceProvider;
+use Seat\Services\AbstractSeatPlugin;
 use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakGroupSync;
 use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakLogsClear;
 use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakUserPolicy;
 
-class TeamspeakConnectorServiceProvider extends ServiceProvider
+class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
 {
     /**
      * Bootstrap the application services.
@@ -88,5 +88,76 @@ class TeamspeakConnectorServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(
             __DIR__ . '/Config/package.sidebar.php', 'package.sidebar');
+    }
+
+    /**
+     * Return an URI to a CHANGELOG.md file or an API path which will be providing changelog history.
+     *
+     * @example https://raw.githubusercontent.com/eveseat/seat/master/LICENSE
+     * @exemple https://api.github.com/repos/eveseat/web/releases
+     *
+     * @return string|null
+     */
+    public function getChangelogUri(): ?string
+    {
+        return 'https://raw.githubusercontent.com/warlof/seat-teamspeak/master/CHANGELOG.md';
+    }
+
+    /**
+     * Return the plugin public name as it should be displayed into settings.
+     *
+     * @example SeAT Web
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return 'Teamspeak Connector';
+    }
+
+    /**
+     * Return the plugin repository address.
+     *
+     * @example https://github.com/eveseat/web
+     *
+     * @return string
+     */
+    public function getPackageRepositoryUrl(): string
+    {
+        return 'https://github.com/warlof/seat-teamspeak';
+    }
+
+    /**
+     * Return the plugin technical name as published on package manager.
+     *
+     * @example web
+     *
+     * @return string
+     */
+    public function getPackagistPackageName(): string
+    {
+        return 'seat-teamspeak';
+    }
+
+    /**
+     * Return the plugin vendor tag as published on package manager.
+     *
+     * @example eveseat
+     *
+     * @return string
+     */
+    public function getPackagistVendorName(): string
+    {
+        return 'warlof';
+    }
+
+    /**
+     * Return the plugin installed version.
+     *
+     * @return string
+     */
+    public function getVersion(): string
+    {
+        return config('teamspeak.config.version');
     }
 }
