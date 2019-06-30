@@ -68,34 +68,34 @@ Route::group([
                 'uses' => 'AccessManagementController@postRelation',
             ]);
 
-            Route::get('/public/{group_id}/remove', [
+            Route::delete('/public/{group_id}', [
                 'as' => 'teamspeak.public.remove',
-                'uses' => 'AccessManagementController@getRemovePublic',
+                'uses' => 'AccessManagementController@removePublic',
             ]);
 
-            Route::get('/users/{user_id}/{group_id}/remove', [
+            Route::delete('/users/{user_id}/{group_id}', [
                 'as' => 'teamspeak.user.remove',
-                'uses' => 'AccessManagementController@getRemoveUser',
+                'uses' => 'AccessManagementController@removeUser',
             ]);
 
-            Route::get('/roles/{role_id}/{group_id}/remove', [
+            Route::delete('/roles/{role_id}/{group_id}', [
                 'as' => 'teamspeak.role.remove',
-                'uses' => 'AccessManagementController@getRemoveRole',
+                'uses' => 'AccessManagementController@removeRole',
             ]);
 
-            Route::get('/corporations/{corporation_id}/{group_id}/remove', [
+            Route::delete('/corporations/{corporation_id}/{group_id}', [
                 'as' => 'teamspeak.corporation.remove',
-                'uses' => 'AccessManagementController@getRemoveCorporation',
+                'uses' => 'AccessManagementController@removeCorporation',
             ]);
 
-            Route::get('/alliances/{alliance_id}/{group_id}/remove', [
+            Route::delete('/alliances/{alliance_id}/{group_id}', [
                 'as' => 'teamspeak.alliance.remove',
-                'uses' => 'AccessManagementController@getRemoveAlliance',
+                'uses' => 'AccessManagementController@removeAlliance',
             ]);
 
-            Route::get('/titles/{corporation_id}/{title_id}/{group_id}/remove', [
+            Route::delete('/titles/{corporation_id}/{title_id}/{group_id}', [
                 'as' => 'teamspeak.title.remove',
-                'uses' => 'AccessManagementController@getRemoveTitle',
+                'uses' => 'AccessManagementController@removeTitle',
             ]);
         });
 
@@ -128,9 +128,9 @@ Route::group([
                 'uses' => 'TeamspeakController@getUsers',
             ]);
 
-            Route::post('/remove', [
+            Route::delete('/', [
                 'as' => 'teamspeak.users.remove',
-                'uses' => 'TeamspeakController@postRemoveUserMapping',
+                'uses' => 'TeamspeakController@removeUserMapping',
             ]);
         });
 

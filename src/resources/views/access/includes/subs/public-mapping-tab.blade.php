@@ -24,10 +24,11 @@
       @endif
       <td>
         <div class="btn-group">
-          <a href="{{ route('teamspeak.public.remove', ['group_id' => $group->teamspeak_sgid]) }}"
-             type="button" class="btn btn-danger btn-xs col-xs-12">
-            {{ trans('web::seat.remove') }}
-          </a>
+          <form method="post" action="{{ route('teamspeak.public.remove', ['group_id' => $group->teamspeak_sgid]) }}">
+            {{ csrf_field() }}
+            {{ method_field('DELETE') }}
+            <button type="submit" class="btn btn-danger btn-xs col-xs-12">{{ trans('web::seat.remove') }}</button>
+          </form>
         </div>
       </td>
     </tr>

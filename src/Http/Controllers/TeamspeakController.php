@@ -54,7 +54,7 @@ class TeamspeakController extends Controller
             ->make(true);
     }
 
-    public function postRemoveUserMapping()
+    public function removeUserMapping()
     {
         $teamspeak_id = request()->input('teamspeak_id');
 

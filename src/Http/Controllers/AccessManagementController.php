@@ -85,6 +85,126 @@ class AccessManagementController
     }
 
     /**
+     * @param $teamspeak_sgid
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function removePublic($teamspeak_sgid)
+    {
+        $public_filter = TeamspeakGroupPublic::where('teamspeak_sgid', $teamspeak_sgid);
+
+        if ($public_filter != null) {
+            $public_filter->delete();
+            return redirect()->back()
+                ->with('success', 'The public teamspeak relation has been removed');
+        }
+
+        return redirect()->back()
+            ->with('error', 'An error occurs while trying to remove the public Teamspeak relation.');
+    }
+
+    /**
+     * @param $user_id
+     * @param $teamspeak_sgid
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function removeUser($user_id, $teamspeak_sgid)
+    {
+        $user_filter = TeamspeakGroupUser::where('group_id', $user_id)
+            ->where('teamspeak_sgid', $teamspeak_sgid);
+
+        if ($user_filter != null) {
+            $user_filter->delete();
+            return redirect()->back()
+                ->with('success', 'The teamspeak relation for the user has been removed');
+        }
+
+        return redirect()->back()
+            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the user.');
+    }
+
+    /**
+     * @param $role_id
+     * @param $teamspeak_sgid
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function removeRole($role_id, $teamspeak_sgid)
+    {
+        $role_filter = TeamspeakGroupRole::where('role_id', $role_id)
+            ->where('teamspeak_sgid', $teamspeak_sgid);
+
+        if ($role_filter != null) {
+            $role_filter->delete();
+            return redirect()->back()
+                ->with('success', 'The teamspeak relation for the role has been removed');
+        }
+
+        return redirect()->back()
+            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the role.');
+    }
+
+    /**
+     * @param $corporation_id
+     * @param $teamspeak_sgid
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function removeCorporation($corporation_id, $teamspeak_sgid)
+    {
+        $corporation_filter = TeamspeakGroupCorporation::where('corporation_id', $corporation_id)
+            ->where('teamspeak_sgid', $teamspeak_sgid);
+
+        if ($corporation_filter != null) {
+            $corporation_filter->delete();
+            return redirect()->back()
+                ->with('success', 'The teamspeak relation for the corporation has been removed');
+        }
+
+        return redirect()->back()
+            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the corporation.');
+    }
+
+    /**
+     * @param $alliance_id
+     * @param $teamspeak_sgid
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function removeAlliance($alliance_id, $teamspeak_sgid)
+    {
+        $alliance_filter = TeamspeakGroupAlliance::where('alliance_id', $alliance_id)
+            ->where('teamspeak_sgid', $teamspeak_sgid);
+
+        if ($alliance_filter != null) {
+            $alliance_filter->delete();
+            return redirect()->back()
+                ->with('success', 'The teamspeak relation for the alliance has been removed');
+        }
+
+        return redirect()->back()
+            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the alliance.');
+    }
+
+    /**
+     * @param $corporation_id
+     * @param $title_id
+     * @param $teamspeak_sgid
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function removeTitle($corporation_id, $title_id, $teamspeak_sgid)
+    {
+        $title_filter = TeamspeakGroupTitle::where('corporation_id', $corporation_id)
+            ->where('title_id', $title_id)
+            ->where('teamspeak_sgid', $teamspeak_sgid);
+
+        if ($title_filter != null) {
+            $title_filter->delete();
+            return redirect()->back()
+                ->with('success', 'The teamspeak relation for the title has been removed');
+        }
+
+        return redirect()->back()
+            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the title.');
+    }
+
+    /**
      * @param AddRelation $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -262,125 +382,5 @@ class AccessManagementController
 
         return redirect()->back()
             ->with('error', 'This relation already exists');
-    }
-
-    /**
-     * @param $teamspeak_sgid
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function getRemovePublic($teamspeak_sgid)
-    {
-        $public_filter = TeamspeakGroupPublic::where('teamspeak_sgid', $teamspeak_sgid);
-
-        if ($public_filter != null) {
-            $public_filter->delete();
-            return redirect()->back()
-                ->with('success', 'The public teamspeak relation has been removed');
-        }
-
-        return redirect()->back()
-            ->with('error', 'An error occurs while trying to remove the public Teamspeak relation.');
-    }
-
-    /**
-     * @param $user_id
-     * @param $teamspeak_sgid
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function getRemoveUser($user_id, $teamspeak_sgid)
-    {
-        $user_filter = TeamspeakGroupUser::where('group_id', $user_id)
-            ->where('teamspeak_sgid', $teamspeak_sgid);
-
-        if ($user_filter != null) {
-            $user_filter->delete();
-            return redirect()->back()
-                ->with('success', 'The teamspeak relation for the user has been removed');
-        }
-
-        return redirect()->back()
-            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the user.');
-    }
-
-    /**
-     * @param $role_id
-     * @param $teamspeak_sgid
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function getRemoveRole($role_id, $teamspeak_sgid)
-    {
-        $role_filter = TeamspeakGroupRole::where('role_id', $role_id)
-            ->where('teamspeak_sgid', $teamspeak_sgid);
-
-        if ($role_filter != null) {
-            $role_filter->delete();
-            return redirect()->back()
-                ->with('success', 'The teamspeak relation for the role has been removed');
-        }
-
-        return redirect()->back()
-            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the role.');
-    }
-
-    /**
-     * @param $corporation_id
-     * @param $teamspeak_sgid
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function getRemoveCorporation($corporation_id, $teamspeak_sgid)
-    {
-        $corporation_filter = TeamspeakGroupCorporation::where('corporation_id', $corporation_id)
-            ->where('teamspeak_sgid', $teamspeak_sgid);
-
-        if ($corporation_filter != null) {
-            $corporation_filter->delete();
-            return redirect()->back()
-                ->with('success', 'The teamspeak relation for the corporation has been removed');
-        }
-
-        return redirect()->back()
-            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the corporation.');
-    }
-
-    /**
-     * @param $alliance_id
-     * @param $teamspeak_sgid
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function getRemoveAlliance($alliance_id, $teamspeak_sgid)
-    {
-        $alliance_filter = TeamspeakGroupAlliance::where('alliance_id', $alliance_id)
-            ->where('teamspeak_sgid', $teamspeak_sgid);
-
-        if ($alliance_filter != null) {
-            $alliance_filter->delete();
-            return redirect()->back()
-                ->with('success', 'The teamspeak relation for the alliance has been removed');
-        }
-
-        return redirect()->back()
-            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the alliance.');
-    }
-
-    /**
-     * @param $corporation_id
-     * @param $title_id
-     * @param $teamspeak_sgid
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function getRemoveTitle($corporation_id, $title_id, $teamspeak_sgid)
-    {
-        $title_filter = TeamspeakGroupTitle::where('corporation_id', $corporation_id)
-            ->where('title_id', $title_id)
-            ->where('teamspeak_sgid', $teamspeak_sgid);
-
-        if ($title_filter != null) {
-            $title_filter->delete();
-            return redirect()->back()
-                ->with('success', 'The teamspeak relation for the title has been removed');
-        }
-
-        return redirect()->back()
-            ->with('error', 'An error occurs while trying to remove the Teamspeak relation for the title.');
     }
 }

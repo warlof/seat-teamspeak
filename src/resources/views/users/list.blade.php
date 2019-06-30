@@ -23,6 +23,7 @@
             </table>
             <form method="post" id="user-remove" action="{{ route('teamspeak.users.remove') }}" class="hidden">
                 {{ csrf_field() }}
+                {{ method_field('DELETE') }}
                 <input type="hidden" name="teamspeak_id" />
             </form>
         </div>
