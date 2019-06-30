@@ -55,7 +55,7 @@ class AccessManagementController
         $alliances = Alliance::all();
         $groups = TeamspeakGroup::all();
 
-        return view('teamspeak::list',
+        return view('teamspeak::access.list',
             compact('group_public', 'group_users', 'group_roles', 'group_corporations', 'group_alliances', 'group_titles',
                 'users', 'roles', 'corporations', 'alliances', 'groups'));
     }
