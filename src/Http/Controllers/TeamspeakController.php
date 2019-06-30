@@ -21,7 +21,9 @@
 
 namespace Warlof\Seat\Connector\Teamspeak\Http\Controllers;
 
+use Seat\Eveapi\Models\Character\CharacterInfo;
 use Seat\Eveapi\Models\Corporation\CorporationInfo;
+use Seat\Services\Models\UserSetting;
 use Seat\Web\Http\Controllers\Controller;
 use TeamSpeak3_Adapter_ServerQuery_Exception;
 use Warlof\Seat\Connector\Teamspeak\Exceptions\MissingMainCharacterException;
@@ -36,15 +38,19 @@ class TeamspeakController extends Controller
         if (! request()->ajax())
             return view('teamspeak::users.list');
 
-        $teamspeak_users = TeamspeakUser::with('group')->get();
+        $teamspeak_users = TeamspeakUser::query()
+            ->leftJoin((new UserSetting())->getTable(), function ($join) {
+                $join->on((new TeamspeakUser())->getTable() . '.group_id', '=', (new UserSetting())->getTable() . '.group_id')
+                    ->where((new UserSetting())->getTable() . '.name', '=', 'main_character_id');
+            })
+            ->leftJoin((new CharacterInfo())->getTable(), 'character_id', '=', 'value')
+            ->select(
+                (new TeamspeakUser())->getTable() . '.*',
+                (new UserSetting())->getTable() . '.value AS user_id',
+                (new CharacterInfo())->getTable() . '.name as user_name'
+            );
 
         return app('DataTables')::of($teamspeak_users)
-            ->addColumn('user_id', function ($row) {
-                return $row->group->main_character_id;
-            })
-            ->addColumn('username', function($row) {
-                return optional($row->group->main_character)->name ?: 'Unknown Character';
-            })
             ->make(true);
     }
 

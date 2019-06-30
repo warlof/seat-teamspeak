@@ -39,13 +39,13 @@
     $(function() {
         var table = $('table#users-table').DataTable({
             processing: true,
-            serverSide: false,
+            serverSide: true,
             ajax: '{{ route('teamspeak.users') }}',
             columns: [
                 {data: 'group_id', type: 'num'},
                 {data: 'user_id', type: 'num'},
-                {data: 'username', type: 'string'},
-                {data: 'teamspeak_id', type: 'num'},
+                {data: 'user_name', type: 'string'},
+                {data: 'teamspeak_id', type: 'string'},
                 {
                     data: null,
                     targets: -1,
