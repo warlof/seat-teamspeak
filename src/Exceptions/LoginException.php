@@ -1,9 +1,8 @@
 <?php
-
 /**
  * This file is part of SeAT Teamspeak Connector.
  *
- * Copyright (C) 2018  Warlof Tutsimo <loic.leuilliot@gmail.com>
+ * Copyright (C) 2019  Warlof Tutsimo <loic.leuilliot@gmail.com>
  *
  * SeAT Teamspeak Connector  is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,22 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Warlof\Seat\Connector\Teamspeak\Models;
+namespace Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions;
 
-use Illuminate\Database\Eloquent\Model;
-use Seat\Web\Models\Acl\Role;
-
-class TeamspeakGroupRole extends Model
+class LoginException extends TeamspeakException
 {
-    protected $fillable = ['role_id', 'teamspeak_sgid', 'enable'];
 
-    public function group()
-    {
-        return $this->belongsTo(TeamspeakGroup::class, 'teamspeak_sgid', 'id');
-    }
-
-    public function role()
-    {
-        return $this->belongsTo(Role::class, 'role_id', 'id');
-    }
 }

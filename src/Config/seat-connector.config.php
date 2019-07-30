@@ -1,9 +1,8 @@
 <?php
-
 /**
  * This file is part of SeAT Teamspeak Connector.
  *
- * Copyright (C) 2018  Warlof Tutsimo <loic.leuilliot@gmail.com>
+ * Copyright (C) 2019  Warlof Tutsimo <loic.leuilliot@gmail.com>
  *
  * SeAT Teamspeak Connector  is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +19,7 @@
  */
 
 return [
-    'teamspeak' => [
-        'view',
-        'setup'
-    ]
+    'name'   => 'teamspeak',
+    'icon'   => 'fa-headphones',
+    'client' => \Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient::class,
 ];

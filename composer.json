@@ -20,22 +20,18 @@
   ],
   "autoload":{
       "psr-4":{
-          "Warlof\\Seat\\Connector\\Teamspeak\\": "src/"
+          "Warlof\\Seat\\Connector\\Drivers\\Teamspeak\\": "src/"
       }
   },
   "require": {
-      "eveseat/eveapi": "^3.0",
-      "eveseat/services": "^3.0",
-      "eveseat/web": "^3.0",
-      "erusev/parsedown": "^1.6",
-      "ext-json": "*",
-      "guzzlehttp/guzzle": "~6.0",
-      "planetteamspeak/ts3-php-framework": "^1.1"
+    "ext-json": "*",
+    "warlof/seat-connector": "^1.0",
+    "par0noid/ts3admin": "^1.0"
   },
   "extra": {
     "laravel": {
       "providers": [
-        "Warlof\\Seat\\Connector\\Teamspeak\\TeamspeakConnectorServiceProvider"
+        "Warlof\\Seat\\Connector\\Drivers\\Teamspeak\\TeamspeakConnectorServiceProvider"
       ]
     }
   }
