@@ -1,9 +1,8 @@
 <?php
-
 /**
  * This file is part of SeAT Teamspeak Connector.
  *
- * Copyright (C) 2018  Warlof Tutsimo <loic.leuilliot@gmail.com>
+ * Copyright (C) 2019  Warlof Tutsimo <loic.leuilliot@gmail.com>
  *
  * SeAT Teamspeak Connector  is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,28 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Warlof\Seat\Connector\Teamspeak\Validation;
+namespace Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class AddRelation extends FormRequest
+class CommandException extends TeamspeakException
 {
 
-    public function authorize()
-    {
-        return true;
-    }
-
-    public function rules()
-    {
-        return [
-            'teamspeak-type' => 'required|string',
-            'teamspeak-user-id' => 'string',
-            'teamspeak-role-id' => 'string',
-            'teamspeak-corporation-id' => 'string',
-            'teamspeak-alliance-id' => 'string',
-            'teamspeak-group-id' => 'required|string',
-            'teamspeak-enabled' => 'boolean'
-        ];
-    }
 }

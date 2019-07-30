@@ -19,13 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Warlof\Seat\Connector\Teamspeak;
+namespace Warlof\Seat\Connector\Drivers\Teamspeak;
 
 use Seat\Services\AbstractSeatPlugin;
-use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakGroupSync;
-use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakLogsClear;
-use Warlof\Seat\Connector\Teamspeak\Commands\TeamspeakUserPolicy;
 
+/**
+ * Class TeamspeakConnectorServiceProvider.
+ *
+ * @package Warlof\Seat\Connector\Drivers\Teamspeak
+ */
 class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
 {
     /**
@@ -35,42 +37,8 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
      */
     public function boot()
     {
-        $this->addCommands();
         $this->addRoutes();
         $this->addViews();
-        $this->addMigrations();
-        $this->addTranslations();
-    }
-
-    public function addCommands()
-    {
-        $this->commands([
-            TeamspeakUserPolicy::class,
-            TeamspeakGroupSync::class,
-            TeamspeakLogsClear::class
-        ]);
-    }
-
-    public function addRoutes()
-    {
-        if (!$this->app->routesAreCached()) {
-            include __DIR__ . '/Http/routes.php';
-        }
-    }
-
-    public function addViews()
-    {
-        $this->loadViewsFrom(__DIR__ . '/resources/views', 'teamspeak');
-    }
-
-    public function addMigrations()
-    {
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations/');
-    }
-
-    public function addTranslations()
-    {
-        $this->loadTranslationsFrom(__DIR__ . '/lang', 'teamspeak');
     }
 
     /**
@@ -84,10 +52,19 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
             __DIR__ . '/Config/teamspeak.config.php', 'teamspeak.config');
 
         $this->mergeConfigFrom(
-            __DIR__ . '/Config/teamspeak.permissions.php', 'web.permissions');
+            __DIR__ . '/Config/seat-connector.config.php', 'seat-connector.drivers.teamspeak');
+    }
 
-        $this->mergeConfigFrom(
-            __DIR__ . '/Config/package.sidebar.php', 'package.sidebar');
+    public function addRoutes()
+    {
+        if (! $this->app->routesAreCached()) {
+            include __DIR__ . '/Http/routes.php';
+        }
+    }
+
+    public function addViews()
+    {
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'seat-connector-teamspeak');
     }
 
     /**

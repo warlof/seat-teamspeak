@@ -2,7 +2,7 @@
 /**
  * This file is part of SeAT Teamspeak Connector.
  *
- * Copyright (C) 2018  Warlof Tutsimo <loic.leuilliot@gmail.com>
+ * Copyright (C) 2019  Warlof Tutsimo <loic.leuilliot@gmail.com>
  *
  * SeAT Teamspeak Connector  is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +18,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Warlof\Seat\Connector\Teamspeak\Exceptions;
-
+namespace Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions;
 
 use Exception;
-use Seat\Web\Models\Group;
+use Throwable;
 
-class MissingMainCharacterException extends Exception
+abstract class TeamspeakException extends Exception
 {
-    public function __construct(Group $group)
+    public function __construct(array $errors = [], $code = 0, Throwable $previous = null)
     {
-        $message = sprintf('The group with ID %d does not have a main character set, ' .
-            'or related character information is missing.', $group->id);
-        parent::__construct($message, 0, null);
+        parent::__construct(implode("\r\n", $errors), $code, $previous);
     }
 }

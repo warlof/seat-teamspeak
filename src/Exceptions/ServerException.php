@@ -1,9 +1,8 @@
 <?php
-
 /**
  * This file is part of SeAT Teamspeak Connector.
  *
- * Copyright (C) 2018  Warlof Tutsimo <loic.leuilliot@gmail.com>
+ * Copyright (C) 2019  Warlof Tutsimo <loic.leuilliot@gmail.com>
  *
  * SeAT Teamspeak Connector  is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Warlof\Seat\Connector\Teamspeak\Models;
+namespace Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions;
 
-use Illuminate\Database\Eloquent\Model;
-
-class TeamspeakGroup extends Model
+class ServerException extends TeamspeakException
 {
-    protected $fillable = [
-        'id', 'name', 'is_server_group'
-    ];
 
-    protected $primaryKey = 'id';
 }
