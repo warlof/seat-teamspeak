@@ -19,7 +19,34 @@
  */
 
 return [
-    'name'   => 'teamspeak',
-    'icon'   => 'fa-headphones',
-    'client' => \Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient::class,
+    'name'     => 'teamspeak',
+    'icon'     => 'fa-headphones',
+    'client'   => \Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient::class,
+    'settings' => [
+        [
+            'name'  => 'server_host',
+            'label' => 'seat-connector-teamspeak::seat.server_host',
+            'type'  => 'text',
+        ],
+        [
+            'name'  => 'server_port',
+            'label' => 'seat-connector-teamspeak::seat.server_port',
+            'type'  => 'numeric|min:1|max:65535',
+        ],
+        [
+            'name'  => 'query_port',
+            'label' => 'seat-connector-teamspeak::seat.query_port',
+            'type'  => 'numeric|min:1|max:65535',
+        ],
+        [
+            'name'  => 'query_username',
+            'label' => 'seat-connector-teamspeak::seat.query_username',
+            'type'  => 'text',
+        ],
+        [
+            'name'  => 'query_password',
+            'label' => 'seat-connector-teamspeak::seat.query_password',
+            'type'  => 'text',
+        ],
+    ],
 ];
