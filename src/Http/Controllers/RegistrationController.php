@@ -20,12 +20,13 @@
 
 namespace Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers;
 
+use Seat\Web\Http\Controllers\Controller;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
 use Warlof\Seat\Connector\Exceptions\DriverSettingsException;
 use Warlof\Seat\Connector\Models\User;
 
-class RegistrationController
+class RegistrationController extends Controller
 {
     public function redirectToProvider()
     {

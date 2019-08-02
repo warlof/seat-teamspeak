@@ -41,4 +41,16 @@ Route::group([
 
     });
 
+    Route::group([
+        'prefix' => 'settings',
+        'middleware' => 'bouncer:superuser',
+    ], function () {
+
+        Route::post('/teamspeak', [
+            'as' => 'seat-connector.drivers.teamspeak.setup',
+            'uses' => 'SettingsController@store',
+        ]);
+
+    });
+
 });
