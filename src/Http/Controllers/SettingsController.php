@@ -63,7 +63,7 @@ class SettingsController extends Controller
                 ->with('error', $e->getMessage());
         }
 
-        setting(['seat-connector.drivers.teamspeak', $settings], true);
+        setting(['seat-connector.drivers.teamspeak', (object) $settings], true);
 
         return redirect()->back()
             ->with('success', 'Teamspeak settings has been successfully saved.');
@@ -77,7 +77,7 @@ class SettingsController extends Controller
      */
     private function checkSettings(array $settings)
     {
-        $client = new ts3admin($settings['server_host'], $settings['server_port'], 15);
+        $client = new ts3admin($settings['server_host'], $settings['query_port'], 15);
 
         $response = $client->connect();
         if (! $client->succeeded($response))
