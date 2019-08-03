@@ -35,7 +35,7 @@ Route::group([
         ]);
 
         Route::post('/teamspeak', [
-            'as'   => 'seat-connector.drivers.teamspeak.callback',
+            'as'   => 'seat-connector.drivers.teamspeak.registration.callback',
             'uses' => 'RegistrationController@handleProviderCallback',
         ]);
 
@@ -47,7 +47,7 @@ Route::group([
     ], function () {
 
         Route::post('/teamspeak', [
-            'as' => 'seat-connector.drivers.teamspeak.setup',
+            'as' => 'seat-connector.drivers.teamspeak.settings',
             'uses' => 'SettingsController@store',
         ]);
 
