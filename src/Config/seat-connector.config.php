@@ -31,12 +31,12 @@ return [
         [
             'name'  => 'server_port',
             'label' => 'seat-connector-teamspeak::seat.server_port',
-            'type'  => 'numeric|min:1|max:65535',
+            'type'  => 'number',
         ],
         [
             'name'  => 'query_port',
             'label' => 'seat-connector-teamspeak::seat.query_port',
-            'type'  => 'numeric|min:1|max:65535',
+            'type'  => 'number',
         ],
         [
             'name'  => 'query_username',
