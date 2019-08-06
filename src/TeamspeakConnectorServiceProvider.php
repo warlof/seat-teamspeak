@@ -22,6 +22,7 @@
 namespace Warlof\Seat\Connector\Drivers\Teamspeak;
 
 use Seat\Services\AbstractSeatPlugin;
+use Warlof\Seat\Connector\Drivers\Teamspeak\Commands\Upgrade;
 
 /**
  * Class TeamspeakConnectorServiceProvider.
@@ -40,6 +41,8 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
         $this->addRoutes();
         $this->addViews();
         $this->addTranslations();
+        $this->addUpgradeCommand();
+        $this->addUpgradeMigrations();
     }
 
     /**
@@ -71,6 +74,18 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
     private function addTranslations()
     {
         $this->loadTranslationsFrom(__DIR__ . '/lang', 'seat-connector-teamspeak');
+    }
+
+    private function addUpgradeCommand()
+    {
+        $this->commands([
+            Upgrade::class,
+        ]);
+    }
+
+    private function addUpgradeMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
     }
 
     /**
