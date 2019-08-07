@@ -22,21 +22,21 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Seat\Eveapi\Models\Alliances\Alliance;
+use Seat\Eveapi\Models\Corporation\CorporationInfo;
 use Warlof\Seat\Connector\Models\Set;
 
 /**
- * Class MigrateTeamspeakAclAlliancesToSeatConnector.
+ * Class MigrateTeamspeakAclCorporationsToSeatConnector.
  */
-class MigrateTeamspeakAclAlliancesToSeatConnector extends Migration
+class MigrateTeamspeakAclCorporationsToSeatConnector extends Migration
 {
     public function up()
     {
-        if (Schema::hasTable('teamspeak_group_alliances')) {
+        if (Schema::hasTable('teamspeak_group_titles')) {
 
-            echo 'Converting old teamspeak alliances policy structure to new seat-connector policies scheme...' . PHP_EOL;
+            echo 'Converting old teamspeak titles policy structure to new seat-connector policies scheme...' . PHP_EOL;
 
-            $policies = DB::table('teamspeak_group_alliances')->get();
+            $policies = DB::table('teamspeak_group_titles')->get();
 
             foreach ($policies as $policy) {
 
@@ -49,8 +49,8 @@ class MigrateTeamspeakAclAlliancesToSeatConnector extends Migration
 
                 DB::table('seat_connector_set_entity')->insert([
                     'set_id'      => $connector_set->id,
-                    'entity_type' => Alliance::class,
-                    'entity_id'   => $policy->alliance_id,
+                    'entity_type' => CorporationInfo::class,
+                    'entity_id'   => $policy->corporation_id,
                 ]);
 
             }

@@ -22,6 +22,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Seat\Eveapi\Models\Corporation\CorporationInfo;
 use Warlof\Seat\Connector\Models\Set;
 
 /**
@@ -48,7 +49,7 @@ class MigrateTeamspeakAclCorporationsToSeatConnector extends Migration
 
                 DB::table('seat_connector_set_entity')->insert([
                     'set_id'      => $connector_set->id,
-                    'entity_type' => 'corporation',
+                    'entity_type' => CorporationInfo::class,
                     'entity_id'   => $policy->corporation_id,
                 ]);
 

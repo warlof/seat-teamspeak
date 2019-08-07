@@ -22,6 +22,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Seat\Web\Models\Acl\Role;
 use Warlof\Seat\Connector\Models\Set;
 
 /**
@@ -48,7 +49,7 @@ class MigrateTeamspeakAclRolesToSeatConnector extends Migration
 
                 DB::table('seat_connector_set_entity')->insert([
                     'set_id'      => $connector_set->id,
-                    'entity_type' => 'role',
+                    'entity_type' => Role::class,
                     'entity_id'   => $policy->role_id,
                 ]);
 
