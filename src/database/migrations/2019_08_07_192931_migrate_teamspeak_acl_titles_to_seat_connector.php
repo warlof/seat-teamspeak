@@ -22,13 +22,13 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Seat\Eveapi\Models\Corporation\CorporationInfo;
+use Seat\Eveapi\Models\Corporation\CorporationTitle;
 use Warlof\Seat\Connector\Models\Set;
 
 /**
- * Class MigrateTeamspeakAclCorporationsToSeatConnector.
+ * Class MigrateTeamspeakAclTitlesToSeatConnector.
  */
-class MigrateTeamspeakAclCorporationsToSeatConnector extends Migration
+class MigrateTeamspeakAclTitlesToSeatConnector extends Migration
 {
     public function up()
     {
@@ -44,13 +44,17 @@ class MigrateTeamspeakAclCorporationsToSeatConnector extends Migration
                     ->where('connector_id', $policy->teamspeak_sgid)
                     ->first();
 
-                if (is_null($connector_set))
+                $title = CorporationTitle::where('corporation_id', $policy->corporation_id)
+                    ->where('title_id', $policy->title_id)
+                    ->first();
+
+                if (is_null($connector_set) || is_null($title))
                     continue;
 
                 DB::table('seat_connector_set_entity')->insert([
                     'set_id'      => $connector_set->id,
-                    'entity_type' => CorporationInfo::class,
-                    'entity_id'   => $policy->corporation_id,
+                    'entity_type' => CorporationTitle::class,
+                    'entity_id'   => $title->id,
                 ]);
 
             }
