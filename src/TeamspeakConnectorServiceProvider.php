@@ -22,7 +22,7 @@
 namespace Warlof\Seat\Connector\Drivers\Teamspeak;
 
 use Seat\Services\AbstractSeatPlugin;
-use Warlof\Seat\Connector\Drivers\Teamspeak\Commands\Upgrade;
+use Warlof\Seat\Connector\Drivers\Teamspeak\Commands\Convert;
 
 /**
  * Class TeamspeakConnectorServiceProvider.
@@ -42,7 +42,6 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
         $this->addViews();
         $this->addTranslations();
         $this->addUpgradeCommand();
-        $this->addUpgradeMigrations();
     }
 
     /**
@@ -79,13 +78,8 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
     private function addUpgradeCommand()
     {
         $this->commands([
-            Upgrade::class,
+            Convert::class,
         ]);
-    }
-
-    private function addUpgradeMigrations()
-    {
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
     }
 
     /**
