@@ -226,7 +226,7 @@ class Convert extends Command
 
         foreach ($users as $user) {
 
-            if (! is_null(User::where('connector_type', 'teamspeak')->where('group_id', $user->group_id)))
+            if (! is_null(User::where('connector_type', 'teamspeak')->where('group_id', $user->group_id)->first()))
                 continue;
 
             try {
