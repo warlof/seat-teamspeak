@@ -1,3 +1,9 @@
+# 4.0.0
+- Switch to an universal SeAT Connector layout : `warlof\seat-connector`
+- A data conversion is available with `php artisan seat-connector:convert:teamspeak`
+- In case you're encountering issue, please open a new ticket [here](https://github.com/warlof/seat-connector/issues)
+- In case you have some trouble with the early 4.x generation, you can stick to previous 3.x using `composer require warlof\seat-teamspeak:^3.1`
+
 # 3.0.9
 - Address two issues related to stale Teamspeak Client ID
 
