@@ -269,13 +269,30 @@ class TeamspeakClient implements IClient
         if (! $this->isConnected())
             $this->connect();
 
-        $speakers = $this->client->clientDbList();
-        if (! $this->client->succeeded($speakers))
-            throw new CommandException($speakers['errors']);
+        $from = 0;
+        $total_users = 0;
 
-        foreach ($speakers['data'] as $speaker_attributes) {
-            $speaker = new TeamspeakSpeaker($speaker_attributes);
-            $this->speakers->put($speaker->getClientId(), $speaker);
+        while (true) {
+
+            $speakers = $this->client->clientDbList($from, -1, $total_users == 0);
+
+            if (! $this->client->succeeded($speakers))
+                throw new CommandException($speakers['errors']);
+
+            if (empty($speakers['data']))
+                break;
+
+            if ($total_users == 0 && array_key_exists('count', array_first($speakers['data'])))
+                $total_users = array_get(array_first($speakers['data']), 'count', 0);
+
+            foreach ($speakers['data'] as $speaker_attributes) {
+                $speaker = new TeamspeakSpeaker($speaker_attributes);
+                $this->speakers->put($speaker->getClientId(), $speaker);
+                $from++;
+            }
+
+            if ($from >= $total_users)
+                break;
         }
     }
 
