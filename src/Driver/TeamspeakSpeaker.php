@@ -113,7 +113,8 @@ class TeamspeakSpeaker implements IUser
 
                 $group = TeamspeakClient::getInstance()->getSet($group_attributes['sgid']);
 
-                $this->server_groups->put($group->getId(), $group);
+                if (! is_null($group))
+                    $this->server_groups->put($group->getId(), $group);
             }
         }
 
