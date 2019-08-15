@@ -21,13 +21,24 @@
 namespace Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers;
 
 use Seat\Web\Http\Controllers\Controller;
+use Warlof\Seat\Connector\Drivers\IUser;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
 use Warlof\Seat\Connector\Exceptions\DriverSettingsException;
+use Warlof\Seat\Connector\Models\Log;
 use Warlof\Seat\Connector\Models\User;
 
+/**
+ * Class RegistrationController.
+ *
+ * @package Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers
+ */
 class RegistrationController extends Controller
 {
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @throws \Seat\Services\Exceptions\SettingException
+     */
     public function redirectToProvider()
     {
         try {
@@ -50,6 +61,9 @@ class RegistrationController extends Controller
 
             $registration_nickname = $driver_user->buildConnectorNickname();
         } catch (DriverSettingsException $e) {
+            $this->log('critical', 'registration', $e->getMessage());
+            logger()->error($e->getMessage());
+
             return redirect()->back()
                 ->with('error', $e->getMessage());
         }
@@ -61,6 +75,10 @@ class RegistrationController extends Controller
             compact('drivers', 'identities', 'settings', 'registration_nickname'));
     }
 
+    /**
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Seat\Services\Exceptions\SettingException
+     */
     public function handleProviderCallback()
     {
         // build a draft connector user in order to determine the expected nickname
@@ -73,7 +91,6 @@ class RegistrationController extends Controller
         $searched_nickname = $driver_user->buildConnectorNickname();
 
         try {
-
             // retrieve the teamspeak client instance
             $client = TeamspeakClient::getInstance();
 
@@ -82,34 +99,92 @@ class RegistrationController extends Controller
 
             // search for the expected user
             $match_user = $users->filter(function ($user) use ($searched_nickname) {
-
                 return $user->getName() == $searched_nickname;
             });
 
         } catch (DriverSettingsException | TeamspeakException $e) {
+            logger()->error($e->getMessage());
+            $this->log('critical', 'registration', $e->getMessage());
+
             return redirect()->route('seat-connector.identities')
                 ->with('error', $e->getMessage());
         }
 
         // in case no user can be found with that nickname - display an error
-        if ($match_user->isEmpty())
+        if ($match_user->isEmpty()) {
+            logger()->error(sprintf('Unable to retrieve user with name %s', $searched_nickname));
+            $this->log('warning', 'registration', sprintf('Unable to retrieve user with name %s', $searched_nickname));
+
             return redirect()->back()
                 ->with('error', 'Unable to retrieve you on the server - is your nickname valid ?');
+        }
 
-        $match_user = $match_user->first();
+        $match_user = $match_user->last();
 
         // register the user
-        User::updateOrCreate([
-            'group_id'       => auth()->user()->group_id,
-            'connector_type' => 'teamspeak',
-        ], [
-            'connector_name' => $searched_nickname,
-            'connector_id'   => $match_user->getClientId(),
-            'unique_id'      => $match_user->getUniqueId(),
-        ]);
+        $profile = $this->coupleUser(auth()->user()->group_id, $searched_nickname, $match_user);
+
+        $allowed_sets = $profile->allowedSets();
+
+        foreach ($allowed_sets as $set_id) {
+            try {
+                $set = $client->getSet($set_id);
+
+                if (is_null($set)) {
+                    logger()->error(sprintf('Unable to retrieve Server Group with ID %s', $set_id));
+                    $this->log('error', 'registration', sprintf('Unable to retrieve Server Group with ID %s', $set_id));
+
+                    continue;
+                }
+
+                $match_user->addSet($set);
+            } catch (TeamspeakException $e) {
+                logger()->error($e->getMessage());
+                $this->log('critical', 'registration', $e->getMessage());
+            }
+        }
 
         return redirect()
             ->route('seat-connector.identities')
             ->with('success', 'You have successfully been registered on Teamspeak.');
+    }
+
+    /**
+     * @param int $group_id
+     * @param string $nickname
+     * @param \Warlof\Seat\Connector\Drivers\IUser $user
+     * @return \Warlof\Seat\Connector\Models\User
+     */
+    private function coupleUser(int $group_id, string $nickname, IUser $user): User
+    {
+        $profile = User::updateOrCreate([
+            'group_id'       => $group_id,
+            'connector_type' => 'teamspeak',
+        ], [
+            'connector_name' => $nickname,
+            'connector_id'   => $user->getClientId(),
+            'unique_id'      => $user->getUniqueId(),
+        ]);
+
+        $this->log('notice', 'registration',
+            sprintf('User %s (%d) has been registered with ID %s and UID %s',
+                $nickname, $group_id, $user->getClientId(), $user->getUniqueId()));
+
+        return $profile;
+    }
+
+    /**
+     * @param string $level
+     * @param string $category
+     * @param string $message
+     */
+    private function log(string $level, string $category, string $message)
+    {
+        Log::create([
+            'connector_type' => 'teamspeak',
+            'level'          => $level,
+            'category'       => $category,
+            'message'        => $message,
+        ]);
     }
 }
