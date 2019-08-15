@@ -85,8 +85,8 @@ class TeamspeakServerGroup implements ISet
     {
         if ($this->members->isEmpty()) {
             $response = TeamspeakClient::getInstance()->sendCall('serverGroupClientList', [
-                'sgid'  => $this->id,
-                'names' => true,
+                $this->id,
+                true,
             ]);
 
             foreach ($response['data'] as $user_attributes) {
@@ -122,8 +122,8 @@ class TeamspeakServerGroup implements ISet
             return;
 
         TeamspeakClient::getInstance()->sendCall('serverGroupAddClient', [
-            'sgid'   => $this->id,
-            'cldbid' => $user->getClientId(),
+            $this->id,
+            $user->getClientId(),
         ]);
 
         $this->members->put($user->getClientId(), $user);
@@ -144,8 +144,8 @@ class TeamspeakServerGroup implements ISet
             return;
 
         TeamspeakClient::getInstance()->sendCall('serverGroupDeleteClient', [
-            'sgid'   => $this->id,
-            'cldbid' => $user->getClientId(),
+            $this->id,
+            $user->getClientId(),
         ]);
 
         $this->members->pull($user->getClientId());

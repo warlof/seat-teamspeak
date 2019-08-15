@@ -106,7 +106,7 @@ class TeamspeakSpeaker implements IUser
     {
         if ($this->server_groups->isEmpty()) {
             $response = TeamspeakClient::getInstance()->sendCall('serverGroupsByClientID', [
-                'cldbid' => $this->id,
+                $this->id,
             ]);
 
             foreach ($response['data'] as $group_attributes) {
@@ -136,8 +136,8 @@ class TeamspeakSpeaker implements IUser
             return;
 
         TeamspeakClient::getInstance()->sendCall('serverGroupAddClient', [
-            'sgid'   => $group->getId(),
-            'cldbid' => $this->id,
+            $group->getId(),
+            $this->id,
         ]);
 
         $this->server_groups->put($group->getId(), $group);
@@ -158,8 +158,8 @@ class TeamspeakSpeaker implements IUser
             return;
 
         TeamspeakClient::getInstance()->sendCall('serverGroupDeleteClient', [
-            'sgid'   => $group->getId(),
-            'cldbid' => $this->id,
+            $group->getId(),
+            $this->id,
         ]);
 
         $this->server_groups->pull($group->getId());
