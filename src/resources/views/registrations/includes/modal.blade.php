@@ -21,16 +21,14 @@
               <input type="text" value="{{ $settings->server_host }}:{{ $settings->server_port }}" readonly="readonly" id="ts-server-host" class="form-control input-sm" />
             </div>
           </div>
+          @if(property_exists($settings, 'server_password') && ! empty($settings->server_password))
           <div class="form-group">
             <label class="col-sm-3 control-label" for="ts-server-password">Server Password</label>
             <div class="col-sm-9">
-              @if(property_exists($settings, 'server_password'))
-                <input type="text" value="{{ $settings->server_password }}" readonly="readonly" id="ts-server-password" class="form-control input-sm" />
-              @else
-                <input type="text" readonly="readonly" id="ts-server-password" class="form-control input-sm" />
-              @endif
+              <input type="text" value="{{ $settings->server_password }}" readonly="readonly" id="ts-server-password" class="form-control input-sm" />
             </div>
           </div>
+          @endif
           <div class="form-group">
             <label class="col-sm-3 control-label" for="ts-nickname">Nickname</label>
             <div class="col-sm-9">
