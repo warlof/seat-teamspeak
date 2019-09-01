@@ -24,8 +24,8 @@ use Seat\Web\Http\Controllers\Controller;
 use Warlof\Seat\Connector\Drivers\IUser;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
+use Warlof\Seat\Connector\Events\EventLogger;
 use Warlof\Seat\Connector\Exceptions\DriverSettingsException;
-use Warlof\Seat\Connector\Models\Log;
 use Warlof\Seat\Connector\Models\User;
 
 /**
@@ -61,7 +61,7 @@ class RegistrationController extends Controller
 
             $registration_nickname = $driver_user->buildConnectorNickname();
         } catch (DriverSettingsException $e) {
-            $this->log('critical', 'registration', $e->getMessage());
+            event(new EventLogger('teamspeak', 'critical', 'registration', $e->getMessage()));
             logger()->error($e->getMessage());
 
             return redirect()->back()
@@ -94,17 +94,20 @@ class RegistrationController extends Controller
             // retrieve the teamspeak client instance
             $client = TeamspeakClient::getInstance();
 
-            // collect all active users
+            // collect all known users
             $users = collect($client->getUsers());
 
+            // search valid active user
+            $found_user = array_first(array_get($client->sendCall('clientdbfind', [$searched_nickname]), 'data'));
+
             // search for the expected user
-            $match_user = $users->filter(function ($user) use ($searched_nickname) {
-                return $user->getName() == $searched_nickname;
+            $match_user = $users->filter(function ($user) use ($found_user) {
+                return $user->getClientId() == $found_user['cldbid'];
             });
 
         } catch (DriverSettingsException | TeamspeakException $e) {
             logger()->error($e->getMessage());
-            $this->log('critical', 'registration', $e->getMessage());
+            event(new EventLogger('teamspeak', 'critical', 'registration', $e->getMessage()));
 
             return redirect()->route('seat-connector.identities')
                 ->with('error', $e->getMessage());
@@ -113,7 +116,8 @@ class RegistrationController extends Controller
         // in case no user can be found with that nickname - display an error
         if ($match_user->isEmpty()) {
             logger()->error(sprintf('Unable to retrieve user with name %s', $searched_nickname));
-            $this->log('warning', 'registration', sprintf('Unable to retrieve user with name %s', $searched_nickname));
+            event(new EventLogger('teamspeak', 'warning', 'registration',
+                sprintf('Unable to retrieve user with name %s', $searched_nickname)));
 
             return redirect()->back()
                 ->with('error', 'Unable to retrieve you on the server - is your nickname valid ?');
@@ -132,7 +136,8 @@ class RegistrationController extends Controller
 
                 if (is_null($set)) {
                     logger()->error(sprintf('Unable to retrieve Server Group with ID %s', $set_id));
-                    $this->log('error', 'registration', sprintf('Unable to retrieve Server Group with ID %s', $set_id));
+                    event(new EventLogger('teamspeak', 'error', 'registration',
+                        sprintf('Unable to retrieve Server Group with ID %s', $set_id)));
 
                     continue;
                 }
@@ -140,7 +145,7 @@ class RegistrationController extends Controller
                 $match_user->addSet($set);
             } catch (TeamspeakException $e) {
                 logger()->error($e->getMessage());
-                $this->log('critical', 'registration', $e->getMessage());
+                event(new EventLogger('teamspeak', 'critical', 'registration', $e->getMessage()));
             }
         }
 
@@ -166,25 +171,10 @@ class RegistrationController extends Controller
             'unique_id'      => $user->getUniqueId(),
         ]);
 
-        $this->log('notice', 'registration',
+        event(new EventLogger('teamspeak', 'notice', 'registration',
             sprintf('User %s (%d) has been registered with ID %s and UID %s',
-                $nickname, $group_id, $user->getClientId(), $user->getUniqueId()));
+                $nickname, $group_id, $user->getClientId(), $user->getUniqueId())));
 
         return $profile;
-    }
-
-    /**
-     * @param string $level
-     * @param string $category
-     * @param string $message
-     */
-    private function log(string $level, string $category, string $message)
-    {
-        Log::create([
-            'connector_type' => 'teamspeak',
-            'level'          => $level,
-            'category'       => $category,
-            'message'        => $message,
-        ]);
     }
 }
