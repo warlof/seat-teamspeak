@@ -21,6 +21,7 @@
 return [
     'server_host'    => 'Server Address',
     'server_port'    => 'Server Port',
+    'query_host'     => 'Query Address',
     'query_port'     => 'Query Port',
     'query_username' => 'Query Username',
     'query_password' => 'Query Password',

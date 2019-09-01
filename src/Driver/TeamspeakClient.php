@@ -60,7 +60,7 @@ class TeamspeakClient implements IClient
     /**
      * @var string
      */
-    private $server_host;
+    private $query_host;
 
     /**
      * @var int
@@ -89,7 +89,7 @@ class TeamspeakClient implements IClient
      */
     private function __construct(array $parameters)
     {
-        $this->server_host    = $parameters['server_host'];
+        $this->query_host     = $parameters['query_host'];
         $this->server_port    = $parameters['server_port'];
         $this->query_port     = $parameters['query_port'];
         $this->query_username = $parameters['query_username'];
@@ -118,6 +118,9 @@ class TeamspeakClient implements IClient
             if (! property_exists($settings, 'server_port') || is_null($settings->server_port) || $settings->server_port == 0)
                 throw new DriverSettingsException('Parameter server_port is missing.');
 
+            if (! property_exists($settings, 'query_host') || is_null($settings->query_host) || $settings->query_host == '')
+                throw new DriverSettingsException('Parameter query_host is missing.');
+
             if (! property_exists($settings, 'query_port') || is_null($settings->query_port) || $settings->query_port == 0)
                 throw new DriverSettingsException('Parameter query_port is missing.');
 
@@ -128,7 +131,7 @@ class TeamspeakClient implements IClient
                 throw new DriverSettingsException('Parameter query_password is missing.');
 
             self::$instance = new TeamspeakClient([
-                'server_host'    => $settings->server_host,
+                'query_host'     => $settings->query_host,
                 'server_port'    => $settings->server_port,
                 'query_port'     => $settings->query_port,
                 'query_username' => $settings->query_username,
@@ -231,7 +234,7 @@ class TeamspeakClient implements IClient
         if ($this->isConnected())
             return;
 
-        $this->client = new ts3admin($this->server_host, $this->query_port, 15);
+        $this->client = new ts3admin($this->query_host, $this->query_port, 15);
 
         $response = $this->client->connect();
         if (! $this->client->succeeded($response))
@@ -269,7 +272,7 @@ class TeamspeakClient implements IClient
         if (! $this->isConnected())
             $this->connect();
 
-        $from = 0;
+        $from        = 0;
         $total_users = 0;
 
         while (true) {

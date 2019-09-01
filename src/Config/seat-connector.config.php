@@ -34,6 +34,11 @@ return [
             'type'  => 'number',
         ],
         [
+            'name'  => 'query_host',
+            'label' => 'seat-connector-teamspeak::seat.query_host',
+            'type'  => 'text',
+        ],
+        [
             'name'  => 'query_port',
             'label' => 'seat-connector-teamspeak::seat.query_port',
             'type'  => 'number',

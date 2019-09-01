@@ -43,6 +43,7 @@ class SettingsController extends Controller
         $request->validate([
             'server_host'    => 'required|string',
             'server_port'    => 'required|numeric|min:1|max:65535',
+            'query_host'     => 'required|string',
             'query_port'     => 'required|numeric|min:1|max:65535',
             'query_username' => 'required|string',
             'query_password' => 'required|string',
@@ -51,6 +52,7 @@ class SettingsController extends Controller
         $settings = [
             'server_host'    => $request->input('server_host'),
             'server_port'    => (int) $request->input('server_port'),
+            'query_host'     => $request->input('query_host'),
             'query_port'     => (int) $request->input('query_port'),
             'query_username' => $request->input('query_username'),
             'query_password' => $request->input('query_password'),
@@ -77,7 +79,7 @@ class SettingsController extends Controller
      */
     private function checkSettings(array $settings)
     {
-        $client = new ts3admin($settings['server_host'], $settings['query_port'], 15);
+        $client = new ts3admin($settings['query_host'], $settings['query_port'], 15);
 
         $response = $client->connect();
         if (! $client->succeeded($response))
