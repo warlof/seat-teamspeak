@@ -79,12 +79,13 @@ class Convert extends Command
         $this->line('');
 
         $server_host = $this->ask('What is either the IP address or domain name where your Teamspeak instance is ?', 'localhost');
+        $query_host = $this->ask('What is either the IP address or domain name where your Teamspeak instance is (server query address) ?', 'localhost');
         $server_port = intval($this->ask('What is the client port from your Teamspeak instance ?', 9987));
         $query_port = intval($this->ask('What is the query port from your Teamspeak server ?', 10011));
         $query_username = $this->ask('What is the server query username from your Teamspeak server ?', 'serveradmin');
         $query_password = $this->secret('What is the server query password from your Teamspeak server ?');
 
-        $this->client = $this->setup($server_host, $server_port, $query_port, $query_username, $query_password);
+        $this->client = $this->setup($server_host, $server_port, $query_host, $query_port, $query_username, $query_password);
 
         if ($this->requireConversion()) {
             $this->info('It appears you were running a previous version of warlof/seat-teamspeak.');
@@ -102,6 +103,7 @@ class Convert extends Command
     /**
      * @param string $server_host
      * @param int $server_port
+     * @param string $query_host
      * @param int $query_port
      * @param string $query_username
      * @param string $query_password
@@ -110,13 +112,13 @@ class Convert extends Command
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
      * @throws \Warlof\Seat\Connector\Exceptions\DriverSettingsException
      */
-    private function setup(string $server_host, int $server_port, int $query_port, string $query_username, string $query_password)
+    private function setup(string $server_host, int $server_port, string $query_host, int $query_port, string $query_username, string $query_password)
     {
-        if (in_array(null, [$server_host, $server_port, $query_port, $query_username, $query_password]))
+        if (in_array(null, [$server_host, $server_port, $query_host, $query_port, $query_username, $query_password]))
             $this->error('You must provide a value for all parameters.');
 
-        if (! is_string($server_host))
-            $this->error('Server Host must be a valid domain or IP address');
+        if (! is_string($server_host) || ! is_string($query_host))
+            $this->error('Server Host and Query Host must be a valid domain or IP address');
 
         if ($server_port == 0 || $server_port < 1 || $server_port > 65535)
             $this->error('Server Port must be a valid port number');
@@ -133,6 +135,7 @@ class Convert extends Command
         $settings = [
             'server_host'    => $server_host,
             'server_port'    => (int) $server_port,
+            'query_host'     => $query_host,
             'query_port'     => (int) $query_port,
             'query_username' => $query_username,
             'query_password' => $query_password,
