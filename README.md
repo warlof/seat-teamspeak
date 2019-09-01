@@ -19,25 +19,36 @@ php artisan migrate
 php artisan up
 ```
 
-And now, when you log into `SeAT`, you should see a `Teamspeak` category in the sidebar.
+And now, when you log into `SeAT`, you should see a `Connector` category in the sidebar.
 
 Access your Teamspeak server and find the `query_ip_whitelist.txt` file.
 Add the IP address of your Seat install server to the list to avoid ServerQuery flood bans when running jobs.
 Don't forget to add an empty line at the end of the `query_ip_whitelist.txt`.
 
-Click on `Teamspeak` and then click on `Settings`.
+Click on `Connector` and then click on `Settings`.
 
-Change the Configuration to meet your Teamspeak server's settings.
+Change the Configuration to meet your Teamspeak server's settings into `Teamspeak` block.
 The Query port is `10011` by default.
 
 Setting the ServerQuery username/password is beyond the scope of this documentation and can be found on
 [official teamspeak website](https://www.teamspeak3.com/support/teamspeak-3-add-server-query-user.php).
 
-Click `Update`, then click `Update Teamspeak server groups` to load in all of your currently defined groups.
+**ATTENTION**
+> In case you're not using `serveradmin` as Query User, ensure used Query User
+> is not tied to any of your own Identities.
+> 
+> Created Query User **MUST** have permissions listed bellow :
+>  - `i_group_member_add_power` : 75
+>  - `i_group_member_remove_power` : 75
+>  - `b_virtualserver_servergroup_client_list` : checked
+>  - `i_client_serverquery_view_power` : 75
+
+In the driver dropdown list, select `Teamspeak` and click on `Update Sets` button which will queue a job to pull all of your currently defined server groups.
 
 Access is granted through the `Access Management` section.
 
 Click on `Settings` and then click on `Schedule`. 
-Add `teamspeak:user:policy` (recommended every 30 minutes).
+ - add `seat-connector:sync:sets` (recommended once an hour)
+ - add `seat-connector:apply:policies` (recommended every 30 minutes)
 
-Good luck, and Happy Hunting !  o7
+In order to grant access to `Identities` section, you must add permission `seat-connector.view` to a role you're assigning to your users.
