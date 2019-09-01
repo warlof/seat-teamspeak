@@ -1,3 +1,13 @@
+# 4.1.0
+- The driver will non longer report `client nickname has been changed` whereas it's not the case (not supported by server query)
+- Logging will now be based on the new connector event layer
+- A new setting has been introduced called `query_host` which will allow to use an internal network address to execute server queries
+
+**ATTENTION - BREAKING CHANGES**
+> This new setting need to be setup manually inside `Connector > Settings` panel, since drivers does not execute any migrations scripts.
+> 
+> Once the settings have been updated, do not forget to restart either `supervisor` service or `seat-worker` container, depending on your setup.
+
 # 4.0.0
 - Switch to an universal SeAT Connector layout : `warlof/seat-connector`
 - A data conversion is available with `php artisan seat-connector:convert:teamspeak`
