@@ -20,6 +20,7 @@
 
 namespace Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers;
 
+use Illuminate\Support\Str;
 use Seat\Web\Http\Controllers\Controller;
 use Warlof\Seat\Connector\Drivers\IUser;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient;
@@ -53,13 +54,9 @@ class RegistrationController extends Controller
             if (! property_exists($settings, 'server_port') || is_null($settings->server_port))
                 throw new DriverSettingsException('Parameter server_port is missing.');
 
-            // build a draft connector user in order to determine the expected nickname
-            $driver_user = new User([
-                'group_id' => auth()->user()->group_id,
-                'connector_type' => 'teamspeak',
-            ]);
+            $registration_nickname = Str::random(30);
 
-            $registration_nickname = $driver_user->buildConnectorNickname();
+            session(['seat-connector.teamspeak.registration_uuid' => $registration_nickname]);
         } catch (DriverSettingsException $e) {
             event(new EventLogger('teamspeak', 'critical', 'registration', $e->getMessage()));
             logger()->error($e->getMessage());
@@ -88,7 +85,7 @@ class RegistrationController extends Controller
         ]);
 
         // determine the expected nickname for that user
-        $searched_nickname = $driver_user->buildConnectorNickname();
+        $searched_nickname = session('seat-connector.teamspeak.registration_uuid');
 
         try {
             // retrieve the teamspeak client instance
@@ -151,7 +148,9 @@ class RegistrationController extends Controller
 
         return redirect()
             ->route('seat-connector.identities')
-            ->with('success', 'You have successfully been registered on Teamspeak.');
+            ->with('success', sprintf(
+                'You have successfully been registered on Teamspeak. You can now rename yourself to %s',
+                $profile->buildConnectorNickname()));
     }
 
     /**
