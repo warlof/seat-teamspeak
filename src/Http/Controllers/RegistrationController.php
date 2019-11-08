@@ -22,6 +22,7 @@ namespace Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers;
 
 use Illuminate\Support\Str;
 use Seat\Web\Http\Controllers\Controller;
+use Warlof\Seat\Connector\Drivers\IClient;
 use Warlof\Seat\Connector\Drivers\IUser;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
@@ -78,12 +79,6 @@ class RegistrationController extends Controller
      */
     public function handleProviderCallback()
     {
-        // build a draft connector user in order to determine the expected nickname
-        $driver_user = new User([
-            'group_id' => auth()->user()->group_id,
-            'connector_type' => 'teamspeak',
-        ]);
-
         // determine the expected nickname for that user
         $searched_nickname = session('seat-connector.teamspeak.registration_uuid');
 
@@ -121,6 +116,12 @@ class RegistrationController extends Controller
         }
 
         $match_user = $match_user->last();
+
+        $original_user = User::where('connector_type', 'teamspeak')->where('group_id', auth()->user()->group_id)->first();
+
+        // if connector ID is a new one - revoke existing access from the old ID
+        if (! is_null($original_user) && $original_user->connector_id != $match_user->getClientId())
+            $this->revokeOldIdentity($client, $original_user);
 
         // register the user
         $profile = $this->coupleUser(auth()->user()->group_id, $searched_nickname, $match_user);
@@ -175,5 +176,28 @@ class RegistrationController extends Controller
                 $nickname, $group_id, $user->getClientId(), $user->getUniqueId())));
 
         return $profile;
+    }
+
+    /**
+     * @param \Warlof\Seat\Connector\Drivers\IClient $client
+     * @param \Warlof\Seat\Connector\Models\User $old_identity
+     */
+    private function revokeOldIdentity(IClient $client, User $old_identity)
+    {
+        // retrieve teamspeak user related to old identity
+        $user = $client->getUser($old_identity->connector_id);
+
+        // pull its active sets
+        $sets = $user->getSets();
+
+        // revoke all of them
+        foreach ($sets as $set) {
+            $user->removeSet($set);
+        }
+
+        // log action
+        event(new EventLogger('discord', 'warning', 'registration',
+            sprintf('User %s (%d) has been uncoupled from ID %s and UID %s',
+                $old_identity->connector_name, $old_identity->group_id, $old_identity->connector_id, $old_identity->unique_id)));
     }
 }
