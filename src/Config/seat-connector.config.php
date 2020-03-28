@@ -20,7 +20,7 @@
 
 return [
     'name'     => 'teamspeak',
-    'icon'     => 'fa-headphones',
+    'icon'     => 'fab fa-teamspeak',
     'client'   => \Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient::class,
     'settings' => [
         [

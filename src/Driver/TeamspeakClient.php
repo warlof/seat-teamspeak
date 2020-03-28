@@ -20,6 +20,8 @@
 
 namespace Warlof\Seat\Connector\Drivers\Teamspeak\Driver;
 
+use Illuminate\Support\Arr;
+use Seat\Services\Exceptions\SettingException;
 use ts3admin;
 use Warlof\Seat\Connector\Drivers\IClient;
 use Warlof\Seat\Connector\Drivers\ISet;
@@ -28,7 +30,11 @@ use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException;
+use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
+use Warlof\Seat\Connector\Exceptions\DriverException;
 use Warlof\Seat\Connector\Exceptions\DriverSettingsException;
+use Warlof\Seat\Connector\Exceptions\InvalidDriverIdentityException;
+use Warlof\Seat\Connector\Exceptions\MissingDriverClientException;
 
 /**
  * Class TeamspeakClient.
@@ -101,13 +107,17 @@ class TeamspeakClient implements IClient
 
     /**
      * @return \Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient
-     * @throws \Seat\Services\Exceptions\SettingException
-     * @throws \Warlof\Seat\Connector\Exceptions\DriverSettingsException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
     public static function getInstance(): IClient
     {
         if (! isset(self::$instance)) {
-            $settings = setting('seat-connector.drivers.teamspeak', true);
+            try {
+                $settings = setting('seat-connector.drivers.teamspeak', true);
+            } catch (SettingException $e) {
+                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                throw new DriverException($e->getMessage(), $e->getCode(), $e);
+            }
 
             if (is_null($settings) || ! is_object($settings))
                 throw new DriverSettingsException('The Driver has not been configured yet.');
@@ -144,30 +154,36 @@ class TeamspeakClient implements IClient
 
     /**
      * @return \Warlof\Seat\Connector\Drivers\IUser[]
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
     public function getUsers(): array
     {
-        if ($this->speakers->isEmpty())
-            $this->seedSpeakers();
+        if ($this->speakers->isEmpty()) {
+            try {
+                $this->seedSpeakers();
+            } catch (TeamspeakException $e) {
+                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                throw new DriverException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
 
         return $this->speakers->toArray();
     }
 
     /**
      * @return \Warlof\Seat\Connector\Drivers\ISet[]
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
     public function getSets(): array
     {
-        if ($this->server_groups->isEmpty())
-            $this->seedServerGroups();
+        if ($this->server_groups->isEmpty()) {
+            try {
+                $this->seedServerGroups();
+            } catch (TeamspeakException $e) {
+                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                throw new DriverException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
 
         return $this->server_groups->toArray();
     }
@@ -175,31 +191,61 @@ class TeamspeakClient implements IClient
     /**
      * @param string $id
      * @return \Warlof\Seat\Connector\Drivers\IUser|null
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
     public function getUser(string $id): ?IUser
     {
-        if ($this->speakers->isEmpty())
-            $this->seedSpeakers();
+        if ($this->speakers->isEmpty()) {
+            try {
+                $this->seedSpeakers();
+            } catch (TeamspeakException $e) {
+                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                throw new DriverException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
 
-        return $this->speakers->get($id);
+        $user = $this->speakers->get($id);
+
+        if (is_null($user)) {
+            try {
+                $response = $this->client->clientDbInfo($id);
+
+                if (! $this->client->succeeded($response))
+                    throw new CommandException($response['errors']);
+
+                $user = new TeamspeakSpeaker($response['data']);
+                $this->speakers->put($user->getClientId(), $user);
+            } catch (TeamspeakException $e) {
+                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+
+                if (strpos($e->getMessage(), 'ErrorID: 512') !== false)
+                    throw new InvalidDriverIdentityException(
+                        sprintf('User ID %s is not found on Teamspeak Server.', $id),
+                        $e->getCode(),
+                        $e);
+
+                throw new DriverException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
+
+        return $user;
     }
 
     /**
      * @param string $id
      * @return \Warlof\Seat\Connector\Drivers\ISet|null
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
     public function getSet(string $id): ?ISet
     {
-        if ($this->server_groups->isEmpty())
-            $this->seedServerGroups();
+        if ($this->server_groups->isEmpty()) {
+            try {
+                $this->seedServerGroups();
+            } catch (TeamspeakException $e) {
+                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                throw new DriverException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
 
         return $this->server_groups->get($id);
     }
@@ -285,8 +331,8 @@ class TeamspeakClient implements IClient
             if (empty($speakers['data']))
                 break;
 
-            if ($total_users == 0 && array_key_exists('count', array_first($speakers['data'])))
-                $total_users = array_get(array_first($speakers['data']), 'count', 0);
+            if ($total_users == 0 && array_key_exists('count', Arr::first($speakers['data'])))
+                $total_users = Arr::get(Arr::first($speakers['data']), 'count', 0);
 
             foreach ($speakers['data'] as $speaker_attributes) {
                 $speaker = new TeamspeakSpeaker($speaker_attributes);

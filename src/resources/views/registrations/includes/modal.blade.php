@@ -2,13 +2,12 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
+        <h4 class="modal-title">
+          <i class="fab fa-teamspeak"></i> Teamspeak Registration
+        </h4>
         <button class="close" type="button" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">
-          <i class="fa fa-headphones"></i>
-          Teamspeak Registration
-        </h4>
       </div>
       <div class="modal-body">
         <p>Please join the teamspeak server with the information displayed bellow.<br/>
@@ -38,8 +37,13 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline pull-left" type="button" data-dismiss="modal">Close</button>
-        <button class="btn btn-success" type="submit" form="ts-registration-form">Confirm</button>
+        <button class="btn btn-outline-secondary pull-left" type="button" data-dismiss="modal">Close</button>
+        <a href="{{ sprintf('ts3server://%s:%d?nickname=%s', $settings->server_host, $settings->server_port, $registration_nickname) }}" class="btn btn-primary">
+          <i class="fas fa-sign-in-alt"></i> Join
+        </a>
+        <button class="btn btn-success" type="submit" form="ts-registration-form">
+          <i class="fas fa-check"></i> Confirm
+        </button>
       </div>
     </div>
   </div>

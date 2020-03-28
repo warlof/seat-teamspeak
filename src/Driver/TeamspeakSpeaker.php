@@ -22,6 +22,8 @@ namespace Warlof\Seat\Connector\Drivers\Teamspeak\Driver;
 
 use Warlof\Seat\Connector\Drivers\ISet;
 use Warlof\Seat\Connector\Drivers\IUser;
+use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
+use Warlof\Seat\Connector\Exceptions\DriverException;
 
 /**
  * Class TeamspeakSpeaker.
@@ -88,6 +90,7 @@ class TeamspeakSpeaker implements IUser
     /**
      * @param string $name
      * @return bool
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
     public function setName(string $name): bool
     {
@@ -96,26 +99,26 @@ class TeamspeakSpeaker implements IUser
 
     /**
      * @return array
-     * @throws \Seat\Services\Exceptions\SettingException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
-     * @throws \Warlof\Seat\Connector\Exceptions\DriverSettingsException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
     public function getSets(): array
     {
         if ($this->server_groups->isEmpty()) {
-            $response = TeamspeakClient::getInstance()->sendCall('serverGroupsByClientID', [
-                $this->id,
-            ]);
+            try {
+                $response = TeamspeakClient::getInstance()->sendCall('serverGroupsByClientID', [
+                    $this->id,
+                ]);
 
-            foreach ($response['data'] as $group_attributes) {
+                foreach ($response['data'] as $group_attributes) {
 
-                $group = TeamspeakClient::getInstance()->getSet($group_attributes['sgid']);
+                    $group = TeamspeakClient::getInstance()->getSet($group_attributes['sgid']);
 
-                if (! is_null($group))
-                    $this->server_groups->put($group->getId(), $group);
+                    if (!is_null($group))
+                        $this->server_groups->put($group->getId(), $group);
+                }
+            } catch (TeamspeakException $e) {
+                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                throw new DriverException($e->getMessage(), $e->getCode(), $e);
             }
         }
 
@@ -124,44 +127,44 @@ class TeamspeakSpeaker implements IUser
 
     /**
      * @param \Warlof\Seat\Connector\Drivers\ISet $group
-     * @throws \Seat\Services\Exceptions\SettingException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
-     * @throws \Warlof\Seat\Connector\Exceptions\DriverSettingsException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
     public function addSet(ISet $group)
     {
         if (in_array($group, $this->getSets()))
             return;
 
-        TeamspeakClient::getInstance()->sendCall('serverGroupAddClient', [
-            $group->getId(),
-            $this->id,
-        ]);
+        try {
+            TeamspeakClient::getInstance()->sendCall('serverGroupAddClient', [
+                $group->getId(),
+                $this->id,
+            ]);
+        } catch (TeamspeakException $e) {
+            logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+            throw new DriverException($e->getMessage(), $e->getCode(), $e);
+        }
 
         $this->server_groups->put($group->getId(), $group);
     }
 
     /**
      * @param \Warlof\Seat\Connector\Drivers\ISet $group
-     * @throws \Seat\Services\Exceptions\SettingException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
-     * @throws \Warlof\Seat\Connector\Exceptions\DriverSettingsException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
     public function removeSet(ISet $group)
     {
         if (! in_array($group, $this->getSets()))
             return;
 
-        TeamspeakClient::getInstance()->sendCall('serverGroupDeleteClient', [
-            $group->getId(),
-            $this->id,
-        ]);
+        try {
+            TeamspeakClient::getInstance()->sendCall('serverGroupDeleteClient', [
+                $group->getId(),
+                $this->id,
+            ]);
+        } catch (TeamspeakException $e) {
+            logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+            throw new DriverException($e->getMessage(), $e->getCode(), $e);
+        }
 
         $this->server_groups->pull($group->getId());
     }
@@ -172,7 +175,8 @@ class TeamspeakSpeaker implements IUser
      */
     public function hydrate(array $attributes)
     {
-        $this->id        = $attributes['cldbid'];
+        $this->id        = array_key_exists('cldbid', $attributes) ?
+            $attributes['cldbid'] : $attributes['client_database_id'];
         $this->unique_id = $attributes['client_unique_identifier'];
         $this->nickname  = $attributes['client_nickname'];
 

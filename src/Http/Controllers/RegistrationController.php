@@ -20,6 +20,7 @@
 
 namespace Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Seat\Web\Http\Controllers\Controller;
 use Warlof\Seat\Connector\Drivers\IClient;
@@ -27,7 +28,9 @@ use Warlof\Seat\Connector\Drivers\IUser;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
 use Warlof\Seat\Connector\Events\EventLogger;
+use Warlof\Seat\Connector\Exceptions\DriverException;
 use Warlof\Seat\Connector\Exceptions\DriverSettingsException;
+use Warlof\Seat\Connector\Exceptions\InvalidDriverIdentityException;
 use Warlof\Seat\Connector\Models\User;
 
 /**
@@ -67,7 +70,7 @@ class RegistrationController extends Controller
         }
 
         $drivers = collect(config('seat-connector.drivers', []));
-        $identities = User::where('group_id', auth()->user()->group_id)->get();
+        $identities = User::where('user_id', auth()->user()->id)->get();
 
         return view('seat-connector-teamspeak::registrations.confirm',
             compact('drivers', 'identities', 'settings', 'registration_nickname'));
@@ -90,16 +93,20 @@ class RegistrationController extends Controller
             $users = collect($client->getUsers());
 
             // search valid active user
-            $found_user = array_first(array_get($client->sendCall('clientdbfind', [$searched_nickname]), 'data'));
+            $found_user = Arr::first(Arr::get($client->sendCall('clientdbfind', [$searched_nickname]), 'data'));
 
             // search for the expected user
             $match_user = $users->filter(function ($user) use ($found_user) {
                 return $user->getClientId() == $found_user['cldbid'];
             });
 
-        } catch (DriverSettingsException | TeamspeakException $e) {
+        } catch (DriverException | TeamspeakException $e) {
             logger()->error($e->getMessage());
             event(new EventLogger('teamspeak', 'critical', 'registration', $e->getMessage()));
+
+            if (strpos($e->getMessage(), 'ErrorID: 1281') !== false)
+                return redirect()->route('seat-connector.identities')
+                    ->with('error', sprintf('Sorry, but we were not able to find you with nickname %s on the server.', $searched_nickname));
 
             return redirect()->route('seat-connector.identities')
                 ->with('error', $e->getMessage());
@@ -117,14 +124,14 @@ class RegistrationController extends Controller
 
         $match_user = $match_user->last();
 
-        $original_user = User::where('connector_type', 'teamspeak')->where('group_id', auth()->user()->group_id)->first();
+        $original_user = User::where('connector_type', 'teamspeak')->where('user_id', auth()->user()->id)->first();
 
         // if connector ID is a new one - revoke existing access from the old ID
         if (! is_null($original_user) && $original_user->connector_id != $match_user->getClientId())
             $this->revokeOldIdentity($client, $original_user);
 
         // register the user
-        $profile = $this->coupleUser(auth()->user()->group_id, $searched_nickname, $match_user);
+        $profile = $this->coupleUser(auth()->user()->id, $searched_nickname, $match_user);
 
         $allowed_sets = $profile->allowedSets();
 
@@ -155,15 +162,15 @@ class RegistrationController extends Controller
     }
 
     /**
-     * @param int $group_id
+     * @param int $user_id
      * @param string $nickname
      * @param \Warlof\Seat\Connector\Drivers\IUser $user
      * @return \Warlof\Seat\Connector\Models\User
      */
-    private function coupleUser(int $group_id, string $nickname, IUser $user): User
+    private function coupleUser(int $user_id, string $nickname, IUser $user): User
     {
         $profile = User::updateOrCreate([
-            'group_id'       => $group_id,
+            'user_id'        => $user_id,
             'connector_type' => 'teamspeak',
         ], [
             'connector_name' => $nickname,
@@ -173,7 +180,7 @@ class RegistrationController extends Controller
 
         event(new EventLogger('teamspeak', 'notice', 'registration',
             sprintf('User %s (%d) has been registered with ID %s and UID %s',
-                $nickname, $group_id, $user->getClientId(), $user->getUniqueId())));
+                $nickname, $user_id, $user->getClientId(), $user->getUniqueId())));
 
         return $profile;
     }
@@ -184,20 +191,24 @@ class RegistrationController extends Controller
      */
     private function revokeOldIdentity(IClient $client, User $old_identity)
     {
-        // retrieve teamspeak user related to old identity
-        $user = $client->getUser($old_identity->connector_id);
+        try {
+            // retrieve teamspeak user related to old identity
+            $user = $client->getUser($old_identity->connector_id);
 
-        // pull its active sets
-        $sets = $user->getSets();
+            // pull its active sets
+            $sets = $user->getSets();
 
-        // revoke all of them
-        foreach ($sets as $set) {
-            $user->removeSet($set);
+            // revoke all of them
+            foreach ($sets as $set) {
+                $user->removeSet($set);
+            }
+        } catch (InvalidDriverIdentityException $e) {
+            return;
         }
 
         // log action
         event(new EventLogger('discord', 'warning', 'registration',
             sprintf('User %s (%d) has been uncoupled from ID %s and UID %s',
-                $old_identity->connector_name, $old_identity->group_id, $old_identity->connector_id, $old_identity->unique_id)));
+                $old_identity->connector_name, $old_identity->user_id, $old_identity->connector_id, $old_identity->unique_id)));
     }
 }
