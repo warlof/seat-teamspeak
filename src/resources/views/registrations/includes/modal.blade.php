@@ -1,4 +1,4 @@
-<div class="modal modal-info fade" role="dialog" id="confirm-ts-registration">
+<div class="modal fade" role="dialog" id="confirm-ts-registration">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
