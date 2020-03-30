@@ -41,7 +41,7 @@
 Be certain you're putting your SeAT server address into your Teamspeak query whitelist in order to avoid any issues.
 
 > **/ ! \ Warning**
->
+> 
 > Due to modification applied on settings level, you may need to setup your teamspeak again.
 > It should be handled by migration, so take a look into settings.
 > 
