@@ -10,7 +10,7 @@ This plugin write for [SeAT](https://github.com/eveseat/seat) is providing to yo
 
 In your seat directory (by default:  `/var/www/seat`), type the following:
 
-```
+```shell script
 php artisan down
 composer require warlof/seat-teamspeak
 
@@ -38,17 +38,17 @@ Setting the ServerQuery username/password is beyond the scope of this documentat
 > is not tied to any of your own Identities.
 > 
 > Created Query User **MUST** have permissions listed bellow :
->  - `i_group_member_add_power` : 75
->  - `i_group_member_remove_power` : 75
->  - `b_virtualserver_servergroup_client_list` : checked
->  - `i_client_serverquery_view_power` : 75
+> - `i_group_member_add_power` : 75
+> - `i_group_member_remove_power` : 75
+> - `b_virtualserver_servergroup_client_list` : checked
+> - `i_client_serverquery_view_power` : 75
 
 In the driver dropdown list, select `Teamspeak` and click on `Update Sets` button which will queue a job to pull all of your currently defined server groups.
 
 Access is granted through the `Access Management` section.
 
 Click on `Settings` and then click on `Schedule`. 
- - add `seat-connector:sync:sets` (recommended once an hour)
- - add `seat-connector:apply:policies` (recommended every 30 minutes)
+- add `seat-connector:sync:sets` (recommended once an hour)
+- add `seat-connector:apply:policies` (recommended every 30 minutes)
 
 In order to grant access to `Identities` section, you must add permission `seat-connector.view` to a role you're assigning to your users.
