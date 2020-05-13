@@ -3,7 +3,8 @@
   "description": "This plugin provide an extension to the standard SeAT character Job which handle automatic graduation for Teamspeak user",
   "type": "seat-plugin",
   "license": "GPL-3.0-or-later",
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "authors": [
     {
       "name": "Warlof Tutsimo",

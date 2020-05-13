@@ -21,7 +21,7 @@
 
 namespace Warlof\Seat\Connector\Drivers\Teamspeak;
 
-use App\Providers\AbstractSeatPlugin;
+use Seat\Services\AbstractSeatPlugin;
 
 /**
  * Class TeamspeakConnectorServiceProvider.
