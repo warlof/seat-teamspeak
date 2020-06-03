@@ -19,10 +19,8 @@
  */
 
 return [
-    'server_host'    => 'Server Address',
-    'server_port'    => 'Server Port',
-    'query_host'     => 'Query Address',
-    'query_port'     => 'Query Port',
-    'query_username' => 'Query Username',
-    'query_password' => 'Query Password',
+    'server_host'  => 'Server Address',
+    'server_port'  => 'Server Port',
+    'api_base_uri' => 'Api Base Uri',
+    'api_key'      => 'Api Key',
 ];

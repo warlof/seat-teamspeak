@@ -1,8 +1,9 @@
 <?php
-/**
+
+/*
  * This file is part of SeAT Teamspeak Connector.
  *
- * Copyright (C) 2019  Warlof Tutsimo <loic.leuilliot@gmail.com>
+ * Copyright (C) 2019,2020  Warlof Tutsimo <loic.leuilliot@gmail.com>
  *
  * SeAT Teamspeak Connector  is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,27 +19,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions;
+namespace Warlof\Seat\Connector\Drivers\Teamspeak\Fetchers;
 
-use Exception;
-use Throwable;
+use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class TeamspeakException.
+ * Interface IFetcher
  *
- * @package Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions
+ * @package Warlof\Seat\Connector\Drivers\Teamspeak\Fetchers
  */
-abstract class TeamspeakException extends Exception
+interface IFetcher
 {
     /**
-     * TeamspeakException constructor.
+     * IFetcher constructor.
      *
-     * @param string $error
-     * @param int $code
-     * @param \Throwable|null $previous
+     * @param string $base_uri
+     * @param string $token
      */
-    public function __construct(string $error, int $code = 0, Throwable $previous = null)
-    {
-        parent::__construct($error, $code, $previous);
-    }
+    public function __construct(string $base_uri, string $token);
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param array $options
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function request(string $method, string $uri = '', array $options = []): ResponseInterface;
 }

@@ -70,7 +70,7 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
 
     private function addTranslations()
     {
-        $this->loadTranslationsFrom(__DIR__ . '/lang', 'seat-connector-teamspeak');
+        $this->loadTranslationsFrom(__DIR__ . '/resources/lang', 'seat-connector-teamspeak');
     }
 
     /**

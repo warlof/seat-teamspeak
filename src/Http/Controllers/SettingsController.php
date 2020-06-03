@@ -22,10 +22,7 @@ namespace Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Seat\Web\Http\Controllers\Controller;
-use ts3admin;
-use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException;
-use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException;
-use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException;
+use Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
 
 /**
@@ -43,24 +40,26 @@ class SettingsController extends Controller
         $request->validate([
             'server_host'    => 'required|string',
             'server_port'    => 'required|numeric|min:1|max:65535',
-            'query_host'     => 'required|string',
-            'query_port'     => 'required|numeric|min:1|max:65535',
-            'query_username' => 'required|string',
-            'query_password' => 'required|string',
+            'api_base_uri'   => 'required|url',
+            'api_key'        => 'required|string',
         ]);
 
+        $old_settings = setting('seat-connector.drivers.teamspeak', true) ?? null;
+
         $settings = [
-            'server_host'    => $request->input('server_host'),
-            'server_port'    => (int) $request->input('server_port'),
-            'query_host'     => $request->input('query_host'),
-            'query_port'     => (int) $request->input('query_port'),
-            'query_username' => $request->input('query_username'),
-            'query_password' => $request->input('query_password'),
+            'server_host'  => $request->input('server_host'),
+            'server_port'  => (int) $request->input('server_port'),
+            'api_base_uri' => $request->input('api_base_uri'),
+            'api_key'      => $request->input('api_key'),
         ];
 
         try {
-            $this->checkSettings($settings);
+            setting(['seat-connector.drivers.teamspeak', (object) $settings], true);
+
+            $settings['instance_id'] = $this->findServerInstance($settings);
         } catch (TeamspeakException $e) {
+            setting(['seat-connector.drivers.teamspeak', $old_settings], true);
+
             return redirect()->back()
                 ->with('error', $e->getMessage());
         }
@@ -73,24 +72,15 @@ class SettingsController extends Controller
 
     /**
      * @param array $settings
+     * @return int
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
      */
-    private function checkSettings(array $settings)
+    private function findServerInstance(array $settings): int
     {
-        $client = new ts3admin($settings['query_host'], $settings['query_port'], 15);
+        $client = new TeamspeakClient($settings);
 
-        $response = $client->connect();
-        if (! $client->succeeded($response))
-            throw new ConnexionException($response['errors']);
-
-        $response = $client->login($settings['query_username'], $settings['query_password']);
-        if (! $client->succeeded($response))
-            throw new LoginException($response['errors']);
-
-        $response = $client->selectServer($settings['server_port']);
-        if (! $client->succeeded($response))
-            throw new ServerException($response['errors']);
+        return $client->findInstanceIdByServerPort($settings['server_port']);
     }
 }

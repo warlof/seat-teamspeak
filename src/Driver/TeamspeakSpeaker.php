@@ -105,19 +105,9 @@ class TeamspeakSpeaker implements IUser
     {
         if ($this->server_groups->isEmpty()) {
             try {
-                $response = TeamspeakClient::getInstance()->sendCall('serverGroupsByClientID', [
-                    $this->id,
-                ]);
-
-                foreach ($response['data'] as $group_attributes) {
-
-                    $group = TeamspeakClient::getInstance()->getSet($group_attributes['sgid']);
-
-                    if (!is_null($group))
-                        $this->server_groups->put($group->getId(), $group);
-                }
+                $this->server_groups = collect(TeamspeakClient::getInstance()->getSpeakerServerGroups($this));
             } catch (TeamspeakException $e) {
-                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
                 throw new DriverException($e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -135,12 +125,9 @@ class TeamspeakSpeaker implements IUser
             return;
 
         try {
-            TeamspeakClient::getInstance()->sendCall('serverGroupAddClient', [
-                $group->getId(),
-                $this->id,
-            ]);
+            TeamspeakClient::getInstance()->addSpeakerToServerGroup($this, $group);
         } catch (TeamspeakException $e) {
-            logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+            logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
             throw new DriverException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -157,12 +144,9 @@ class TeamspeakSpeaker implements IUser
             return;
 
         try {
-            TeamspeakClient::getInstance()->sendCall('serverGroupDeleteClient', [
-                $group->getId(),
-                $this->id,
-            ]);
+            TeamspeakClient::getInstance()->removeSpeakerFromServerGroup($this, $group);
         } catch (TeamspeakException $e) {
-            logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+            logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
             throw new DriverException($e->getMessage(), $e->getCode(), $e);
         }
 

@@ -34,23 +34,13 @@ return [
             'type'  => 'number',
         ],
         [
-            'name'  => 'query_host',
-            'label' => 'seat-connector-teamspeak::seat.query_host',
-            'type'  => 'text',
+            'name'  => 'api_base_uri',
+            'label' => 'seat-connector-teamspeak::seat.api_base_uri',
+            'type'  => 'url',
         ],
         [
-            'name'  => 'query_port',
-            'label' => 'seat-connector-teamspeak::seat.query_port',
-            'type'  => 'number',
-        ],
-        [
-            'name'  => 'query_username',
-            'label' => 'seat-connector-teamspeak::seat.query_username',
-            'type'  => 'text',
-        ],
-        [
-            'name'  => 'query_password',
-            'label' => 'seat-connector-teamspeak::seat.query_password',
+            'name'  => 'api_key',
+            'label' => 'seat-connector-teamspeak::seat.api_key',
             'type'  => 'text',
         ],
     ],

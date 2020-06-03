@@ -20,9 +20,10 @@
 
 namespace Warlof\Seat\Connector\Drivers\Teamspeak\Driver;
 
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Arr;
 use Seat\Services\Exceptions\SettingException;
-use ts3admin;
 use Warlof\Seat\Connector\Drivers\IClient;
 use Warlof\Seat\Connector\Drivers\ISet;
 use Warlof\Seat\Connector\Drivers\IUser;
@@ -34,7 +35,6 @@ use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
 use Warlof\Seat\Connector\Exceptions\DriverException;
 use Warlof\Seat\Connector\Exceptions\DriverSettingsException;
 use Warlof\Seat\Connector\Exceptions\InvalidDriverIdentityException;
-use Warlof\Seat\Connector\Exceptions\MissingDriverClientException;
 
 /**
  * Class TeamspeakClient.
@@ -59,14 +59,14 @@ class TeamspeakClient implements IClient
     private $server_groups;
 
     /**
-     * @var \ts3admin
+     * @var \Warlof\Seat\Connector\Drivers\Teamspeak\Fetchers\IFetcher
      */
     private $client;
 
     /**
-     * @var string
+     * @var int
      */
-    private $query_host;
+    private $instance_id;
 
     /**
      * @var int
@@ -74,35 +74,32 @@ class TeamspeakClient implements IClient
     private $server_port;
 
     /**
-     * @var int
+     * @var string
      */
-    private $query_port;
+    private $api_base_uri;
 
     /**
      * @var string
      */
-    private $query_username;
-
-    /**
-     * @var string
-     */
-    private $query_password;
+    private $api_key;
 
     /**
      * TeamspeakClient constructor.
      *
      * @param array $parameters
      */
-    private function __construct(array $parameters)
+    public function __construct(array $parameters)
     {
-        $this->query_host     = $parameters['query_host'];
         $this->server_port    = $parameters['server_port'];
-        $this->query_port     = $parameters['query_port'];
-        $this->query_username = $parameters['query_username'];
-        $this->query_password = $parameters['query_password'];
+        $this->instance_id    = $parameters['instance_id'] ?? 0;
+        $this->api_base_uri   = $parameters['api_base_uri'];
+        $this->api_key        = $parameters['api_key'];
 
         $this->speakers      = collect();
         $this->server_groups = collect();
+
+        $fetcher = config('teamspeak.config.fetcher');
+        $this->client = new $fetcher($this->api_base_uri, $this->api_key);
     }
 
     /**
@@ -115,37 +112,33 @@ class TeamspeakClient implements IClient
             try {
                 $settings = setting('seat-connector.drivers.teamspeak', true);
             } catch (SettingException $e) {
-                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
                 throw new DriverException($e->getMessage(), $e->getCode(), $e);
             }
 
             if (is_null($settings) || ! is_object($settings))
                 throw new DriverSettingsException('The Driver has not been configured yet.');
 
-            if (! property_exists($settings, 'server_host') || is_null($settings->server_host) || $settings->server_host == '')
+            if (! property_exists($settings, 'server_host') || empty($settings->server_host))
                 throw new DriverSettingsException('Parameter server_host is missing.');
 
             if (! property_exists($settings, 'server_port') || is_null($settings->server_port) || $settings->server_port == 0)
                 throw new DriverSettingsException('Parameter server_port is missing.');
 
-            if (! property_exists($settings, 'query_host') || is_null($settings->query_host) || $settings->query_host == '')
-                throw new DriverSettingsException('Parameter query_host is missing.');
+            if (! property_exists($settings, 'api_base_uri') || empty($settings->api_base_uri))
+                throw new DriverSettingsException('Parameter api_base_uri is missing.');
 
-            if (! property_exists($settings, 'query_port') || is_null($settings->query_port) || $settings->query_port == 0)
-                throw new DriverSettingsException('Parameter query_port is missing.');
+            if (! property_exists($settings, 'api_key') || empty($settings->api_key))
+                throw new DriverSettingsException('Parameter api_key is missing.');
 
-            if (! property_exists($settings, 'query_username') || is_null($settings->query_username) || $settings->query_username == '')
-                throw new DriverSettingsException('Parameter query_username is missing.');
-
-            if (! property_exists($settings, 'query_password') || is_null($settings->query_password) || $settings->query_password == '')
-                throw new DriverSettingsException('Parameter query_password is missing.');
+            if (! property_exists($settings, 'instance_id') || is_null($settings->instance_id) || $settings->instance_id == 0)
+                throw new DriverSettingsException('Parameter instance_id is missing.');
 
             self::$instance = new TeamspeakClient([
-                'query_host'     => $settings->query_host,
-                'server_port'    => $settings->server_port,
-                'query_port'     => $settings->query_port,
-                'query_username' => $settings->query_username,
-                'query_password' => $settings->query_password,
+                'server_port'  => $settings->server_port,
+                'instance_id'  => $settings->instance_id ?? 0,
+                'api_base_uri' => $settings->api_base_uri,
+                'api_key'      => $settings->api_key,
             ]);
         }
 
@@ -162,7 +155,7 @@ class TeamspeakClient implements IClient
             try {
                 $this->seedSpeakers();
             } catch (TeamspeakException $e) {
-                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                logger()->error(sprintf('[seat-connector][teamspeak] %d: %s', $e->getCode(), $e->getMessage()));
                 throw new DriverException($e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -180,7 +173,7 @@ class TeamspeakClient implements IClient
             try {
                 $this->seedServerGroups();
             } catch (TeamspeakException $e) {
-                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
                 throw new DriverException($e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -192,6 +185,7 @@ class TeamspeakClient implements IClient
      * @param string $id
      * @return \Warlof\Seat\Connector\Drivers\IUser|null
      * @throws \Warlof\Seat\Connector\Exceptions\DriverException
+     * @throws \Warlof\Seat\Connector\Exceptions\InvalidDriverIdentityException
      */
     public function getUser(string $id): ?IUser
     {
@@ -199,7 +193,7 @@ class TeamspeakClient implements IClient
             try {
                 $this->seedSpeakers();
             } catch (TeamspeakException $e) {
-                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
                 throw new DriverException($e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -208,17 +202,24 @@ class TeamspeakClient implements IClient
 
         if (is_null($user)) {
             try {
-                $response = $this->client->clientDbInfo($id);
+                $response = $this->sendCall('GET', '/{instance}/clientdbinfo', [
+                    'cldbid' => $id,
+                    'instance' => $this->instance_id,
+                ]);
 
-                if (! $this->client->succeeded($response))
-                    throw new CommandException($response['errors']);
+                $client_info = Arr::first($response);
 
-                $user = new TeamspeakSpeaker($response['data']);
-                $this->speakers->put($user->getClientId(), $user);
+                $speaker = new TeamspeakSpeaker([
+                    'client_database_id' => $client_info->client_database_id,
+                    'client_unique_identifier' => $client_info->client_unique_identifier,
+                    'client_nickname' => $client_info->client_nickname,
+                ]);
+
+                $this->speakers->put($speaker->getClientId(), $speaker);
             } catch (TeamspeakException $e) {
-                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
 
-                if (strpos($e->getMessage(), 'ErrorID: 512') !== false)
+                if ($e->getCode() == 512)
                     throw new InvalidDriverIdentityException(
                         sprintf('User ID %s is not found on Teamspeak Server.', $id),
                         $e->getCode(),
@@ -232,6 +233,53 @@ class TeamspeakClient implements IClient
     }
 
     /**
+     * @param string $nickname
+     * @return \Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakSpeaker
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
+     * @throws \Warlof\Seat\Connector\Exceptions\InvalidDriverIdentityException
+     */
+    public function findUserByName(string $nickname)
+    {
+        try {
+            $response = $this->sendCall('GET', '/{instance}/clientdbfind', [
+                'pattern' => $nickname,
+                'instance' => $this->instance_id,
+            ]);
+
+            $id = Arr::first($response)->cldbid;
+
+            $response = $this->sendCall('GET', '/{instance}/clientdbinfo', [
+                'cldbid' => $id,
+                'instance' => $this->instance_id,
+            ]);
+        } catch (TeamspeakException $e) {
+            if ($e->getCode() == 1281)
+                throw new InvalidDriverIdentityException(
+                    sprintf('Unable to find user %s', $nickname),
+                    $e->getCode(),
+                    $e);
+
+            if ($e->getCode() == 512)
+                throw new InvalidDriverIdentityException(
+                    sprintf('Unable to find user with Client ID %d', $id),
+                    $e->getCode(),
+                    $e);
+
+            throw $e;
+        }
+
+        $identity = Arr::first($response);
+
+        $speaker = new TeamspeakSpeaker([
+            'client_database_id'       => $identity->client_database_id,
+            'client_unique_identifier' => $identity->client_unique_identifier,
+            'client_nickname'          => $identity->client_nickname,
+        ]);
+
+        return $speaker;
+    }
+
+    /**
      * @param string $id
      * @return \Warlof\Seat\Connector\Drivers\ISet|null
      * @throws \Warlof\Seat\Connector\Exceptions\DriverException
@@ -242,7 +290,7 @@ class TeamspeakClient implements IClient
             try {
                 $this->seedServerGroups();
             } catch (TeamspeakException $e) {
-                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
                 throw new DriverException($e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -251,59 +299,178 @@ class TeamspeakClient implements IClient
     }
 
     /**
-     * @param string $command
-     * @param array $arguments
-     * @return mixed
+     * @param int $server_port
+     * @return int
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
      */
-    public function sendCall(string $command, array $arguments = [])
+    public function findInstanceIdByServerPort(int $server_port): int
     {
-        $this->connect();
-        $response = call_user_func_array([$this->client, $command], $arguments);
+        $response = $this->sendCall('GET', '/serverlist');
 
-        if (! $this->client->succeeded($response))
-            throw new CommandException($response['errors']);
+        $instances = collect($response);
 
-        return $response;
+        $instance = $instances->first(function ($instance) use ($server_port) {
+            return intval($instance->virtualserver_port) == $server_port;
+        });
+
+        if (! $instance)
+            throw new ServerException(sprintf('Unable to find a server instance listening on port %d.', $server_port));
+
+        return $instance->virtualserver_id;
     }
 
     /**
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
+     * @param \Warlof\Seat\Connector\Drivers\IUser $speaker
+     * @param \Warlof\Seat\Connector\Drivers\ISet $server_group
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
+     */
+    public function addSpeakerToServerGroup(IUser $speaker, ISet $server_group)
+    {
+        $this->sendCall('POST', '/{instance}/servergroupaddclient', [
+            'sgid'     => $server_group->getId(),
+            'cldbid'   => $speaker->getClientId(),
+            'instance' => $this->instance_id,
+        ]);
+    }
+
+    /**
+     * @param \Warlof\Seat\Connector\Drivers\IUser $speaker
+     * @param \Warlof\Seat\Connector\Drivers\ISet $server_group
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
+     */
+    public function removeSpeakerFromServerGroup(IUser $speaker, ISet $server_group)
+    {
+        $this->sendCall('POST', '/{instance}/servergroupdelclient', [
+            'sgid'     => $server_group->getId(),
+            'cldbid'   => $speaker->getClientId(),
+            'instance' => $this->instance_id,
+        ]);
+    }
+
+    /**
+     * @param \Warlof\Seat\Connector\Drivers\ISet $server_group
+     * @return IUser[]
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
+     */
+    public function getServerGroupMembers(ISet $server_group): array
+    {
+        $response = $this->sendCall('GET', '/{instance}/servergroupclientlist', [
+            'sgid'     => $server_group->getId(),
+            'instance' => $this->instance_id,
+        ]);
+
+        $speakers = [];
+
+        foreach ($response as $element) {
+            $speakers[] = $this->getUser($element->cldbid);
+        }
+
+        return $speakers;
+    }
+
+    /**
+     * @param \Warlof\Seat\Connector\Drivers\IUser $speaker
+     * @return ISet[]
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     */
+    public function getSpeakerServerGroups(IUser $speaker): array
+    {
+        $response = $this->sendCall('GET', '/{instance}/serverinfo', [
+            'instance' => $this->instance_id,
+        ]);
+
+        $server_info = Arr::first($response);
+
+        $response = $this->sendCall('GET', '/{instance}/servergroupsbyclientid', [
+            'cldbid' => $speaker->getClientId(),
+            'instance' => $this->instance_id,
+        ]);
+
+        $server_group = [];
+
+        foreach ($response as $element) {
+
+            // ignore default server group - since it's automatically assigned
+            if ($element->sgid == $server_info->virtualserver_default_server_group)
+                continue;
+
+            $server_group[] = new TeamspeakServerGroup([
+                'sgid' => $element->sgid,
+                'name' => $element->name,
+            ]);
+        }
+
+        return $server_group;
+    }
+
+    /**
+     * @param string $method
+     * @param string $endpoint
+     * @param array $arguments
+     * @return array
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
      */
-    private function connect()
+    private function sendCall(string $method, string $endpoint, array $arguments = []): array
     {
-        if ($this->isConnected())
-            return;
+        $uri = ltrim($endpoint, '/');
+        $method = strtoupper($method);
 
-        $this->client = new ts3admin($this->query_host, $this->query_port, 15);
+        foreach ($arguments as $uri_parameter => $value) {
+            if (strpos($uri, sprintf('{%s}', $uri_parameter)) === false)
+                continue;
 
-        $response = $this->client->connect();
-        if (! $this->client->succeeded($response))
-            throw new ConnexionException($response['errors']);
+            $uri = str_replace(sprintf('{%s}', $uri_parameter), $value, $uri);
 
-        $response = $this->client->login($this->query_username, $this->query_password);
-        if (! $this->client->succeeded($response))
-            throw new LoginException($response['errors']);
+            Arr::pull($arguments, $uri_parameter);
+        }
 
-        $response = $this->client->selectServer($this->server_port);
-        if (! $this->client->succeeded($response))
-            throw new ServerException($response['errors']);
-    }
+        try {
+            if ($method == 'GET') {
+                $response = $this->client->request($method, $uri, [
+                    'query' => $arguments,
+                ]);
+            } else {
+                $response = $this->client->request($method, $uri, [
+                    'body' => json_encode($arguments),
+                ]);
+            }
 
-    /**
-     * @return bool
-     */
-    private function isConnected(): bool
-    {
-        if (is_null($this->client))
-            return false;
+            logger()->debug(
+                sprintf('[seat-connector][teamspeak] [http %d, %s] %s -> /%s',
+                    $response->getStatusCode(), $response->getReasonPhrase(), $method, $uri),
+                $method == 'GET' ? [
+                    'response' => [
+                        'body' => $response->getBody()->getContents(),
+                    ],
+                ] : [
+                    'request' => [
+                        'body' => json_encode($arguments),
+                    ],
+                    'response' => [
+                        'body' => $response->getBody()->getContents(),
+                    ],
+                ],
+            );
+        } catch (ConnectException $e) {
+            throw new ConnexionException($e->getMessage(), $e->getCode(), $e);
+        } catch (RequestException $e) {
+            throw new ServerException($e->getMessage(), $e->getCode(), $e);
+        }
 
-        return $this->client->succeeded($this->client->connect());
+        $result = json_decode($response->getBody());
+
+        if ($result->status->code !== 0) {
+            if (in_array($result->status->code, [5122, 5124]))
+                throw new LoginException($result->status->message, $result->status->code);
+
+            throw new CommandException($result->status->message, $result->status->code);
+        }
+
+        return $result->body ?? [];
     }
 
     /**
@@ -314,34 +481,31 @@ class TeamspeakClient implements IClient
      */
     private function seedSpeakers()
     {
-        // ensure we have an open socket to the server
-        if (! $this->isConnected())
-            $this->connect();
-
         $from        = 0;
-        $total_users = 0;
 
         while (true) {
+            try {
+                $response = $this->sendCall('GET', '/{instance}/clientdblist', [
+                    'start' => $from,
+                    'instance' => $this->instance_id,
+                ]);
 
-            $speakers = $this->client->clientDbList($from, -1, $total_users == 0);
+                foreach ($response as $identity) {
+                    $speaker = new TeamspeakSpeaker([
+                        'cldbid' => $identity->cldbid,
+                        'client_unique_identifier' => $identity->client_unique_identifier,
+                        'client_nickname' => $identity->client_nickname,
+                    ]);
 
-            if (! $this->client->succeeded($speakers))
-                throw new CommandException($speakers['errors']);
+                    $this->speakers->put($speaker->getClientId(), $speaker);
+                    $from++;
+                }
+            } catch (TeamspeakException $e) {
+                if ($e->getCode() == 1281)
+                    break;
 
-            if (empty($speakers['data']))
-                break;
-
-            if ($total_users == 0 && array_key_exists('count', Arr::first($speakers['data'])))
-                $total_users = Arr::get(Arr::first($speakers['data']), 'count', 0);
-
-            foreach ($speakers['data'] as $speaker_attributes) {
-                $speaker = new TeamspeakSpeaker($speaker_attributes);
-                $this->speakers->put($speaker->getClientId(), $speaker);
-                $from++;
+                throw $e;
             }
-
-            if ($from >= $total_users)
-                break;
         }
     }
 
@@ -353,26 +517,31 @@ class TeamspeakClient implements IClient
      */
     private function seedServerGroups()
     {
-        // ensure we have an open socket to the server
-        if (! $this->isConnected())
-            $this->connect();
+        $response = $this->sendCall('GET', '/{instance}/serverinfo', [
+            'instance' => $this->instance_id,
+        ]);
 
-        $server_info = $this->client->serverInfo();
-        if (! $this->client->succeeded($server_info))
-            throw new CommandException($server_info['errors']);
+        $server_info = Arr::first($response);
 
-        // collect only normal server from the active instance
-        $server_groups = $this->client->serverGroupList(1);
-        if (! $this->client->succeeded($server_groups))
-            throw new ConnexionException($server_groups['errors']);
+        $response = $this->sendCall('GET', '/{instance}/servergrouplist', [
+            'instance' => $this->instance_id,
+        ]);
 
-        foreach ($server_groups['data'] as $group_attributes) {
+        foreach ($response as $group) {
 
-            // ignore default server group
-            if ($group_attributes['sgid'] == $server_info['data']['virtualserver_default_server_group'])
+            // ignore default server group - since it's automatically assigned
+            if ($group->sgid == $server_info->virtualserver_default_server_group)
                 continue;
 
-            $server_group = new TeamspeakServerGroup($group_attributes);
+            // groupDbType (0 = template, 1 = normal, 2 = query)
+            if ($group->type != '1')
+                continue;
+
+            $server_group = new TeamspeakServerGroup([
+                'sgid' => $group->sgid,
+                'name' => $group->name,
+            ]);
+
             $this->server_groups->put($server_group->getId(), $server_group);
         }
     }

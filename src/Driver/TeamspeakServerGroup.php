@@ -1,8 +1,9 @@
 <?php
-/**
+
+/*
  * This file is part of SeAT Teamspeak Connector.
  *
- * Copyright (C) 2019  Warlof Tutsimo <loic.leuilliot@gmail.com>
+ * Copyright (C) 2019, 2020  Warlof Tutsimo <loic.leuilliot@gmail.com>
  *
  * SeAT Teamspeak Connector  is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,26 +83,9 @@ class TeamspeakServerGroup implements ISet
     {
         if ($this->members->isEmpty()) {
             try {
-                $response = TeamspeakClient::getInstance()->sendCall('serverGroupClientList', [
-                    $this->id,
-                    true,
-                ]);
-
-                foreach ($response['data'] as $user_attributes) {
-                    if (! array_key_exists('cldbid', $user_attributes))
-                        continue;
-
-                    $member = TeamspeakClient::getInstance()->getUser($user_attributes['cldbid']);
-
-                    if (is_null($member)) {
-                        $member = new TeamspeakSpeaker($user_attributes);
-                        TeamspeakClient::getInstance()->addSpeaker($member);
-                    }
-
-                    $this->members->put($member->getClientId(), $member);
-                }
+                $this->members = collect(TeamspeakClient::getInstance()->getServerGroupMembers($this));
             } catch (TeamspeakException $e) {
-                logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+                logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
                 throw new DriverException($e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -119,12 +103,9 @@ class TeamspeakServerGroup implements ISet
             return;
 
         try {
-            TeamspeakClient::getInstance()->sendCall('serverGroupAddClient', [
-                $this->id,
-                $user->getClientId(),
-            ]);
+            TeamspeakClient::getInstance()->addSpeakerToServerGroup($user, $this);
         } catch (TeamspeakException $e) {
-            logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+            logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
             throw new DriverException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -141,12 +122,9 @@ class TeamspeakServerGroup implements ISet
             return;
 
         try {
-            TeamspeakClient::getInstance()->sendCall('serverGroupDeleteClient', [
-                $this->id,
-                $user->getClientId(),
-            ]);
+            TeamspeakClient::getInstance()->removeSpeakerFromServerGroup($user, $this);
         } catch (TeamspeakException $e) {
-            logger()->error(sprintf('[seat-connector][teamspeak] %s', $e->getMessage()));
+            logger()->error(sprintf('[seat-connector][teamspeak] %d : %s', $e->getCode(), $e->getMessage()));
             throw new DriverException($e->getMessage(), $e->getCode(), $e);
         }
 
