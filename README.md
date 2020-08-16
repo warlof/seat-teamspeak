@@ -22,26 +22,19 @@ php artisan up
 And now, when you log into `SeAT`, you should see a `Connector` category in the sidebar.
 
 Access your Teamspeak server and find the `query_ip_whitelist.txt` file.
-Add the IP address of your Seat install server to the list to avoid ServerQuery flood bans when running jobs.
+Add the IP address of your Seat install server to the list to avoid flood bans when running jobs.
 Don't forget to add an empty line at the end of the `query_ip_whitelist.txt`.
 
 Click on `Connector` and then click on `Settings`.
 
 Change the Configuration to meet your Teamspeak server's settings into `Teamspeak` block.
-The Query port is `10011` by default.
+~~The Query port is `10011` by default.~~
 
-Setting the ServerQuery username/password is beyond the scope of this documentation and can be found on
-[official teamspeak website](https://www.teamspeak3.com/support/teamspeak-3-add-server-query-user.php).
+**CAUTION**
 
-**ATTENTION**
-> In case you're not using `serveradmin` as Query User, ensure used Query User
-> is not tied to any of your own Identities.
-> 
-> Created Query User **MUST** have permissions listed bellow :
-> - `i_group_member_add_power` : 75
-> - `i_group_member_remove_power` : 75
-> - `b_virtualserver_servergroup_client_list` : checked
-> - `i_client_serverquery_view_power` : 75
+With version 5, this driver switched from old server query system to new API backend. You'll have to update settings and fill base URI and API Key.
+If using docker container, you can enable the new API backend by adding `http` to the `TS3SERVER_QUERY_PROTOCOLS` environment variable.
+An API KEY is generated at first start, however, if you need to generate one, you can do this by following this topic https://community.teamspeak.com/t/what-is-apikey-for/6156/2
 
 In the driver dropdown list, select `Teamspeak` and click on `Update Sets` button which will queue a job to pull all of your currently defined server groups.
 
