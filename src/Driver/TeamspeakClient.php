@@ -202,6 +202,7 @@ class TeamspeakClient implements IClient
 
         if (is_null($user)) {
             try {
+                // scope: manage_scope
                 $response = $this->sendCall('GET', '/{instance}/clientdbinfo', [
                     'cldbid' => $id,
                     'instance' => $this->instance_id,
@@ -241,6 +242,7 @@ class TeamspeakClient implements IClient
     public function findUserByName(string $nickname)
     {
         try {
+            // scope: manage_scope
             $response = $this->sendCall('GET', '/{instance}/clientdbfind', [
                 'pattern' => $nickname,
                 'instance' => $this->instance_id,
@@ -248,6 +250,7 @@ class TeamspeakClient implements IClient
 
             $id = Arr::first($response)->cldbid;
 
+            // scope: manage_scope
             $response = $this->sendCall('GET', '/{instance}/clientdbinfo', [
                 'cldbid' => $id,
                 'instance' => $this->instance_id,
@@ -307,6 +310,7 @@ class TeamspeakClient implements IClient
      */
     public function findInstanceIdByServerPort(int $server_port): int
     {
+        // scope: manage_scope
         $response = $this->sendCall('GET', '/serverlist');
 
         $instances = collect($response);
@@ -328,6 +332,7 @@ class TeamspeakClient implements IClient
      */
     public function addSpeakerToServerGroup(IUser $speaker, ISet $server_group)
     {
+        // scope: manage_scope
         $this->sendCall('POST', '/{instance}/servergroupaddclient', [
             'sgid'     => $server_group->getId(),
             'cldbid'   => $speaker->getClientId(),
@@ -342,6 +347,7 @@ class TeamspeakClient implements IClient
      */
     public function removeSpeakerFromServerGroup(IUser $speaker, ISet $server_group)
     {
+        // scope: manage_scope
         $this->sendCall('POST', '/{instance}/servergroupdelclient', [
             'sgid'     => $server_group->getId(),
             'cldbid'   => $speaker->getClientId(),
@@ -357,6 +363,7 @@ class TeamspeakClient implements IClient
      */
     public function getServerGroupMembers(ISet $server_group): array
     {
+        // scope: manage_scope
         $response = $this->sendCall('GET', '/{instance}/servergroupclientlist', [
             'sgid'     => $server_group->getId(),
             'instance' => $this->instance_id,
@@ -378,12 +385,14 @@ class TeamspeakClient implements IClient
      */
     public function getSpeakerServerGroups(IUser $speaker): array
     {
+        // scope: manage_scope
         $response = $this->sendCall('GET', '/{instance}/serverinfo', [
             'instance' => $this->instance_id,
         ]);
 
         $server_info = Arr::first($response);
 
+        // scope: manage_scope
         $response = $this->sendCall('GET', '/{instance}/servergroupsbyclientid', [
             'cldbid' => $speaker->getClientId(),
             'instance' => $this->instance_id,
@@ -485,6 +494,7 @@ class TeamspeakClient implements IClient
 
         while (true) {
             try {
+                // scope: manage_scope
                 $response = $this->sendCall('GET', '/{instance}/clientdblist', [
                     'start' => $from,
                     'instance' => $this->instance_id,
@@ -517,12 +527,14 @@ class TeamspeakClient implements IClient
      */
     private function seedServerGroups()
     {
+        // scope: manage_scope
         $response = $this->sendCall('GET', '/{instance}/serverinfo', [
             'instance' => $this->instance_id,
         ]);
 
         $server_info = Arr::first($response);
 
+        // scope: manage_scope
         $response = $this->sendCall('GET', '/{instance}/servergrouplist', [
             'instance' => $this->instance_id,
         ]);
