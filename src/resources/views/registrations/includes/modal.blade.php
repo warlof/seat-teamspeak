@@ -29,16 +29,16 @@
           </div>
           @endif
           <div class="form-group">
-            <label class="col-sm-3 control-label" for="ts-nickname">Nickname</label>
+            <label class="col-sm-3 control-label" for="ts-nickname">Privilege Key</label>
             <div class="col-sm-9">
-              <input type="text" value="{{ $registration_nickname }}" readonly="readonly" id="ts-nickname" class="form-control input-sm" />
+              <input type="text" value="{{ $registration_token }}" readonly="readonly" id="ts-nickname" class="form-control input-sm" />
             </div>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline-secondary pull-left" type="button" data-dismiss="modal">Close</button>
-        <a href="{{ sprintf('ts3server://%s:%d?nickname=%s', $settings->server_host, $settings->server_port, $registration_nickname) }}" class="btn btn-primary">
+        <a href="{{ sprintf('ts3server://%s:%d?nickname=%s&token=%s', $settings->server_host, $settings->server_port, auth()->user()->name, $registration_token) }}" class="btn btn-primary">
           <i class="fas fa-sign-in-alt"></i> Join
         </a>
         <button class="btn btn-success" type="submit" form="ts-registration-form">

@@ -24,11 +24,13 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Arr;
 use Seat\Services\Exceptions\SettingException;
+use Seat\Web\Models\User;
 use Warlof\Seat\Connector\Drivers\IClient;
 use Warlof\Seat\Connector\Drivers\ISet;
 use Warlof\Seat\Connector\Drivers\IUser;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException;
+use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\EmptyResultException;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
@@ -143,6 +145,18 @@ class TeamspeakClient implements IClient
         }
 
         return self::$instance;
+    }
+
+    /**
+     * @param int $instance_id
+     *
+     * @return $this
+     */
+    public function setInstance(int $instance_id): self
+    {
+        $this->instance_id = $instance_id;
+
+        return $this;
     }
 
     /**
@@ -283,6 +297,78 @@ class TeamspeakClient implements IClient
     }
 
     /**
+     * @param \Seat\Web\Models\User $user
+     *
+     * @return \Warlof\Seat\Connector\Drivers\IUser[]
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
+     * @throws \Warlof\Seat\Connector\Exceptions\InvalidDriverIdentityException
+     */
+    public function customSearch(User $user): array
+    {
+        try {
+            $response = $this->sendCall('POST', '/{instance_id}/customsearch', [
+                'ident' => 'seat_user_id',
+                'pattern' => $user->getAuthIdentifier(),
+                'instance_id' => $this->instance_id,
+            ]);
+        } catch (EmptyResultException $e) {
+            logger()->debug('Teamspeak return empty results', [
+                'command' => 'customsearch',
+                'ident' => 'seat_user_id',
+                'pattern' => $user->getAuthIdentifier(),
+                'instance_id' => $this->instance_id,
+            ]);
+
+            return [];
+        }
+
+        $speakers = [];
+
+        foreach ($response as $speaker) {
+            $speakers[] = $this->getUser($speaker->cldbid);
+        }
+
+        return $speakers;
+    }
+
+    /**
+     * @param string $uid
+     *
+     * @return int[]
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
+     * @throws \Warlof\Seat\Connector\Exceptions\InvalidDriverIdentityException
+     */
+    public function clientGetIds(string $uid): array
+    {
+        try {
+            $response = $this->sendCall('GET', '/{instance}/clientgetids', [
+                'cluid' => $uid,
+                'instance' => $this->instance_id,
+            ]);
+        } catch (EmptyResultException $e) {
+            logger()->debug('Teamspeak return empty results', [
+                'command' => 'clientgetids',
+                'cluid' => $uid,
+                'instance_id' => $this->instance_id,
+            ]);
+
+            return [];
+        }
+
+        $speakers = [];
+
+        foreach ($response as $speaker) {
+            $speakers[] = $speaker->clid;
+        }
+
+        return $speakers;
+    }
+
+    /**
      * @param string $id
      * @return \Warlof\Seat\Connector\Drivers\ISet|null
      * @throws \Warlof\Seat\Connector\Exceptions\DriverException
@@ -385,12 +471,7 @@ class TeamspeakClient implements IClient
      */
     public function getSpeakerServerGroups(IUser $speaker): array
     {
-        // scope: manage_scope
-        $response = $this->sendCall('GET', '/{instance}/serverinfo', [
-            'instance' => $this->instance_id,
-        ]);
-
-        $server_info = Arr::first($response);
+        $server_info = $server_info = $this->serverInfo();
 
         // scope: manage_scope
         $response = $this->sendCall('GET', '/{instance}/servergroupsbyclientid', [
@@ -413,6 +494,74 @@ class TeamspeakClient implements IClient
         }
 
         return $server_group;
+    }
+
+    /**
+     * @param int[] $clients
+     *
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
+     */
+    public function kickClientFromServerInstance(array $clients)
+    {
+        $this->sendCall('POST', '/{instance}/clientkick', [
+            'clid' => $clients,
+            'reasonid' => 5,
+            'reasonmsg' => 'Duplicate account is not allowed !',
+            'instance' => $this->instance_id,
+        ]);
+    }
+
+    /**
+     * @param \Warlof\Seat\Connector\Drivers\IUser $speaker
+     *
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
+     */
+    public function deleteClientFromServerInstance(IUser $speaker)
+    {
+        $this->sendCall('POST', '/{instance}/clientdbdelete', [
+            'cldbid' => $speaker->getClientId(),
+            'instance' => $this->instance_id,
+        ]);
+    }
+
+    /**
+     * @param \Seat\Web\Models\User $user
+     * @param int $server_group
+     *
+     * @return string
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
+     */
+    public function tokenAdd(User $user, int $server_group): string
+    {
+        // scope: manage_scope
+        $response = $this->sendCall('POST', '/{instance}/tokenadd', [
+            'tokentype' => 0,
+            'tokenid1' => $server_group,
+            'tokenid2' => 0,
+            'tokendescription' => sprintf('Automatically created token from SeAT for %s', $user->name),
+            'tokencustomset' => sprintf('ident=seat_user_id value=%d', $user->id),
+            'instance' => $this->instance_id,
+        ]);
+
+        return Arr::first($response)->token;
+    }
+
+    /**
+     * @return mixed
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
+     */
+    private function serverInfo()
+    {
+        // scope: manage_scope
+        $response = $this->sendCall('GET', '/{instance}/serverinfo', [
+            'instance' => $this->instance_id,
+        ]);
+
+        return Arr::first($response);
     }
 
     /**
@@ -462,7 +611,7 @@ class TeamspeakClient implements IClient
                     'response' => [
                         'body' => $response->getBody()->getContents(),
                     ],
-                ],
+                ]
             );
         } catch (ConnectException $e) {
             throw new ConnexionException($e->getMessage(), $e->getCode(), $e);
@@ -475,6 +624,9 @@ class TeamspeakClient implements IClient
         if ($result->status->code !== 0) {
             if (in_array($result->status->code, [5122, 5124]))
                 throw new LoginException($result->status->message, $result->status->code);
+
+            if ($result->status->code == 1281)
+                throw new EmptyResultException($result->status->message, $result->status->code);
 
             throw new CommandException($result->status->message, $result->status->code);
         }
@@ -490,7 +642,7 @@ class TeamspeakClient implements IClient
      */
     private function seedSpeakers()
     {
-        $from        = 0;
+        $from = 0;
 
         while (true) {
             try {
@@ -527,12 +679,7 @@ class TeamspeakClient implements IClient
      */
     private function seedServerGroups()
     {
-        // scope: manage_scope
-        $response = $this->sendCall('GET', '/{instance}/serverinfo', [
-            'instance' => $this->instance_id,
-        ]);
-
-        $server_info = Arr::first($response);
+        $server_info = $this->serverInfo();
 
         // scope: manage_scope
         $response = $this->sendCall('GET', '/{instance}/servergrouplist', [
