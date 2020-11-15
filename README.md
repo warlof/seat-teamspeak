@@ -53,7 +53,7 @@ Once this configuration has been done, we will generate an API Key which will be
 To do so, authenticate on the teamspeak server using `serveradmin` account with a tool of your choice (ie: [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) or [YaTQA](https://yat.qa))
 
 1. Authenticate against server using `login serveradmin ${serveradminpassword}`
-2. Generate new API Key for SeAT using `apikeyadd scope=manage_scope lifetime=0`
+2. Generate new API Key for SeAT using `apikeyadd scope=manage lifetime=0`
 
 The server should answer with something similar
 ```
@@ -106,15 +106,15 @@ In order to grant access to `Identities` section, you must add permission `seat-
 
 You'll find below a list of required permissions and used query patterns
 
-| Query                                | Server Permission                         | Api Scope      |
-| ------------------------------------ | ----------------------------------------- | -------------- |
-| `/serverlist`                        | `b_serverinstance_virtualserver_list`     | `manage_scope` |
-| `/{instance}/clientdbfind`           | `b_virtualserver_client_dbsearch`         | `manage_scope` |
-| `/{instance}/clientdbinfo`           | `b_virtualserver_client_dbinfo`           | `manage_scope` |
-| `/{instance}/clientdblist`           | `b_virtualserver_client_dblist`           | `manage_scope` |
-| `/{instance}/servergroupaddclient`   | `i_group_member_add_power`                | `manage_scope` |
-| `/{instance}/servergroupsbyclientid` |                                           | `manage_scope` |
-| `/{instance}/servergroupclientlist`  | `b_virtualserver_servergroup_client_list` | `manage_scope` |
-| `/{instance}/servergroupdelclient`   | `i_group_member_remove_power`             | `manage_scope` |
-| `/{instance}/servergrouplist`        | `b_virtualserver_servergroup_list`        | `manage_scope` |
-| `/{instance}/serverinfo`             | `b_serverinstance_help_view`              | `manage_scope` |
+| Query                                | Server Permission                         | Api Scope   |
+| ------------------------------------ | ----------------------------------------- | ----------- |
+| `/serverlist`                        | `b_serverinstance_virtualserver_list`     | `manage`    |
+| `/{instance}/clientdbfind`           | `b_virtualserver_client_dbsearch`         | `manage`    |
+| `/{instance}/clientdbinfo`           | `b_virtualserver_client_dbinfo`           | `manage`    |
+| `/{instance}/clientdblist`           | `b_virtualserver_client_dblist`           | `manage`    |
+| `/{instance}/servergroupaddclient`   | `i_group_member_add_power`                | `manage`    |
+| `/{instance}/servergroupsbyclientid` |                                           | `manage`    |
+| `/{instance}/servergroupclientlist`  | `b_virtualserver_servergroup_client_list` | `manage`    |
+| `/{instance}/servergroupdelclient`   | `i_group_member_remove_power`             | `manage`    |
+| `/{instance}/servergrouplist`        | `b_virtualserver_servergroup_list`        | `manage`    |
+| `/{instance}/serverinfo`             | `b_serverinstance_help_view`              | `manage`    |
