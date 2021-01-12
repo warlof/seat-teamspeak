@@ -10,8 +10,9 @@
         </button>
       </div>
       <div class="modal-body">
-        <p>Please join the teamspeak server with the information displayed bellow.<br/>
-          Once you'll be on the server with proper nickname, click on the <code>Confirm</code> button.</p>
+        <p>Please join the teamspeak server with the information displayed below.<br/>
+          After connecting to the server, please click the <code>Confirm</code> button. You may then rename yourself to your desired nickname.<br/>
+          Finally, please bookmark and reconnect to the server. Use this bookmark to connect to the server in the future.</p>
         <form method="post" id="ts-registration-form" class="form-horizontal">
           {{ csrf_field() }}
           <div class="form-group">
