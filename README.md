@@ -6,6 +6,11 @@ This plugin write for [SeAT](https://github.com/eveseat/seat) is providing to yo
 [![Maintainability](https://api.codeclimate.com/v1/badges/b7d8d113d57ba075b975/maintainability)](https://codeclimate.com/github/warlof/seat-teamspeak/maintainability)
 [![License](https://poser.pugx.org/warlof/seat-teamspeak/license)](https://packagist.org/packages/warlof/seat-teamspeak)
 
+## Requirements
+
+- In order this driver works with Teamspeak, the target Teamspeak Server must be 3.12.x or newer. Be sure you're running [latest version](https://www.teamspeak.com/en/downloads/#server)
+- REST Api must be enabled on the Teamspeak Server (either http or https query protocole) - [see instructions bellow](#teamspeak-server-configuration)
+
 ## Installation
 
 ### Package deployment
