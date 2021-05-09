@@ -42,6 +42,9 @@ class SettingsController extends Controller
             'server_port'    => 'required|numeric|min:1|max:65535',
             'api_base_uri'   => 'required|url',
             'api_key'        => 'required|string',
+            # TODO: Is there a way to make this default to 0?
+            # TODO: Max value is arbitrary and probably unnecessary. Keep it anyway?
+            'instance_id'    => 'optional|numeric|min:0|max:65535',
         ]);
 
         $old_settings = setting('seat-connector.drivers.teamspeak', true) ?? null;
@@ -51,17 +54,21 @@ class SettingsController extends Controller
             'server_port'  => (int) $request->input('server_port'),
             'api_base_uri' => $request->input('api_base_uri'),
             'api_key'      => $request->input('api_key'),
+            'instance_id'  => (int) $request->input('instance_id'),
         ];
 
-        try {
-            setting(['seat-connector.drivers.teamspeak', (object) $settings], true);
+        # TODO: Perform a check on the API anyway and throw an error if the instance ID is wrong?
+        if($settings['instance_id'] == 0) {
+            try {
+                setting(['seat-connector.drivers.teamspeak', (object) $settings], true);
 
-            $settings['instance_id'] = $this->findServerInstance($settings);
-        } catch (TeamspeakException $e) {
-            setting(['seat-connector.drivers.teamspeak', $old_settings], true);
+                $settings['instance_id'] = $this->findServerInstance($settings);
+            } catch (TeamspeakException $e) {
+                setting(['seat-connector.drivers.teamspeak', $old_settings], true);
 
-            return redirect()->back()
-                ->with('error', $e->getMessage());
+                return redirect()->back()
+                    ->with('error', $e->getMessage());
+            }
         }
 
         setting(['seat-connector.drivers.teamspeak', (object) $settings], true);
