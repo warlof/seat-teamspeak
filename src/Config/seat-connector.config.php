@@ -43,5 +43,10 @@ return [
             'label' => 'seat-connector-teamspeak::seat.api_key',
             'type'  => 'text',
         ],
+        [
+            'name'  => 'registration_group_name',
+            'label' => 'seat-connector-teamspeak::seat.registration_group',
+            'type'  => 'text',
+        ],
     ],
 ];

@@ -20,10 +20,12 @@
 
 namespace Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Seat\Web\Http\Controllers\Controller;
+use Warlof\Seat\Connector\Drivers\ISet;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient;
+use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\InvalidServerGroupException;
 use Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException;
+use Warlof\Seat\Connector\Drivers\Teamspeak\Http\Validation\Settings;
 
 /**
  * Class SettingsController.
@@ -35,31 +37,20 @@ class SettingsController extends Controller
     /**
      * @param \Illuminate\Support\Facades\Request $request
      */
-    public function store(Request $request)
+    public function store(Settings $request)
     {
-        $request->validate([
-            'server_host'    => 'required|string',
-            'server_port'    => 'required|numeric|min:1|max:65535',
-            'api_base_uri'   => 'required|url',
-            'api_key'        => 'required|string',
-        ]);
-
-        $old_settings = setting('seat-connector.drivers.teamspeak', true) ?? null;
-
         $settings = [
-            'server_host'  => $request->input('server_host'),
-            'server_port'  => (int) $request->input('server_port'),
-            'api_base_uri' => $request->input('api_base_uri'),
-            'api_key'      => $request->input('api_key'),
+            'server_host'             => $request->input('server_host'),
+            'server_port'             => (int) $request->input('server_port'),
+            'api_base_uri'            => $request->input('api_base_uri'),
+            'api_key'                 => $request->input('api_key'),
+            'registration_group_id'   => 0,
+            'registration_group_name' => $request->input('registration_group_name'),
         ];
 
         try {
-            setting(['seat-connector.drivers.teamspeak', (object) $settings], true);
-
-            $settings['instance_id'] = $this->findServerInstance($settings);
+            $settings = $this->verify($settings);
         } catch (TeamspeakException $e) {
-            setting(['seat-connector.drivers.teamspeak', $old_settings], true);
-
             return redirect()->back()
                 ->with('error', $e->getMessage());
         }
@@ -71,16 +62,36 @@ class SettingsController extends Controller
     }
 
     /**
+     * Verify provided settings and return updated settings in case of success.
+     *
      * @param array $settings
-     * @return int
-     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
+     *
+     * @return array
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
+     * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\InvalidServerGroupException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
+     * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
-    private function findServerInstance(array $settings): int
+    private function verify(array $settings)
     {
         $client = new TeamspeakClient($settings);
 
-        return $client->findInstanceIdByServerPort($settings['server_port']);
+        $settings['instance_id'] = $client->findInstanceIdByServerPort($settings['server_port']);
+
+        // attempt to retrieve server group ID matching with provided name
+        $group = collect($client->setInstance($settings['instance_id'])->getSets())
+            ->first(function (ISet $server_group) use ($settings) {
+                return $server_group->getName() == $settings['registration_group_name'];
+            });
+
+        if (is_null($group))
+            throw new InvalidServerGroupException($settings['registration_group_name']);
+
+        // update setting container with registration group ID
+        $settings['registration_group_id']   = $group->getId();
+        $settings['registration_group_name'] = $group->getName();
+
+        return $settings;
     }
 }

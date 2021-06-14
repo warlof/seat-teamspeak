@@ -1,8 +1,8 @@
 <?php
-/**
+/*
  * This file is part of SeAT Teamspeak Connector.
  *
- * Copyright (C) 2019  Warlof Tutsimo <loic.leuilliot@gmail.com>
+ * Copyright (C) 2020  Warlof Tutsimo <loic.leuilliot@gmail.com>
  *
  * SeAT Teamspeak Connector  is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-return [
-    'server_host'        => 'Server Address',
-    'server_port'        => 'Server Port',
-    'api_base_uri'       => 'Api Base Uri',
-    'api_key'            => 'Api Key',
-    'registration_group' => 'Registration Server Group',
-];
+namespace Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions;
+
+use Throwable;
+
+/**
+ * Class InvalidServerGroupException.
+ *
+ * @package Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions
+ */
+class InvalidServerGroupException extends TeamspeakException
+{
+    /**
+     * InvalidServerGroupException constructor.
+     *
+     * @param string $server_group
+     */
+    public function __construct(string $server_group)
+    {
+        parent::__construct(sprintf('Server Group %s is not found.', $server_group));
+    }
+}
